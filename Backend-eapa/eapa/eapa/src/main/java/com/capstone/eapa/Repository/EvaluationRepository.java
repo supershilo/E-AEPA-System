@@ -13,9 +13,17 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query(value = "SELECT * FROM tblevaluation eval WHERE eval.is_deleted = 0", nativeQuery = true)
     List<EvaluationEntity> findAllEvals();
 
+    //return peer id using eval id
+    @Query("SELECT e.peer.userID FROM EvaluationEntity e WHERE e.evalID = :evalID AND e.isDeleted = 0")
+    Integer findPeerIDByEvalID(@Param("evalID") int evalID);
+
     //Query to get evaluation id
     @Query(value = "SELECT evalID FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
     Integer findEvalIDByUserIDAndPeriodAndStageAndEvalType(int userID, String period, String stage, String evalType);
+
+    //Query to get evaluation id for assigned peer
+    @Query(value = "SELECT evalID FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(peer_id) = :peerID AND TRIM(is_deleted) = 0", nativeQuery = true)
+    Integer findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(int userID, String period, String stage, String evalType, int peerID);
 
     //Query evaluation id for HEAD
     @Query(value = "SELECT evalID FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(peer_id) = :empID  AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
@@ -30,9 +38,6 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query(value = "SELECT status FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(peer_id) = :empID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
     String findStatusByUserIDEmpIDPeriodStageAndEvalType(int userID, int empID, String period, String stage, String evalType);
 
-
-     @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID")
-    List<EvaluationEntity> findByUserID(@Param("userID") int userID);
 
     //total employees for recommendation
     @Query("SELECT COUNT(e) FROM EvaluationEntity e WHERE e.period = '5th Month' AND e.status = 'COMPLETED'")
@@ -208,5 +213,14 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
             ")")
     List<Long> getCompletedAnnualEvaluation();
 
+
+     @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID")
+    List<EvaluationEntity> findByUserID(@Param("userID") int userID);
+
+    @Query(value = "SELECT * FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(peer_id) = :empID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
+    EvaluationEntity findEvalByUserIdPeriodStageHead(@Param("userID") int userID, @Param("empID") int empID, @Param("period") String period, @Param("stage") String stage, @Param("evalType") String evalType);
+
+    @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID AND e.peer.userID = :peerID AND e.period = :period AND e.evalType = :evalType AND e.isDeleted = 0")
+    List<EvaluationEntity> findByUserIDAndPeerIDAndPeriodAndEvalType(int userID, int peerID, String period, String evalType);
 
 }

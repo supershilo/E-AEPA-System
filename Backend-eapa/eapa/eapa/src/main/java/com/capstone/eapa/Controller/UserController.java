@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userServ;
@@ -139,6 +139,22 @@ public class UserController {
         }
     }
 
+    
+    //random assigned peers
+    @GetMapping("/getAssignedEvaluators")
+    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
         //total probationary employees
     @GetMapping("/countProbationaryUsers")
     public ResponseEntity<Long> countProbationaryUsers() {
@@ -191,4 +207,13 @@ public class UserController {
     // }
 
 
+
+
+
+    @GetMapping("/getHeadUserIdByDept")
+    public ResponseEntity<Integer> getHeadUserIdByDept(@RequestParam String dept) {
+        Integer userId = userServ.getHeadUserIdByDept(dept);
+        return ResponseEntity.ok(userId);
+    }
+}
 

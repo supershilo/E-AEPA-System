@@ -9,11 +9,12 @@ import EvaluationTypeTab from "./EvaluationTypeTab";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import zIndex from "@mui/material/styles/zIndex";
 
 function EvaluationCard({
   id,
   period,
+  dateHired,
+  evalDate,
   loggedUser,
   handleOpenForm,
   handleEvalTypeChange,
@@ -28,6 +29,18 @@ function EvaluationCard({
 }) {
   const [takeEval, setTakeEval] = useState(false);
   const [shouldDisplay, setShouldDisplay] = useState(true);
+
+  // //eval start date
+  // const evaluationStartDate = new Date(dateHired);
+  // evaluationStartDate.setMonth(evaluationStartDate.getMonth() + 2);
+
+  // //current date
+  // // Get the current date
+  // const today = new Date();
+  // const options = { year: "numeric", month: "long", day: "numeric" };
+
+  // // Format the date
+  // const formattedDate = today.toLocaleDateString("en-US", options);
 
   const handleReturn = () => {
     setTakeEval(!takeEval);
@@ -140,7 +153,7 @@ function EvaluationCard({
               }}
             >
               <p>Date:</p>
-              <p>September 11, 2024</p>
+              {evalDate}
             </div>
           </>
         )}
@@ -157,7 +170,7 @@ function EvaluationCard({
               }}
             >
               <p style={{ width: "20%" }}>Date:</p>
-              <p>February 11, 2024</p>
+              <p>{evalDate}</p>
             </div>
             <div
               style={{
@@ -209,8 +222,7 @@ function EvaluationCard({
           {/**Evaluation description */}
           <div style={{ width: "82%" }}>
             <p>
-              As of February 11, 2024, the employee has completed his{" "}
-              {period + " "}
+              As of {evalDate}, the employee has completed his {period + " "}
               probationary period. During this e-AEPA, the employee will undergo
               evaluations by their Immediate Head, Self Evaluation, and Peer
               Evaluation.
@@ -295,6 +307,14 @@ function EvaluationCard({
           setShouldDisplay={setShouldDisplay}
         />
       )}
+
+      {/* <EvaluationTypeTab
+        period={period}
+        evalType={evalType}
+        handleOpenForm={handleOpenForm}
+        handleOpenModal={handleOpenModal}
+        setShouldDisplay={setShouldDisplay}
+      /> */}
 
       {/**Confirmation Modal */}
       <Modal

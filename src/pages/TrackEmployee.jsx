@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
-import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, Hidden } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
-import ViewRatingsPage from "./ViewRatingsPage"; 
-import Fade from '@mui/material/Fade';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
-
+import { apiUrl } from '../config/config';
+import CheckIcon from '@mui/icons-material/Check';
 
 function TrackEmployee({isConfirmed}) {
   const userID = sessionStorage.getItem("userID");
@@ -19,11 +18,11 @@ function TrackEmployee({isConfirmed}) {
   const [loggedUserData, setLoggedUserData] = useState({});
   const [showPasswordModal, setShowPasswordModal] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // Adjust this based on your needs
+  const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState('');
-
-
+  const [empStatusFilter, setEmpStatusFilter] = useState('');
+  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
@@ -52,7 +51,7 @@ function TrackEmployee({isConfirmed}) {
 
   const fetchData = async () => {
     try {
-      const userResponse = await fetch(`http://localhost:8080/user/getUser/${userID}`);
+      const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
       if (!userResponse.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -60,7 +59,7 @@ function TrackEmployee({isConfirmed}) {
       setLoggedUserData(userData);
       
 
-      const allUsersResponse = await fetch("http://localhost:8080/evaluation/evaluations");
+      const allUsersResponse = await fetch(`${apiUrl}evaluation/evaluations`);
       if (!allUsersResponse.ok) {
         throw new Error("Failed to fetch all users data");
       }
@@ -72,8 +71,16 @@ function TrackEmployee({isConfirmed}) {
           ...item,
           name: `${item.fName} ${item.lName}`,
           userID: item.userID,
-          
-        }));
+        }))
+        .filter((item) => {
+          if (empStatusFilter === '') {
+            return true;
+          }
+          if (empStatusFilter === 'Regular' && item.empStatus === '') {
+            return true;
+          }
+          return item.empStatus === empStatusFilter;
+        });
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
         Object.values(item).some(
@@ -94,7 +101,7 @@ function TrackEmployee({isConfirmed}) {
 
   useEffect(() => {
     fetchData();
-  }, [userID, updateFetch, searchTerm]);
+  }, [userID, updateFetch, searchTerm, empStatusFilter]);
 
   useEffect(() => {
     if (!showPasswordModal) {
@@ -104,7 +111,7 @@ function TrackEmployee({isConfirmed}) {
 
   const handleViewResultClick = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:8080/user/getUser/${userId}`);
+      const response = await fetch(`${apiUrl}user/getUser/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -118,6 +125,17 @@ function TrackEmployee({isConfirmed}) {
 
 
   
+  const handleFilterClick = (event) => {
+    setFilterAnchorEl(event.currentTarget);
+  };
+  const handleCloseFilter = () => {
+    setFilterAnchorEl(null);
+  };
+
+  const handleMenuClick = (value) => {
+    setEmpStatusFilter(value);
+    handleCloseFilter();
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -133,7 +151,7 @@ function TrackEmployee({isConfirmed}) {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 100,
+      minWidth: 90,
     },
     {
       id: "name",
@@ -142,19 +160,62 @@ function TrackEmployee({isConfirmed}) {
       align: "center",
       format: (value) => formatName(value),
     },
-
-    {
-      id: "position",
-      label: "Position",
-      minWidth: 150,
-      align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
-    },
-    
     {
       id: "empStatus",
-      label: "Employee Status",
-      minWidth: 150,
+      label: (
+        <div style={{ display: 'flex', alignItems: 'center', }}>
+          <span>Employee Status</span>
+          <IconButton
+            onClick={handleFilterClick}
+            sx={{ color: 'white', width: '1.3em', height: '1.3em', ml: '.6vh' }}
+          >
+            <FilterAltIcon fontSize="medium" />
+          </IconButton>
+          <Menu
+            anchorEl={filterAnchorEl}
+            open={Boolean(filterAnchorEl)}
+            onClose={handleCloseFilter}
+            PaperProps={{
+              sx: {
+                '& .MuiMenuItem-root': {
+                  fontSize: '.7em',
+                  fontFamily: 'Poppins',
+                },
+              },
+            }}
+          >
+            <MenuItem
+            dense
+              onClick={() => handleMenuClick('')}
+              selected={empStatusFilter === ''}
+              sx={{ fontFamily: 'Poppins' }}
+            >
+              <ListItemIcon>{empStatusFilter === '' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText  primary="All" style={{ fontFamily: 'Poppins',fontSize:'.5em',  }} />
+            </MenuItem>
+            <MenuItem
+            dense
+              onClick={() => handleMenuClick('Regular')}
+              selected={empStatusFilter === 'Regular'}
+              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+            >
+              <ListItemIcon>{empStatusFilter === 'Regular' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText primary="Regular" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+            </MenuItem>
+            <MenuItem
+            dense
+              onClick={() => handleMenuClick('Probationary')}
+              selected={empStatusFilter === 'Probationary'}
+              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+            >
+              <ListItemIcon>{empStatusFilter === 'Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText primary="Probationary" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+            </MenuItem>
+          </Menu>
+
+        </div>
+      ),
+      minWidth: 180.3,
       align: "center",
       format: (value) => {
         const color = value === "Probationary" ? "red" : value === "Regular" ? "green" : "black";
@@ -168,8 +229,8 @@ function TrackEmployee({isConfirmed}) {
 
     {
       id: "sjbpStatus",
-      label: "S-JBPA Status",
-      minWidth: 150,
+      label: "S-JBPA",
+      minWidth: 120,
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
@@ -184,8 +245,8 @@ function TrackEmployee({isConfirmed}) {
 
     {
       id: "svbpaStatus",
-      label: "S-VBPA Status",
-      minWidth: 150,
+      label: "S-VBPA ",
+      minWidth: 120,
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
@@ -200,9 +261,9 @@ function TrackEmployee({isConfirmed}) {
 
 
     {
-      id: "pvbpaStatus",
-      label: "P-VBPA Status",
-      minWidth: 150,
+      id: "pavbpaStatus",
+      label: "P-VBPA (as evaluator) ",
+      minWidth: 120,
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
@@ -210,6 +271,23 @@ function TrackEmployee({isConfirmed}) {
         } else if (value === "COMPLETED") {
           return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
         } else {
+          return "Not Yet Open"
+        }
+      },
+    },
+    {
+      id: "pvbpaStatus",
+      label: "P-VBPA",
+      minWidth: 150,
+      align: "center",
+      format: (value) => {
+        if (value === "OPEN") {
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>OPEN</span>;
+        } else if (value === "COMPLETED") {
+          return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
+        } else if(value === "IN PROGRESS"){
+          return <span style={{ color: 'blue', fontWeight: "bold" }}>IN PROGRESS</span>;
+        }else{
           return "Not Yet Open"
         }
       },
@@ -218,19 +296,19 @@ function TrackEmployee({isConfirmed}) {
     {
       id: "actions",
       label: "Result",
-      minWidth: 150,
+      minWidth: 80,
       align: "center",
       format: (value, row) => {
         
         return (
           <div>
-            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" &&(
+            {row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && {/*row.pvbpaStatus === "COMPLETED"*/} &&  row.pavbpaStatus === "COMPLETED" && (
               <Button sx={{
                 color: '#8c383e',
                 fontSize: '.9em', "&:hover": { color: "red", },
                 fontFamily: 'Poppins'
               }}
-                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
+                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".9rem", }} />}
                 onClick={() => handleViewResultClick(row.userId)}>
                 View
               </Button>
@@ -258,7 +336,7 @@ function TrackEmployee({isConfirmed}) {
           <Skeleton variant="text" sx={{ fontSize: '3em', width: '8em', ml: '1em', mt: '.3em' }}></Skeleton>
         ) : (
           <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>
-            Track Employees
+            Evaluation Tracking
           </Typography>
         )}
         {showPasswordModal ? (
@@ -314,19 +392,20 @@ function TrackEmployee({isConfirmed}) {
         )}
 
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
-          <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-            <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 1, width: "93%" } }}>
+          <Grid container  sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+            {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent",position:'relative'}}> */}
               {showPasswordModal ? (
-                <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
+                <Skeleton variant="rectangular" width="100%" height="27.1em" sx={{bgcolor:'lightgray'}}></Skeleton>
               ) : (
-                <TableContainer sx={{ borderRadius: "5px 5px 0 0", maxHeight: "100%" }}>
-                  <Table stickyHeader aria-label="sticky table" size="small">
+                <TableContainer sx={{ borderRadius: "5px 5px 0 0",height:'29.8em',border:'1px solid lightgray' }}>
+                  <Table stickyHeader aria-label="a dense table" size="small">
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
                         {columnsEmployees.map((column) => (
                           <TableCell
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                           component="th" scope="row"
+                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", fontSize: ".8em" }}
                             key={column.id}
                             align={column.align}
                             style={{ minWidth: column.minWidth }}
@@ -340,11 +419,11 @@ function TrackEmployee({isConfirmed}) {
                       <TableBody>
                         {paginatedRows.map((row) => (
                           <TableRow
-                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
+                            sx={{height:'2.87em', bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" } }}
                             key={row.id}
                           >
                             {columnsEmployees.map((column) => (
-                              <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
+                              <TableCell  component="th" scope="row" sx={{ fontFamily: "Poppins" ,fontSize:'.8em'}} key={`${row.id}-${column.id}`} align={column.align}>
                                 {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
                               </TableCell>
                             ))}
@@ -375,7 +454,7 @@ function TrackEmployee({isConfirmed}) {
                   </Table>
                 </TableContainer>
               )}
-            </Card>
+            {/* </Card> */}
           </Grid>
           <ViewResults
             open={showViewRatingsModal}
@@ -391,8 +470,8 @@ function TrackEmployee({isConfirmed}) {
             className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
             style={{
               position: "relative", // Change to relative to keep it in place
-              // bottom: 200,
-              // left: '20%',
+              // bottom: 170,
+              // left: '21%',
               // transform: "translateX(-50%)",
               display: "flex",
               alignItems: "center",

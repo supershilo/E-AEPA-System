@@ -52,6 +52,8 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; //p
 import axios from "axios";
 import Animated from "../components/motion";
 import { BorderBottom } from "@mui/icons-material";
+import { apiUrl } from '../config/config';
+
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -393,7 +395,7 @@ function ManageAccount() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/user/getAllUser");
+        const response = await fetch(`${apiUrl}user/getAllUser`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -413,14 +415,22 @@ function ManageAccount() {
           userID: item.userID,
         }));
 
-        // Apply search filter
-        const searchFilteredData = processedData.filter((item) =>
-          Object.values(item).some(
-            (value) =>
-              value &&
-              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-          )
-        );
+      // Columns to be considered for search
+      const columnsToSearch = new Set(
+        selectedTab === 0
+          ? ["workID", "name", "workEmail", "dept"]
+          : ["workID", "name", "username"]
+      );
+
+      // Apply search filter based on specific columns
+      const searchFilteredData = processedData.filter((item) =>
+        Object.entries(item).some(
+          ([key, value]) =>
+            columnsToSearch.has(key) &&
+            value &&
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
 
         setRows(searchFilteredData);
         const filterAdmin = processedData.filter(
@@ -444,10 +454,10 @@ function ManageAccount() {
     const fetchDeptAndUsers = async () => {
       try {
         const deptResponse = await axios.get(
-          "http://localhost:8080/department/getAllDepts"
+          `${apiUrl}department/getAllDepts`
         );
         const userResponse = await axios.get(
-          "http://localhost:8080/user/getAllUser"
+          `${apiUrl}user/getAllUser`
         );
 
         const fetchedDepartments = deptResponse.data;
@@ -490,7 +500,7 @@ function ManageAccount() {
     const fetchUsername = async () => {
       try {
         const response = await axios.put(
-          `http://localhost:8080/user/checkUsername/${modifiedUsername}`
+          `${apiUrl}user/checkUsername/${modifiedUsername}`
         );
         const availability = response.data === "Username is available";
         setMsgInfo(response.data);
@@ -517,7 +527,7 @@ function ManageAccount() {
     const fetchEmail = async () => {
       try {
         const response = await axios.put(
-          `http://localhost:8080/user/checkEmail/${emailChange}`
+          `${apiUrl}user/checkEmail/${emailChange}`
         );
         const emailAvailability =
           response.data === "Email Address is available";
@@ -593,7 +603,7 @@ function ManageAccount() {
         userData.workEmail = emailChange;
       }
 
-      const response = await fetch(`http://localhost:8080/register/${loggedId}`, {
+      const response = await fetch(`${apiUrl}register/${loggedId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -638,7 +648,7 @@ function ManageAccount() {
   const handleClickEditBtn = async (userID) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/user/getUser/${userID}`
+        `${apiUrl}user/getUser/${userID}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
@@ -684,10 +694,12 @@ function ManageAccount() {
         dept: selectedUser.dept,
         empStatus: selectedUser.empStatus,
         probeStatus: selectedUser.probeStatus,
+        dateHired: selectedUser.dateHired,
         dateStarted: selectedUser.dateStarted,
+        dateHired: selectedUser.dateHired,
       };
       await axios.patch(
-        `http://localhost:8080/user/editUser/${loggedId}/${selectedUser.userID}`,
+        `${apiUrl}user/editUser/${loggedId}/${selectedUser.userID}`,
         userPayload,
         {
           headers: {
@@ -716,7 +728,7 @@ function ManageAccount() {
     console.log("delete Yes user:", userID);
     try {
       const response = await fetch(
-        `http://localhost:8080/user/delete/${loggedId}/${userID}`,
+        `${apiUrl}user/delete/${loggedId}/${userID}`,
         {
           method: "DELETE",
           headers: {
@@ -779,7 +791,7 @@ function ManageAccount() {
       id: "workID",
       label: "Employee ID",
       align: "center",
-      minWidth: 90,
+      minWidth: 80,
     },
     {
       id: "name",
@@ -791,7 +803,7 @@ function ManageAccount() {
     {
       id: "workEmail",
       label: "Email",
-      minWidth: 100,
+      minWidth: 250,
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
@@ -802,17 +814,11 @@ function ManageAccount() {
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
-    {
-      id: "position",
-      label: "Position",
-      minWidth: 150,
-      align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
-    },
+
     {
       id: "actions",
       label: "Actions",
-      minWidth: 60,
+      minWidth: 150,
       align: "center",
       format: (value, row) => {
         return (
@@ -822,7 +828,7 @@ function ManageAccount() {
                 icon={faPenToSquare}
                 style={{
                   color: "#8C383E",
-                  fontSize: "1.1rem",
+                  fontSize: ".9rem",
                   cursor: "pointer",
                 }}
                 onClick={() => handleClickEditBtn(row.userID)}
@@ -833,7 +839,7 @@ function ManageAccount() {
                 icon={faTrash}
                 style={{
                   color: "#8C383E",
-                  fontSize: "1.1rem",
+                  fontSize: ".9rem",
                   cursor: "pointer",
                 }}
                 onClick={() => {
@@ -881,7 +887,7 @@ function ManageAccount() {
               icon={faPenToSquare}
               style={{
                 color: "#8C383E",
-                fontSize: "1.1rem",
+                fontSize: ".9rem",
                 cursor: "pointer",
               }}
               onClick={() => handleClickEditBtn(row.userID)}
@@ -892,7 +898,7 @@ function ManageAccount() {
               icon={faTrash}
               style={{
                 color: "#8C383E",
-                fontSize: "1.1rem",
+                fontSize: ".9rem",
                 cursor: "pointer",
               }}
               onClick={() => {
@@ -993,12 +999,9 @@ function ManageAccount() {
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            "& > :not(style)": { ml: 6, mt: 0.1, width: "93.5%" },
+            "& > :not(style)": { ml: 6, mt: 0.1, width: "93%" },
           }}
         >
-
-
-
           <Grid
             container
             sx={{
@@ -1011,7 +1014,7 @@ function ManageAccount() {
               <Grid
                 item
                 xs={12}
-                sx={{ height: "3em", display: "flex", mt: "-1em" }}
+                sx={{ height: "2em", display: "flex", mt: "-1em", mb: '.2em' }}
               >
                 <Tabs
                   value={selectedTab}
@@ -1026,117 +1029,120 @@ function ManageAccount() {
             )}
 
 
-            <Card
+            {/* <Card
               variant="outlined"
               sx={{
-                borderRadius: '5px 0 0',
+                borderRadius: '5.6px 5.6px 0 0',
                 variant: "outlined",
                 width: "100%",
-                height: "31.9em",
+                height: "29.55em",
                 backgroundColor: "transparent",
                 mt: ".2%",
                 position: 'relative',
               }}
-            >
+            > */}
 
+            <TableContainer
+
+              sx={{height:'29.55em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%",maxWidth:'100%', position: 'relative', border: '1px solid lightgray' }}
+            >
               {loggedUserRole === "SUPERUSER" && loading ? (
                 <div style={{
-                  height: '32em',
+                  height: '29em',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
                   fontWeight: 500,
                 }}>Loading... </div>
               ) : (
-                <TableContainer
-                  sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%" }}
-                >
-                  <Table stickyHeader aria-label="sticky table" size="small">
-                    <TableHead sx={{ height: "3em" }}>
-                      <TableRow>
-                        {(selectedTab === 0
-                          ? columnsEmployees
-                          : columnsAdmins
-                        ).map((column) => (
-                          <TableCell
-                            sx={{
-                              fontFamily: "Poppins",
-                              bgcolor: "#8c383e",
-                              color: "white",
-                              fontWeight: 500,
-                              width: "10%",
-                            }}
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                          >
-                            {column.label}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    {hasData ? (
-                      <TableBody>
+                <Table stickyHeader aria-label="a dense table" size="small">
+                  <TableHead sx={{ height: '2.3em' }}>
+                    <TableRow>
+                      {(selectedTab === 0
+                        ? columnsEmployees
+                        : columnsAdmins
+                      ).map((column) => (
+                        <TableCell
+                          component="th" scope="row"
+                          sx={{
+                            fontFamily: "Poppins",
+                            bgcolor: "#8c383e",
+                            color: "white",
+                            fontWeight: 500,
 
-                        {paginatedRows.map((row) => (
-                          <TableRow
-                            sx={{
-                              bgcolor: "white",
-                              "&:hover": {
-                                backgroundColor: "rgba(248, 199, 2, 0.5)",
-                                color: "black",
-                              },
-                            }}
-                            key={row.id}
-                          >
-                            {(selectedTab === 0
-                              ? columnsEmployees
-                              : columnsAdmins
-                            ).map((column) => (
-                              <TableCell
-                                sx={{ fontFamily: "Poppins", fontWeight: 500 }}
-                                key={`${row.id}-${column.id}`}
-                                align={column.align}
-                              >
-                                {column.id === "name"
-                                  ? row.name
-                                  : column.id === "actions"
-                                    ? column.format
-                                      ? column.format(row[column.id], row)
-                                      : null
-                                    : column.format
-                                      ? column.format(row[column.id])
-                                      : row[column.id]}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    ) : (
-                      <TableBody>
-                        <TableRow>
-                          <TableCell sx={{ bgcolor: 'white', }} colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
-                            <Typography
-                              sx={{
-                                textAlign: "center",
-                                fontFamily: "Poppins",
-                                fontSize: "15px",
-                                color: "#1e1e1e",
-                                fontWeight: 500,
-                                padding: "20px",
-                              }}
+                          }}
+                          key={column.id}
+                          align={column.align}
+                          style={{ minWidth: column.minWidth }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  {hasData ? (
+                    <TableBody>
+
+                      {paginatedRows.map((row) => (
+                        <TableRow
+                          sx={{
+                            bgcolor: "white",
+                            "&:hover": {
+                              backgroundColor: "rgba(248, 199, 2, 0.5)",
+                              color: "black",
+                            },
+                          }}
+                          key={row.id}
+                        >
+                          {(selectedTab === 0
+                            ? columnsEmployees
+                            : columnsAdmins
+                          ).map((column) => (
+                            <TableCell
+                              component="th" scope="row"
+                              sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: '.8em' }}
+                              key={`${row.id}-${column.id}`}
+                              align={column.align}
                             >
-                              Oops! We couldn't find any results matching your
-															search.
-                            </Typography>
-                          </TableCell>
+                              {column.id === "name"
+                                ? row.name
+                                : column.id === "actions"
+                                  ? column.format
+                                    ? column.format(row[column.id], row)
+                                    : null
+                                  : column.format
+                                    ? column.format(row[column.id])
+                                    : row[column.id]}
+                            </TableCell>
+                          ))}
                         </TableRow>
-                      </TableBody>
-                    )}
-                  </Table>
-                </TableContainer>
+                      ))}
+                    </TableBody>
+                  ) : (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell sx={{ bgcolor: 'white', height: '5em', }} colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                          <Typography
+                            sx={{
+                              textAlign: "center",
+                              fontFamily: "Poppins",
+                              fontSize: "17px",
+                              color: "#1e1e1e",
+                              fontWeight: 500,
+                              padding: "25px",
+                            }}
+                          >
+                            No user are currently registered
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  )}
+                </Table>
               )}
-            </Card>
+            </TableContainer>
+
+            {/* </Card> */}
           </Grid>
         </Box>
         {/* Pagination */}
@@ -1144,13 +1150,13 @@ function ManageAccount() {
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
             position: "relative", // Change to relative to keep it in place
-            // bottom: 90,
-            // left: '19%',
+            // bottom: 30,
+            // left: '21.5%',
             // transform: "translateX(-50%",
             display: "flex",
             alignItems: "center",
 
-            ml: '4em'
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">
