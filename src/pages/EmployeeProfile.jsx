@@ -70,8 +70,7 @@ function EmployeeProfile({ user, handleBack }) {
 	const [buttonText, setButtonText] = useState(false);
 	const [is3rdEvalComplete, setIs3rdEvalComplete] = useState(false);
 	console.log(role);
-  const role = sessionStorage.getItem("userRole");
-  console.log(role);
+
 
   //adi changes
   const [openModal, setOpenModal] = useState(false);
