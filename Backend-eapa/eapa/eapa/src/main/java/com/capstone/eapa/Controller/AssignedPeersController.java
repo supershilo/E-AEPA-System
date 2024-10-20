@@ -24,6 +24,12 @@ public class AssignedPeersController {
     @Autowired
     AssignedPeersService apServ;
 
+//ANGELA
+    @GetMapping("/status")
+    public Map<Integer, String> getOverallStatus() {
+        return apServ.getOverallStatus();
+    }
+
     @PostMapping("/createAssignedPeers")
     public AssignedPeersDTO createAssignedPeers(@RequestBody AssignedPeersEntity assignedPeers) {
         AssignedPeersEntity savedEntity = apServ.createAssignedPeers(assignedPeers);
@@ -83,6 +89,15 @@ public class AssignedPeersController {
         return apServ.isAssignedPeersIdPresent(period, evaluateeId);
     }
 
+    //is assign peer id present for annual
+    @GetMapping("/isAssignedPeersIdPresentAnnual")
+    public boolean isAssignedPeersIdPresentAnnual(
+            @RequestParam String period,
+            @RequestParam int evaluateeId,
+            @RequestParam String schoolYear,
+            @RequestParam String semester) {
+        return apServ.isAssignedPeersIdPresentAnnual(period, evaluateeId, schoolYear, semester);
+    }
 
     // Update status of assigned evaluators by ID
     @PatchMapping("/updateEvaluatorStatus/{id}")
