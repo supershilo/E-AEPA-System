@@ -211,6 +211,8 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+
+
     @PatchMapping("/{userId}/promote")
     public ResponseEntity<String> promoteTo5thProbationary(@PathVariable int userId) {
         try {

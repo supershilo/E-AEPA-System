@@ -57,6 +57,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "Probationary Status")
     private String probeStatus;
 
+    // mao ni sa is3rd
     private boolean is3rdEvalComplete= false;
 
     private boolean is5thEvalComplete= false;

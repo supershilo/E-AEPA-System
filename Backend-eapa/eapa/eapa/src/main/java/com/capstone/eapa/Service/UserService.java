@@ -534,7 +534,7 @@ public class UserService implements UserDetailsService {
 
 
 
-    //Check if 3rd Results is sent
+    //Check if 3rd Results is sent checkinn...
     public void update3rdEvaluationStatus(int userId, boolean status) {
         UserEntity user = userRepo.findById(userId).orElseThrow(() -> new NoSuchElementException("User " + userId + " not found."));
         user.setIs3rdEvalComplete(status);
