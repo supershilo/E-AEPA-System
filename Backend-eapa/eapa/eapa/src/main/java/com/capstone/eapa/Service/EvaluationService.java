@@ -205,6 +205,7 @@ public class EvaluationService {
                     String fName = user.getfName();
                     String lName = user.getlName();
                     Role role = user.getRole();
+                    String dateHired = user.getDateHired();
 
                     List<EvaluationEntity> userEvaluations = entry.getValue();
 
@@ -216,6 +217,7 @@ public class EvaluationService {
                     dto.setfName(fName);
                     dto.setlName(lName);
                     dto.setRole(role);
+                    dto.setDateHired(dateHired);
 
                     // Set overall status from AssignedPeerEvaluators
                     String overallStatus = overallStatuses.get(userId); // assuming userId corresponds to assigned_peers_id
@@ -236,84 +238,6 @@ public class EvaluationService {
                 })
                 // .filter(Objects::nonNull) // Remove any null entries
                 .collect(Collectors.toList());
-    }
-
-    public List<PeerEvaluationDTO> getMergedPeerEvaluations() {
-        List<AssignedPeerEvaluators> evaluations = assignedPeerEvaluatorsRepo.findAll();
-
-        // Create a map to store AssignedPeersEntity based on id
-        Map<Integer, AssignedPeersEntity> assignedPeersEntityMap = evaluations.stream()
-                .map(AssignedPeerEvaluators::getAssignedPeers) // Get AssignedPeersEntity
-                .distinct() // Ensure each entry is unique
-                .collect(Collectors.toMap(AssignedPeersEntity::getId, Function.identity()));
-
-        // Group evaluations by AssignedPeersEntity id
-        Map<Integer, List<AssignedPeerEvaluators>> groupedByPeersId = evaluations.stream()
-                .collect(Collectors.groupingBy(evaluation -> evaluation.getAssignedPeers().getId()));
-
-        return groupedByPeersId.entrySet().stream()
-                .map(entry -> {
-                    int assignedPeersId = entry.getKey();
-                    List<AssignedPeerEvaluators> peerEvaluations = entry.getValue();
-
-                    PeerEvaluationDTO dto = new PeerEvaluationDTO();
-                    dto.setAssignedPeersId(assignedPeersId);
-
-                    // Retrieve evaluateeId from AssignedPeersEntity
-                    AssignedPeersEntity assignedPeersEntity = assignedPeersEntityMap.get(assignedPeersId);
-                    if (assignedPeersEntity != null) {
-                        dto.setEvaluateeId(assignedPeersEntity.getEvaluatee().getUserID());
-                    }
-
-                    long pendingCount = peerEvaluations.stream()
-                            .filter(e -> "PENDING".equals(e.getStatus()))
-                            .count();
-
-                    long completedCount = peerEvaluations.stream()
-                            .filter(e -> "COMPLETED".equals(e.getStatus()))
-                            .count();
-
-                    String mergedStatus;
-                    if (pendingCount == 3) {
-                        mergedStatus = "Not Yet Open";
-                    } else if (completedCount == 3) {
-                        mergedStatus = "COMPLETED";
-                    } else if (pendingCount >= 1 && pendingCount < 3) {
-                        mergedStatus = "IN PROGRESS";
-                    } else {
-                        mergedStatus = "UNKNOWN"; // Default case, handle other cases as needed
-                    }
-
-                    dto.setMergedStatus(mergedStatus);
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
-    public String calculateCombinedPeerStatus(List<EvaluationEntity> userEvaluations) {
-        boolean peerCompleted = false;
-        boolean peerACompleted = false;
-
-        for (EvaluationEntity eval : userEvaluations) {
-            if ("PEER-VALUES".equals(eval.getEvalType() + "-" + eval.getStage())) {
-                if ("COMPLETED".equals(eval.getStatus())) {
-                    peerCompleted = true;
-                }
-            } else if ("PEER-A-VALUES".equals(eval.getEvalType() + "-" + eval.getStage())) {
-                if ("COMPLETED".equals(eval.getStatus())) {
-                    peerACompleted = true;
-                }
-            }
-        }
-
-        if (peerCompleted && peerACompleted) {
-            return "COMPLETED";
-        } else if (peerCompleted || peerACompleted) {
-            return "IN PROGRESS";
-        } else {
-            return "Not Yet Open";
-        }
     }
 
  //total employee for recommendation

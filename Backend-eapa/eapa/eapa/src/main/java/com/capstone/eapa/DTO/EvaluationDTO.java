@@ -17,10 +17,19 @@ public class EvaluationDTO {
     private String sjbpStatus;
     private String svbpaStatus;
     private String pvbpaStatus;
+    private String dateHired;
 
     
 
     // Getters and Setters
+
+    public String getDateHired() {
+        return dateHired;
+    }
+
+    public void setDateHired(String dateHired) {
+        this.dateHired = dateHired;
+    }
 
     public int getUserId() {
         return userId;
