@@ -27,7 +27,6 @@ import Animated from "../components/motion";
 import AdminViewResult from "../modals/AdminViewResults";
 import { apiUrl } from "../config/config";
 import ManagePeerModal from "../modals/ManagePeerModal";
-import AdminViewResult from "../modals/AdminViewResults";
 import SendResultsModal from "../components/SendResultsModal";
 
 const theme = createTheme({
@@ -65,6 +64,7 @@ function EmployeeProfile({ user, handleBack }) {
   const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] =
     useState("3rd Month");
   const [evaluationsData, setEvaluationsData] = useState([]);
+  const [peerData, setPeerData] = useState([]);
 	const role = sessionStorage.getItem("userRole");
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [buttonText, setButtonText] = useState(false);
@@ -83,6 +83,7 @@ function EmployeeProfile({ user, handleBack }) {
     setOpenModal(false);
   };
 
+  //FETCH DATA FOR HEAD EVAL
   useEffect(() => {
     axios
       .get("http://localhost:8080/evaluation/getAllEvaluation")
@@ -103,6 +104,28 @@ function EmployeeProfile({ user, handleBack }) {
       });
   }, [user.userID]);
 
+  //FETCH DATA FOR PEER EVAL
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/evaluation/getAllEvaluation")
+      .then((response) => {
+        console.log("Fetched Evaluations:", response.data);
+
+        const filterPeer = response.data.filter(
+          (evalItem) =>
+            (evalItem.evalType === "PEER" || evalItem.evalType === "PEER-A")  &&
+            evalItem.peer?.userID === user.userID
+        );
+
+        console.log("Filtered Peer Evaluations (PeerID matches UserID):", filterPeer);
+        setPeerData(filterPeer);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the evaluations!", error);
+      });
+  }, [user.userID]);
+  
+  //FETCH DATA FOR EMPLOYEE SELF & JOB EVAL
   useEffect(() => {
     const fetchEvaluations = async () => {
       try {
@@ -228,6 +251,14 @@ function EmployeeProfile({ user, handleBack }) {
 				evaluation.period === selectedEvaluationPeriod
 		);
 
+    const peerEval = peerData.filter(
+			(evaluation) =>
+				new Date(evaluation.dateTaken).getFullYear() ===
+					parseInt(selectedYearEvaluation) &&
+				evaluation.peer.userID === user.userID &&
+				evaluation.period === selectedEvaluationPeriod
+		);
+
 		// Check for Filter evaluations per user under the department
 		const headEval = evaluationsData.filter(
 			(evaluation) =>
@@ -245,10 +276,10 @@ function EmployeeProfile({ user, handleBack }) {
         evaluation.status === "COMPLETED"
     );
 
-    const hasCompletedValuesPeer = filteredEvaluations.some(
+    const hasCompletedValuesPeer = peerEval.some(
       (evaluation) =>
         evaluation.stage === "VALUES" &&
-        evaluation.evalType === "PEER" &&
+        evaluation.evalType === "PEER" || "PEER-A" &&
         evaluation.status === "COMPLETED"
     );
 
@@ -292,7 +323,7 @@ function EmployeeProfile({ user, handleBack }) {
                 Head
               </TableCell>
               <TableCell align="center" style={headStyle}>
-                Peer
+                Peer/s
               </TableCell>
               <TableCell align="center" style={{ backgroundColor: "#8C383E" }}>
                 {" "}
