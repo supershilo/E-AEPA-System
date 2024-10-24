@@ -38,50 +38,28 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     long countTotalEmployees();
 
     //count Regular Employees
-    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
-    long countRegularEmployees();
+//    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
+//    long countRegularEmployees();
 
 
     @Query("SELECT u.userID FROM UserEntity u WHERE u.role = 'HEAD' AND u.dept = :dept AND u.isDeleted = 0")
     Integer findHeadUserIdByDept(@Param("dept") String dept);
 
-           // get count users  For 3rd, 5th and Annual Month Eval.
+    //dashboard adi
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.probeStatus = '3rd Probationary' AND u.isDeleted = 0")
+    Integer countThirdMonthEmployees();
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.probeStatus = '5th Probationary' AND u.isDeleted = 0")
+    Integer countFifthMonthEmployees();
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular' AND u.isDeleted = 0")
+    Integer countRegularEmployees();
 
-    @Query(value = "SELECT u.userID " +
-    "FROM tbluser u " +
-    "WHERE u.`Employment Status` = 'Probationary' " +
-    "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) <= 90",
-    nativeQuery = true)
-List<Long> getUsersFor3rdMonthEvaluation();
+    //fetch all 3rd month employees
+    List<UserEntity> findAllByProbeStatusAndIsDeleted(String probeStatus, int isDeleted);
 
-@Query(value = "SELECT u.userID " +
-    "FROM tbluser u " +
-    "WHERE u.`Employment Status` = 'Probationary' " +
-    "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) BETWEEN 121 AND 150",
-    nativeQuery = true)
-List<Long> getUsersFor5thMonthEvaluation();
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.probeStatus = :probeStatus AND u.dept = :dept AND u.isDeleted = 0")
+    int countByProbeStatusAndDept(@Param("probeStatus") String probeStatus, @Param("dept") String dept);
 
-@Query(value = "SELECT u.userID " +
-    "FROM tbluser u " +
-    "WHERE u.`Employment Status` = 'Probationary' " +
-    "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) BETWEEN 335 AND 395",
-    nativeQuery = true)
-List<Long> getUsersForAnnualEvaluation();
-
-// Users Details | Upcoming Evaluators for 3rd and 5th Month
-@Query(value = "SELECT u.* " +
-    "FROM tbluser u " +
-    "WHERE u.`Employment Status` = 'Probationary' " +
-    "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) <= 90",
-    nativeQuery = true)
-List<UserEntity> getUsersDetailsFor3rdMonthEvaluation();
-
-@Query(value = "SELECT u.* " +
-    "FROM tbluser u " +
-    "WHERE u.`Employment Status` = 'Probationary' " +
-    "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) BETWEEN 121 AND 150",
-    nativeQuery = true)
-List<UserEntity> getUsersDetailsFor5thMonthEvaluation();
-
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = :empStatus AND u.dept = :dept AND u.isDeleted = 0")
+    int countByEmpStatusAndDept(@Param("empStatus") String empStatus, @Param("dept") String dept);
 
 }

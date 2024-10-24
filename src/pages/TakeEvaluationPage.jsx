@@ -1130,6 +1130,8 @@ function TakeEvaluationPage() {
       period: period,
       evalType: evalType,
       status: "OPEN",
+      schoolYear: schoolYear,
+      semester: semester,
       dateTaken: currentDate,
       isDeleted: 0,
     };

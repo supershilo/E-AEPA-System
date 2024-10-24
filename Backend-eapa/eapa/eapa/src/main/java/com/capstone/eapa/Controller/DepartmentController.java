@@ -59,5 +59,10 @@ public class DepartmentController {
 	public String deleteDept(@PathVariable int adminId,@PathVariable int id) {
 		return departmentServ.deleteDepartment(adminId,id);
 	}
+
+	@GetMapping("/getAllDeptNames")
+	public List<String> getAllDeptNames() {
+		return departmentServ.getAllDepartmentNames();
+	}
     
 }

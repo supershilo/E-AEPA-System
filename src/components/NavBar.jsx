@@ -59,6 +59,24 @@ function NavBar() {
 
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
+  const abbreviateDept = (deptName) => {
+    if (!deptName) {
+      return "";
+    }
+
+    const commonWords = ["of", "and"];
+    const words = deptName.split(" ");
+
+    if (words.length < 2) {
+      return deptName;
+    }
+
+    return words
+      .filter((word) => !commonWords.includes(word.toLowerCase()))
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("");
+  };
+
   // Token expiry check function
   const checkTokenExpiry = () => {
     const token = localStorage.getItem("token");
@@ -292,7 +310,9 @@ function NavBar() {
               ? "Admin"
               : loggedUserData.role === "SUPERUSER"
               ? "Superuser"
-              : `${loggedUserData.dept} - ${loggedUserData.position}`}
+              : `${abbreviateDept(loggedUserData.dept)} - ${
+                  loggedUserData.position
+                }`}
           </Typography>
         </div>
       </div>

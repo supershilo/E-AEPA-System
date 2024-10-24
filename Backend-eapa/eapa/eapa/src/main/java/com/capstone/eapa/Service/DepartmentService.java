@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import com.capstone.eapa.Entity.DepartmentEntity;
 import com.capstone.eapa.Repository.DepartmentRepository;
@@ -62,6 +63,13 @@ public class DepartmentService {
         String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
         userService.logActivity(adminId,admin,"Deleted Department", "Deleted Department : " + existingDepartment.getDeptName() );
         return "Department deleted";
+    }
+
+    //get all department names
+    public List<String> getAllDepartmentNames() {
+        return departmentRepo.findByIsDeleted(0).stream()
+                .map(DepartmentEntity::getDeptName)
+                .collect(Collectors.toList());
     }
 
 

@@ -1,5 +1,7 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.DTO.ThirdAndFifthProbeDTO;
+import com.capstone.eapa.DTO.UserCountDTO;
 import com.capstone.eapa.Entity.ActivityLogEntity;
 import com.capstone.eapa.Entity.PasswordResetToken;
 import com.capstone.eapa.Entity.Role;
@@ -8,25 +10,15 @@ import com.capstone.eapa.Repository.ActivityLogRepository;
 import com.capstone.eapa.Repository.PasswordResetTokenRepository;
 import com.capstone.eapa.Repository.UserRepository;
 
-import io.jsonwebtoken.io.IOException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,10 +32,13 @@ public class UserService implements UserDetailsService {
     private PasswordResetTokenRepository passResetTokenRepo;
     @Autowired
     private EmailService emailService;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ActivityLogRepository activityLogRepo;
+
+
 
     public List<UserEntity> getAllUser() {
         return userRepo.findAllByIsDeleted(0);
@@ -159,6 +154,7 @@ public class UserService implements UserDetailsService {
     public UserEntity editUserDetails(int adminId,int userID, UserEntity newDetails) {
         UserEntity user = userRepo.findById(userID)
                 .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
+
         try {
             if (newDetails.getfName() != null)
                 user.setfName(newDetails.getfName());
@@ -189,7 +185,9 @@ public class UserService implements UserDetailsService {
             
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
             logActivity(adminId,admin,"Edited User Account", "Modified User Details : " + user.getfName() + " " + user.getlName());
+
             return userRepo.save(user);
+
         } catch (Exception e) {
             throw e; 
         }
@@ -532,5 +530,78 @@ public class UserService implements UserDetailsService {
         return userRepo.getUsersDetailsFor5thMonthEvaluation();
     }
 
+
+
+    //adi dashboard methods
+    //get 3rd month emp count
+    public Integer getThirdMonthEmpCount(){
+        return userRepo.countThirdMonthEmployees();
+    }
+    //get 5th month emp count
+    public Integer getFifthMonthEmpCount(){
+        return userRepo.countFifthMonthEmployees();
+    }
+    //get regular emp count
+    public Integer getRegularEmpCount(){
+        return userRepo.countRegularEmployees();
+    }
+    //get list of users who are 3rd probationary
+    public List<ThirdAndFifthProbeDTO> getAll3rdMonthProbeEmp (String probeStatus){
+        List<UserEntity> userList = userRepo.findAllByProbeStatusAndIsDeleted(probeStatus, 0);
+        List<ThirdAndFifthProbeDTO> userDTOList = new ArrayList<>();
+
+        for(UserEntity user : userList){
+            ThirdAndFifthProbeDTO dto = new ThirdAndFifthProbeDTO(
+                    user.getUserID(),
+                    user.getfName(),
+                    user.getlName(),
+                    user.getDept(),
+                    user.getPosition(),
+                    user.getDateHired()
+            );
+            userDTOList.add(dto);
+        }
+        return userDTOList;
+    }
+
+    public List<ThirdAndFifthProbeDTO> getAll5thMonthProbeEmp (String probeStatus){
+        List<UserEntity> userList = userRepo.findAllByProbeStatusAndIsDeleted(probeStatus, 0);
+        List<ThirdAndFifthProbeDTO> userDTOList = new ArrayList<>();
+
+        for(UserEntity user : userList){
+            ThirdAndFifthProbeDTO dto = new ThirdAndFifthProbeDTO(
+                    user.getUserID(),
+                    user.getfName(),
+                    user.getlName(),
+                    user.getDept(),
+                    user.getPosition(),
+                    user.getDateHired()
+            );
+            userDTOList.add(dto);
+        }
+        return userDTOList;
+    }
+
+    public UserCountDTO getUserCountsByDept(String department){
+        int countOf3MonthProbe = userRepo.countByProbeStatusAndDept("3rd Probationary", department);
+        int countOf5MonthProbe = userRepo.countByProbeStatusAndDept("5th Probationary", department);
+        int countOfRegEmp = userRepo.countByEmpStatusAndDept("Regular", department);
+
+        return new UserCountDTO(department, countOf3MonthProbe, countOf5MonthProbe, countOfRegEmp);
+    }
+
+    public List<UserCountDTO> getEmployeeCountsByDepartments(String[] departmentNames) {
+        List<UserCountDTO> userCounts = new ArrayList<>();
+
+        for (String deptName : departmentNames) {
+            int countOf3MonthProbe = userRepo.countByProbeStatusAndDept("3rd Probationary", deptName);
+        int countOf5MonthProbe = userRepo.countByProbeStatusAndDept("5th Probationary", deptName);
+        int countOfRegEmp = userRepo.countByEmpStatusAndDept("Regular", deptName);
+
+            userCounts.add(new UserCountDTO(deptName, countOf3MonthProbe, countOf5MonthProbe, countOfRegEmp));
+        }
+
+        return userCounts;
+    }
 
 }
