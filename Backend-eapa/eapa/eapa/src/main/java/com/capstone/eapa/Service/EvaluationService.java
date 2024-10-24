@@ -321,39 +321,39 @@ public class EvaluationService {
     return evalRepo.countByPeriodAndStatus();
 }
 
-//3rd Month: Eligible takers
-public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
-List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
-List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
+////3rd Month: Eligible takers
+//public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
+//List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
+//List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
+//
+//int totalEligible = eligibleUsers.size();
+//int completed = completedEvaluations.size();
+//int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+//
+//return new EvaluationStatusDTO(completed, notCompleted);
+//}
 
-int totalEligible = eligibleUsers.size();
-int completed = completedEvaluations.size();
-int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
-
-return new EvaluationStatusDTO(completed, notCompleted);
-}
-
-public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
-    List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
-    List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
-
-    int totalEligible = eligibleUsers.size();
-    int completed = completedEvaluations.size();
-    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
-
-    return new EvaluationStatusDTO(completed, notCompleted);
-}
-
-public EvaluationStatusDTO getAnnualEvaluationStatus() {
-    List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
-    List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
-
-    int totalEligible = eligibleUsers.size();
-    int completed = completedEvaluations.size();
-    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
-
-    return new EvaluationStatusDTO(completed, notCompleted);
-}
+//public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
+//    List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
+//    List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
+//
+//    int totalEligible = eligibleUsers.size();
+//    int completed = completedEvaluations.size();
+//    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+//
+//    return new EvaluationStatusDTO(completed, notCompleted);
+//}
+//
+//public EvaluationStatusDTO getAnnualEvaluationStatus() {
+//    List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
+//    List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
+//
+//    int totalEligible = eligibleUsers.size();
+//    int completed = completedEvaluations.size();
+//    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+//
+//    return new EvaluationStatusDTO(completed, notCompleted);
+//}
 
 
 // New methods for only completed counts

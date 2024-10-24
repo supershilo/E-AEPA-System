@@ -118,22 +118,22 @@ public long countRecommendedEmployees() {
     return evalServ.countRecommendedEmployees();
 }
 
-// Endpoint for 3rd Month evaluation status
-@GetMapping("/thirdMonthStatus")
-public ResponseEntity<EvaluationStatusDTO> getThirdMonthStatus() {
-    EvaluationStatusDTO status = evalServ.getThirdMonthEvaluationStatus();
-    return ResponseEntity.ok(status);
-}
-@GetMapping("/fifthMonthStatus")
-public ResponseEntity<EvaluationStatusDTO> getFifthMonthEvaluationStatus() {
-    EvaluationStatusDTO status = evalServ.getFifthMonthEvaluationStatus();
-    return ResponseEntity.ok(status);
-}
-@GetMapping("/annualStatus")
-public ResponseEntity<EvaluationStatusDTO> getAnnualEvaluationStatus() {
-    EvaluationStatusDTO status = evalServ.getAnnualEvaluationStatus();
-    return ResponseEntity.ok(status);
-}
+//// Endpoint for 3rd Month evaluation status
+//@GetMapping("/thirdMonthStatus")
+//public ResponseEntity<EvaluationStatusDTO> getThirdMonthStatus() {
+//    EvaluationStatusDTO status = evalServ.getThirdMonthEvaluationStatus();
+//    return ResponseEntity.ok(status);
+//}
+//@GetMapping("/fifthMonthStatus")
+//public ResponseEntity<EvaluationStatusDTO> getFifthMonthEvaluationStatus() {
+//    EvaluationStatusDTO status = evalServ.getFifthMonthEvaluationStatus();
+//    return ResponseEntity.ok(status);
+//}
+//@GetMapping("/annualStatus")
+//public ResponseEntity<EvaluationStatusDTO> getAnnualEvaluationStatus() {
+//    EvaluationStatusDTO status = evalServ.getAnnualEvaluationStatus();
+//    return ResponseEntity.ok(status);
+//}
 
 
 
