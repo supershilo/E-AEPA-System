@@ -24,6 +24,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
 import ActivityLog from "./pages/ActivityLogs";
 import AdminDashboard from "./pages/AdminDashboard";
+import HeadEvalResult from "./pages/HeadEvalResult";
+import EligibleEvaluators from "./components/EligibleEvaluators";
 
 const router = createBrowserRouter([
   {
@@ -105,14 +107,6 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      // {
-      //   path: "/ViewProfileHead",
-      //   element: (
-      //     <PrivateRoute requiredRoles={["HEAD"]}>
-      //       <ViewProfilePageHead />
-      //     </PrivateRoute>
-      //   ),
-      // },
       {
         path: "/EvaluateEmployee",
         element: (
@@ -129,6 +123,24 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      //ANGELA
+      {
+        path: "/HeadEvalResult",
+        element: (
+         <PrivateRoute requiredRoles={["HEAD"]}>
+            <HeadEvalResult />
+          </PrivateRoute>
+        ),
+      },
+
+      {
+        path: "/AdminDashboard/EligibleEvaluators",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <EligibleEvaluators />
+          </PrivateRoute>
+        ),
+      }
     ],
   },
   {},

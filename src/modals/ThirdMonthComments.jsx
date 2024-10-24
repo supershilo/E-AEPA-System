@@ -21,7 +21,6 @@ const ThirdMonthComments = ({ userId, filter }) => {
   const role = sessionStorage.getItem("userRole");
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
-  const [peerIds, setPeerIds] = useState([]);
   const [commentsData, setCommentsData] = useState({
     27: "", // GAP comment
     28: "", // TARGET comment
@@ -324,7 +323,6 @@ const ThirdMonthComments = ({ userId, filter }) => {
                       color: "white",
                       fontSize: "1rem",
                       fontWeight: "bold",
-                      //height: "40px",
                       display: "flex",
                       alignItems: "center",
                       width: "100%",

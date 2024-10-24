@@ -208,9 +208,6 @@ public class UserController {
     // }
 
 
-
-
-
     @GetMapping("/getHeadUserIdByDept")
     public ResponseEntity<Integer> getHeadUserIdByDept(@RequestParam String dept) {
         Integer userId = userServ.getHeadUserIdByDept(dept);

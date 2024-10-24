@@ -1,3 +1,5 @@
+ 
+
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
 import {
@@ -52,7 +54,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; //p
 import axios from "axios";
 import Animated from "../components/motion";
 import { BorderBottom } from "@mui/icons-material";
-import { apiUrl } from "../config/config";
+import { apiUrl } from '../config/config';
+import Loader from "../components/Loader";
+
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -1013,11 +1017,8 @@ function ManageAccount() {
                   onChange={handleTabChange}
                   sx={tabStyle}
                 >
-                  <Tab
-                    label={`All Employees (${countEmployee})`}
-                    sx={tabStyle}
-                  />
-                  <Tab label={`All Admins (${countAdmin})`} sx={tabStyle} />
+                  <Tab label={`All Employees`} sx={tabStyle} />
+                  <Tab label={`All Admins`} sx={tabStyle} />
                 </Tabs>
               </Grid>
             )}
@@ -1037,122 +1038,101 @@ function ManageAccount() {
 
             <TableContainer
               sx={{
-                height: "29.55em",
-                borderRadius: "5px 5px 0 0 ",
+                height: '29.55em',
+                borderRadius: "5px 5px 0 0",
                 maxHeight: "100%",
-                maxWidth: "100%",
-                position: "relative",
-                border: "1px solid lightgray",
+                maxWidth: '100%',
+                position: 'relative',
+                border: '1px solid lightgray',
               }}
             >
-              {loggedUserRole === "SUPERUSER" && loading ? (
-                <div
-                  style={{
-                    height: "29em",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    fontWeight: 500,
-                  }}
-                >
-                  Loading...{" "}
-                </div>
-              ) : (
-                <Table stickyHeader aria-label="a dense table" size="small">
-                  <TableHead sx={{ height: "2.3em" }}>
+              <Table stickyHeader aria-label="a dense table" size="small">
+                {/* Always render the TableHead */}
+                <TableHead sx={{ height: '2.3em' }}>
+                  <TableRow>
+                    {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                          fontFamily: "Poppins",
+                          bgcolor: "#8c383e",
+                          color: "white",
+                          fontWeight: 500,
+                        }}
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+
+                {/* Render TableBody with conditional loading based on loggedUserRole */}
+                <TableBody>
+                  {loggedUserRole === "SUPERUSER" && loading ? (
+                    // Display loading message in the TableBody
                     <TableRow>
-                      {(selectedTab === 0
-                        ? columnsEmployees
-                        : columnsAdmins
-                      ).map((column) => (
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          sx={{
-                            fontFamily: "Poppins",
-                            bgcolor: "#8c383e",
-                            color: "white",
-                            fontWeight: 500,
-                          }}
-                          key={column.id}
-                          align={column.align}
-                          style={{ minWidth: column.minWidth }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      ))}
+                      <TableCell colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                          <Loader />
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  {hasData ? (
-                    <TableBody>
-                      {paginatedRows.map((row) => (
-                        <TableRow
-                          sx={{
-                            bgcolor: "white",
-                            "&:hover": {
-                              backgroundColor: "rgba(248, 199, 2, 0.5)",
-                              color: "black",
-                            },
-                          }}
-                          key={row.id}
-                        >
-                          {(selectedTab === 0
-                            ? columnsEmployees
-                            : columnsAdmins
-                          ).map((column) => (
-                            <TableCell
-                              component="th"
-                              scope="row"
-                              sx={{
-                                fontFamily: "Poppins",
-                                fontWeight: 500,
-                                fontSize: ".8em",
-                              }}
-                              key={`${row.id}-${column.id}`}
-                              align={column.align}
-                            >
-                              {column.id === "name"
-                                ? row.name
-                                : column.id === "actions"
+                  ) : hasData ? (
+                    paginatedRows.map((row) => (
+                      <TableRow
+                        sx={{
+                          bgcolor: "white",
+                          "&:hover": {
+                            backgroundColor: "rgba(248, 199, 2, 0.5)",
+                            color: "black",
+                          },
+                        }}
+                        key={row.id}
+                      >
+                        {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: '.8em' }}
+                            key={`${row.id}-${column.id}`}
+                            align={column.align}
+                          >
+                            {column.id === "name"
+                              ? row.name
+                              : column.id === "actions"
                                 ? column.format
                                   ? column.format(row[column.id], row)
                                   : null
                                 : column.format
-                                ? column.format(row[column.id])
-                                : row[column.id]}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  ) : (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell
-                          sx={{ bgcolor: "white", height: "5em" }}
-                          colSpan={
-                            columnsEmployees.length || columnsAdmins.length
-                          }
-                          align="center"
-                        >
-                          <Typography
-                            sx={{
-                              textAlign: "center",
-                              fontFamily: "Poppins",
-                              fontSize: "17px",
-                              color: "#1e1e1e",
-                              fontWeight: 500,
-                              padding: "25px",
-                            }}
-                          >
-                            No user are currently registered
-                          </Typography>
-                        </TableCell>
+                                  ? column.format(row[column.id])
+                                  : row[column.id]}
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    </TableBody>
+                    ))
+                  ) : (
+                    // No data case
+                    <TableRow>
+                      <TableCell colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                        <Typography
+                          sx={{
+                            textAlign: "center",
+                            fontFamily: "Poppins",
+                            fontSize: "17px",
+                            color: "#1e1e1e",
+                            fontWeight: 500,
+                            padding: "25px",
+                          }}
+                        >
+                          No user is currently registered
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
                   )}
-                </Table>
-              )}
+                </TableBody>
+              </Table>
             </TableContainer>
 
             {/* </Card> */}
