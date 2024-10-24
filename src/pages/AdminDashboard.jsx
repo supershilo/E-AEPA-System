@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { format } from "date-fns";
 import { Box, Grid, Typography, Paper, Container } from "@mui/material";
 import EvaluationStatusChart from "../components/EvaluationStatusChart";
 import EmployeeStatusChart from "../components/EmployeeStatusChart";
@@ -18,10 +17,41 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import ReactApexChart from "react-apexcharts";
 import Loader from "../components/Loader";
+import axios from "axios";
+import { apiUrl } from "../config/config";
+import { format, differenceInMonths, isSameMonth } from "date-fns";
 
 function AdminDashboard() {
   const [currentDate, setCurrentDate] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [openSYModal, setOpenSYModal] = useState(false);
+  const [isOpenView, setIsOpenView] = useState(false);
+  const [openAddSY, setOpenAddSY] = useState(false);
+  const [openEditView, setOpenEditView] = useState(false);
+  const [month, setMonth] = useState("3rd Month");
+  const data = {
+    "3rd Month": [2, 2, 1],
+    "5th Month": [20, 25, 55],
+  };
+
+  const [thirdMonthEmpCount, setThirdMonthEmpCount] = useState(0);
+  const [fifthMonthEmpCount, setFifthMonthEmpCount] = useState(0);
+  const [regEmpCount, setRegEmpCount] = useState(0);
+  const [regEmpCountFromTable, setRegEmpCountFromTable] = useState(0);
+  const [thirdMonthEmp, setThirdMonthEmp] = useState([]);
+  const [fifthMonthEmp, setFifthMonthEmp] = useState([]);
+
+  const getCurrentMonthAndYear = () => {
+    const date = new Date();
+    const month = date.toLocaleString("default", { month: "long" }); // Full month name
+    const year = date.getFullYear(); // Current year as an integer
+
+    return { month, year };
+  };
+
+  const { month: currentMonth, year: currentYear } = getCurrentMonthAndYear();
+  console.log("Current month and year:", currentMonth, currentYear);
 
   useEffect(() => {
     const now = new Date();
@@ -34,16 +64,164 @@ function AdminDashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-  //adi codes
-  const [openSYModal, setOpenSYModal] = useState(false);
-  const [isOpenView, setIsOpenView] = useState(false);
-  const [openAddSY, setOpenAddSY] = useState(false);
-  const [openEditView, setOpenEditView] = useState(false);
+  //fetch 3rd, 5th, Reg emp count
+  useEffect(() => {
+    const fetchEmpCount = async () => {
+      try {
+        const [response1, response2, response3] = await Promise.all([
+          axios.get(`${apiUrl}user/getThirdMonthEmpCount`),
+          axios.get(`${apiUrl}user/getFifthMonthEmpCount`),
+          axios.get(`${apiUrl}user/getRegularEmpCount`),
+        ]);
 
-  const [month, setMonth] = useState("3rd Month");
-  const data = {
-    "3rd Month": [17, 30, 53],
-    "5th Month": [20, 25, 55],
+        setThirdMonthEmpCount(response1.data);
+        setFifthMonthEmpCount(response2.data);
+        setRegEmpCount(response3.data);
+
+        console.log("Fetched regEmpCount:", response3.data);
+      } catch (error) {
+        console.error("Error fetching employee count:", error);
+      }
+    };
+
+    fetchEmpCount();
+  }, []);
+
+  //get reg emp count and updates in the table if there are changes
+  useEffect(() => {
+    const fetchRegEmpCount = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}regEmpCount/count`, {
+          params: { month: currentMonth, year: currentYear },
+        });
+        setRegEmpCountFromTable(response.data);
+        console.log("Fetched regEmpCountFromTable:", response.data);
+      } catch (error) {
+        console.error(
+          "Error fetching regular employee count from tblregempcount:",
+          error
+        );
+      }
+    };
+
+    if (currentMonth && currentYear) {
+      fetchRegEmpCount();
+    }
+  }, [currentMonth, currentYear]);
+
+  //condition if regEmpCount is not equal to regEmpCountFromTable then update
+  useEffect(() => {
+    const updateRegEmpCount = async () => {
+      try {
+        console.log(
+          "Comparing regEmpCount:",
+          regEmpCount,
+          "with regEmpCountFromTable:",
+          regEmpCountFromTable
+        );
+
+        if (regEmpCount !== regEmpCountFromTable) {
+          console.log(
+            "Counts are not equal. Updating regEmpCount in the table."
+          );
+
+          const response = await axios.patch(
+            `${apiUrl}regEmpCount/update`,
+            null,
+            {
+              params: {
+                month: currentMonth,
+                year: currentYear,
+                currentRegEmpCount: regEmpCount,
+              },
+            }
+          );
+          console.log("Update response:", response.data);
+        } else {
+          console.log("Counts are equal. No update needed."); // Log if no update is needed
+        }
+      } catch (error) {
+        console.error(
+          "Error updating regular employee count from tblregempcount:",
+          error
+        );
+      }
+    };
+
+    if (regEmpCountFromTable && regEmpCount) {
+      updateRegEmpCount();
+    }
+  }, [regEmpCountFromTable, regEmpCount]);
+
+  //filter third month employees
+  const filterThirdMonthEmployees = (employees) => {
+    const currentDate = new Date();
+
+    return employees.filter((employee) => {
+      const dateHired = new Date(employee.dateHired);
+      const threeMonthsAfterHire = new Date(
+        dateHired.setMonth(dateHired.getMonth() + 3)
+      );
+
+      return isSameMonth(threeMonthsAfterHire, currentDate);
+    });
+  };
+
+  //filter fifth month employees
+  const filterFifthMonthEmployees = (employees) => {
+    const currentDate = new Date();
+
+    return employees.filter((employee) => {
+      const dateHired = new Date(employee.dateHired);
+      const fiveMonthsAfterHire = new Date(
+        dateHired.setMonth(dateHired.getMonth() + 5)
+      );
+
+      return isSameMonth(fiveMonthsAfterHire, currentDate);
+    });
+  };
+
+  //fetch 3rd month probationary employees
+  useEffect(() => {
+    const fetchProbationaryEmp = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}user/get3rdMonthProbeEmp`);
+        const response2 = await axios.get(`${apiUrl}user/get5thMonthProbeEmp`);
+        const thirdMonthEmployees = response.data;
+        const fifthMonthEmployees = response2.data;
+
+        const filtered3rdMonthEmp =
+          filterThirdMonthEmployees(thirdMonthEmployees);
+        setThirdMonthEmp(filtered3rdMonthEmp);
+        const filtered5thMonthEmp =
+          filterFifthMonthEmployees(fifthMonthEmployees);
+        setFifthMonthEmp(filtered5thMonthEmp);
+      } catch (error) {
+        console.error(
+          "Error fetching third month probationary employees:",
+          error
+        );
+      }
+    };
+    fetchProbationaryEmp();
+  }, []);
+
+  const abbreviateDept = (deptName) => {
+    if (!deptName) {
+      return "";
+    }
+
+    const commonWords = ["of", "and"];
+    const words = deptName.split(" ");
+
+    if (words.length < 2) {
+      return deptName;
+    }
+
+    return words
+      .filter((word) => !commonWords.includes(word.toLowerCase()))
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("");
   };
 
   const handleMonthChange = (event) => {
@@ -62,7 +240,7 @@ function AdminDashboard() {
       legend: {
         position: "bottom",
       },
-      colors: ["#636E72", "#F8C702", "#7C2828"],
+      colors: ["#808080", "#F8C702", "#8C383E"],
     },
   });
 
@@ -75,11 +253,11 @@ function AdminDashboard() {
   }, [month]);
 
   //line chart
-  const [lineChartData] = useState({
+  const [lineChartData, setLineChartData] = useState({
     series: [
       {
-        name: "Desktops",
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 80, 85, 95, 100],
+        name: "Regular Employees",
+        data: [],
       },
     ],
     options: {
@@ -133,20 +311,48 @@ function AdminDashboard() {
     },
   });
 
+  //line chart useEffect
+  useEffect(() => {
+    const fetchRegEmpCountData = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}regEmpCount/getAllByYear`, {
+          params: {
+            year: currentYear,
+          },
+        });
+
+        const empCounts = response.data.map((item) => item.regularEmpCount);
+
+        setLineChartData((prevData) => ({
+          ...prevData,
+          series: [{ ...prevData.series[0], data: empCounts }],
+        }));
+      } catch (error) {
+        console.error("Error fetching regular employee counts:", error);
+      }
+    };
+
+    if (currentYear) {
+      fetchRegEmpCountData();
+    }
+  }, [currentYear]);
+
+  const [deptArray, setDeptArray] = useState([]);
+
   //column chart
-  const [chartData] = useState({
+  const [columnChartData, setColumnChartData] = useState({
     series: [
       {
         name: "3rd Month",
-        data: [10, 7, 5, 12, 6, 10, 4, 6, 5, 8, 3, 2, 5, 6, 3], // Example data for 3rd Month
+        data: [10, 7, 5, 12, 6, 10, 4, 6], // Example data for 3rd Month
       },
       {
         name: "5th Month",
-        data: [5, 3, 4, 6, 3, 4, 2, 4, 3, 4, 1, 1, 2, 3, 1], // Example data for 5th Month
+        data: [5, 3, 4, 6, 3, 4, 2, 4], // Example data for 5th Month
       },
       {
         name: "Regular",
-        data: [15, 18, 12, 17, 20, 15, 16, 13, 17, 19, 12, 15, 18, 14, 20], // Example data for Regular
+        data: [15, 18, 12, 17, 20, 15, 16, 13], // Example data for Regular
       },
     ],
     options: {
@@ -173,23 +379,7 @@ function AdminDashboard() {
         colors: ["transparent"],
       },
       xaxis: {
-        categories: [
-          "HR",
-          "TSG",
-          "QAO",
-          "ETO",
-          "MIS",
-          "Finance",
-          "IMDC",
-          "Guidance",
-          "TSG",
-          "MSDO",
-          "WIL",
-          "OAS",
-          "SAO",
-          "Makerspace",
-          "CES",
-        ], // Department categories
+        categories: [], // Department categories
       },
       yaxis: {
         // title: {
@@ -198,9 +388,9 @@ function AdminDashboard() {
       },
       fill: {
         opacity: 1,
-        colors: ["#7C2828", "#636E72", "#F8C702"], // Match your colors for each series
+        colors: ["#8C383E", "#808080", "#F8C702"], // Match your colors for each series
       },
-      colors: ["#7C2828", "#636E72", "#F8C702"],
+      colors: ["#8C383E", "#808080", "#F8C702"],
       legend: {
         position: "top", // Legend position
         horizontalAlign: "center",
@@ -214,6 +404,60 @@ function AdminDashboard() {
       },
     },
   });
+
+  useEffect(() => {
+    const fetchDepartmentNamesAndCount = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}department/getAllDeptNames`);
+        const departmentNames = response.data;
+        setDeptArray(departmentNames);
+
+        // Fetch employee counts by departments
+        const countsResponse = await axios.get(
+          `${apiUrl}user/counts-by-departments`,
+          {
+            params: {
+              departments: departmentNames.join(","),
+            },
+          }
+        );
+        const countsData = countsResponse.data;
+
+        const seriesData = {
+          "3rd Month": [],
+          "5th Month": [],
+          Regular: [],
+        };
+
+        countsData.forEach((dept) => {
+          seriesData["3rd Month"].push(dept.countOf3MonthProbe);
+          seriesData["5th Month"].push(dept.countOf5MonthProbe);
+          seriesData["Regular"].push(dept.countOfRegEmp);
+        });
+
+        const abbreviatedNames = departmentNames.map(abbreviateDept);
+
+        setColumnChartData((prevData) => ({
+          ...prevData,
+          series: [
+            { name: "3rd Month", data: seriesData["3rd Month"] },
+            { name: "5th Month", data: seriesData["5th Month"] },
+            { name: "Regular", data: seriesData["Regular"] },
+          ],
+          options: {
+            ...prevData.options,
+            xaxis: {
+              categories: abbreviatedNames,
+            },
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching department names:", error);
+      }
+    };
+
+    fetchDepartmentNamesAndCount();
+  }, []);
 
   const handleOpenEditView = () => {
     setOpenEditView(true);
@@ -322,7 +566,7 @@ function AdminDashboard() {
                 style={{
                   height: "31%",
                   width: "100%",
-                  backgroundColor: "#7C2828",
+                  backgroundColor: "#8C383E",
                   borderRadius: "8px",
                   padding: "12px",
                   boxShadow:
@@ -338,9 +582,14 @@ function AdminDashboard() {
                   }}
                 >
                   <div
-                    style={{ height: "30%", fontWeight: "500", color: "white" }}
+                    style={{
+                      height: "30%",
+                      fontWeight: "500",
+                      color: "white",
+                      fontSize: "15px",
+                    }}
                   >
-                    <h3>3rd Month Employees</h3>
+                    <h3>3rd Month Probationaries</h3>
                   </div>
 
                   <div
@@ -359,7 +608,7 @@ function AdminDashboard() {
                         color: "white",
                       }}
                     >
-                      13
+                      {thirdMonthEmpCount}
                     </p>
                     <FontAwesomeIcon
                       icon={faSeedling}
@@ -372,7 +621,7 @@ function AdminDashboard() {
                 style={{
                   height: "31%",
                   width: "100%",
-                  backgroundColor: "#636E72",
+                  backgroundColor: "#808080",
                   //backgroundColor: "#FFEEAD",
                   borderRadius: "8px",
                   padding: "12px",
@@ -389,9 +638,14 @@ function AdminDashboard() {
                   }}
                 >
                   <div
-                    style={{ height: "30%", fontWeight: "500", color: "white" }}
+                    style={{
+                      height: "30%",
+                      fontWeight: "500",
+                      color: "white",
+                      fontSize: "15px",
+                    }}
                   >
-                    <h3>5th Month Employees</h3>
+                    <h3>5th Month Probationaries</h3>
                   </div>
 
                   <div
@@ -410,7 +664,7 @@ function AdminDashboard() {
                         color: "white",
                       }}
                     >
-                      10
+                      {fifthMonthEmpCount}
                     </p>
                     <FontAwesomeIcon
                       icon={faHandshake}
@@ -453,7 +707,7 @@ function AdminDashboard() {
                     }}
                   >
                     <p style={{ fontSize: "40px", fontWeight: "bolder" }}>
-                      256
+                      {regEmpCount}
                     </p>
                     <FontAwesomeIcon
                       icon={faUsers}
@@ -493,12 +747,14 @@ function AdminDashboard() {
                 >
                   Total Regular Employees
                 </h1>
-                <ReactApexChart
-                  options={lineChartData.options}
-                  series={lineChartData.series}
-                  type="line"
-                  height={280}
-                />
+                <div style={{ padding: "0px 10px 0pc 0pc" }}>
+                  <ReactApexChart
+                    options={lineChartData.options}
+                    series={lineChartData.series}
+                    type="line"
+                    height={280}
+                  />
+                </div>
               </div>
             </div>
             {/** Employee Evaluation Pie Chart */}
@@ -521,17 +777,26 @@ function AdminDashboard() {
                   justifyContent: "space-evenly",
                   borderRadius: "10px",
                   backgroundColor: "white",
-                  padding: "10px",
+                  padding: "15px",
                 }}
               >
                 <div
                   style={{
                     //backgroundColor: "yellow",
                     display: "flex",
-                    justifyContent: "end",
+                    width: "99%",
+                    margin: "auto",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     //padding: "5px",
                   }}
                 >
+                  <p style={{ fontSize: "13px" }}>
+                    Employee count:{" "}
+                    {month === "3rd Month"
+                      ? thirdMonthEmp.length
+                      : fifthMonthEmp.length}
+                  </p>
                   <select
                     value={month}
                     onChange={handleMonthChange}
@@ -576,8 +841,8 @@ function AdminDashboard() {
             >
               <div id="chart">
                 <ReactApexChart
-                  options={chartData.options}
-                  series={chartData.series}
+                  options={columnChartData.options}
+                  series={columnChartData.series}
                   type="bar"
                   height={330}
                 />
@@ -616,7 +881,7 @@ function AdminDashboard() {
               >
                 <h2
                   style={{
-                    backgroundColor: "#7C2828",
+                    backgroundColor: "#8C383E",
                     borderRadius: "10px 10px 0px 0px",
                     padding: "5px 15px",
                     fontWeight: "500",
@@ -651,7 +916,7 @@ function AdminDashboard() {
                       alignItems: "center",
                       color: "#636E72",
                       //borderBottom: "1px solid #A9A9A9",
-                      fontSize: "14px",
+                      fontSize: "13px",
                       fontWeight: "500",
                       marginTop: "5px",
                       position: "sticky",
@@ -687,55 +952,76 @@ function AdminDashboard() {
                     </p>
                   </div>
                   {/** users data */}
-                  <div
-                    style={{
-                      //backgroundColor: "#FFAD60",
-                      //padding: "5px 15px",
-                      fontWeight: "500",
+                  {thirdMonthEmp.length > 0 ? (
+                    thirdMonthEmp.map((user) => {
+                      return (
+                        <div
+                          style={{
+                            //backgroundColor: "#FFAD60",
+                            //padding: "5px 15px",
+                            fontWeight: "500",
 
-                      height: "5vh",
-                      width: "95%",
-                      margin: "auto",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      color: "#636E72",
-                      borderBottom: "1px solid #A9A9A9",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <p
+                            height: "5vh",
+                            width: "95%",
+                            margin: "auto",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            color: "#636E72",
+                            borderBottom: "1px solid #A9A9A9",
+                            fontSize: "12px",
+                          }}
+                        >
+                          <p
+                            style={{
+                              //backgroundColor: "tomato",
+                              flex: 2,
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faUser}
+                              style={{ fontSize: "13px", marginRight: "10px" }}
+                            />
+                            {user.fName} {user.lName}
+                          </p>
+                          <p
+                            style={{
+                              //backgroundColor: "lightgreen",
+                              flex: 2,
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            {abbreviateDept(user.dept)}
+                          </p>
+                          <p
+                            style={{
+                              //backgroundColor: "lightcoral",
+                              flex: 2,
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            {user.position}
+                          </p>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div
                       style={{
-                        //backgroundColor: "tomato",
-                        flex: 2,
-                        paddingLeft: "15px",
+                        //backgroundColor: "lightpink",
+                        height: "45%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "end",
                       }}
                     >
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        style={{ fontSize: "13px", marginRight: "10px" }}
-                      />
-                      John Doe
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightgreen",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      MIS
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightcoral",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Programmer
-                    </p>
-                  </div>
+                      <p style={{ fontSize: "13px", color: "#636E72" }}>
+                        There are no 3rd month probationary employees for this
+                        month.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
               <div
@@ -750,7 +1036,7 @@ function AdminDashboard() {
               >
                 <h2
                   style={{
-                    backgroundColor: "#636E72",
+                    backgroundColor: "#808080",
                     borderRadius: "10px 10px 0px 0px",
                     padding: "5px 15px",
                     fontWeight: "500",
@@ -785,7 +1071,7 @@ function AdminDashboard() {
                       alignItems: "center",
                       color: "#636E72",
                       //borderBottom: "1px solid #A9A9A9",
-                      fontSize: "14px",
+                      fontSize: "13px",
                       fontWeight: "500",
                       marginTop: "5px",
                       position: "sticky",
@@ -821,79 +1107,79 @@ function AdminDashboard() {
                     </p>
                   </div>
                   {/** users data */}
-                  <div
-                    style={{
-                      //backgroundColor: "#FFAD60",
-                      //padding: "5px 15px",
-                      fontWeight: "500",
+                  {fifthMonthEmp.length > 0 ? (
+                    fifthMonthEmp.map((user) => {
+                      return (
+                        <div
+                          style={{
+                            //backgroundColor: "#FFAD60",
+                            //padding: "5px 15px",
+                            fontWeight: "500",
 
-                      height: "5vh",
-                      width: "95%",
-                      margin: "auto",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      color: "#636E72",
-                      borderBottom: "1px solid #A9A9A9",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <p
+                            height: "5vh",
+                            width: "95%",
+                            margin: "auto",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            color: "#636E72",
+                            borderBottom: "1px solid #A9A9A9",
+                            fontSize: "12px",
+                          }}
+                        >
+                          <p
+                            style={{
+                              //backgroundColor: "tomato",
+                              flex: 2,
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faUser}
+                              style={{ fontSize: "13px", marginRight: "10px" }}
+                            />
+                            {user.fName} {user.lName}
+                          </p>
+                          <p
+                            style={{
+                              //backgroundColor: "lightgreen",
+                              flex: 2,
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            {abbreviateDept(user.dept)}
+                          </p>
+                          <p
+                            style={{
+                              //backgroundColor: "lightcoral",
+                              flex: 2,
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            {user.position}
+                          </p>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div
                       style={{
-                        //backgroundColor: "tomato",
-                        flex: 2,
-                        paddingLeft: "15px",
+                        //backgroundColor: "lightpink",
+                        height: "45%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "end",
                       }}
                     >
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        style={{ fontSize: "13px", marginRight: "10px" }}
-                      />
-                      John Doe
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightgreen",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      MIS
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightcoral",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Programmer
-                    </p>
-                  </div>
+                      <p style={{ fontSize: "13px", color: "#636E72" }}>
+                        There are no 5th month probationary employees for this
+                        month.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-              {/* <div
-              style={{
-                height: "100%",
-                width: "49%",
-                backgroundColor: "white",
-                borderRadius: "10px",
-                boxShadow:
-                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
-              }}
-            >
-              <h2
-                style={{
-                  backgroundColor: "#FFEEAD",
-                  borderRadius: "10px 10px 0px 0px",
-                  padding: "5px 15px",
-                  fontWeight: "500",
-                  fontSize: "16px",
-                }}
-              >
-                5th-Month Probationary Employee for This Month
-              </h2>
-            </div> */}
+
               <SchoolYearModal
                 openModal={openSYModal}
                 handleCloseModal={handleCloseSYModal}

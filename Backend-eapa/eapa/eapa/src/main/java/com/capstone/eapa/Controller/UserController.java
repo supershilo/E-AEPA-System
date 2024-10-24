@@ -1,6 +1,7 @@
 package com.capstone.eapa.Controller;
 
-import com.capstone.eapa.DTO.PasswordRequest;
+import com.capstone.eapa.DTO.ThirdAndFifthProbeDTO;
+import com.capstone.eapa.DTO.UserCountDTO;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -215,5 +216,58 @@ public class UserController {
         Integer userId = userServ.getHeadUserIdByDept(dept);
         return ResponseEntity.ok(userId);
     }
+
+    //dashboard adi
+    @GetMapping("/getThirdMonthEmpCount")
+    public ResponseEntity<Integer> getThirdMonthEmpCount(){
+        Integer thirdMonthEmpCount = userServ.getThirdMonthEmpCount();
+        return ResponseEntity.ok(thirdMonthEmpCount);
+    }
+    @GetMapping("/getFifthMonthEmpCount")
+    public ResponseEntity<Integer> getFifthMonthEmpCount(){
+        Integer fifthMonthEmpCount = userServ.getFifthMonthEmpCount();
+        return ResponseEntity.ok(fifthMonthEmpCount);
+    }
+    @GetMapping("/getRegularEmpCount")
+    public ResponseEntity<Integer> getRegularEmpCount(){
+        Integer regularEmpCount = userServ.getRegularEmpCount();
+        return ResponseEntity.ok(regularEmpCount);
+    }
+
+    @GetMapping("/get3rdMonthProbeEmp")
+    public ResponseEntity<List<ThirdAndFifthProbeDTO>> get3rdMonthProbeEmp(){
+        List<ThirdAndFifthProbeDTO> userList = userServ.getAll3rdMonthProbeEmp("3rd Probationary");
+
+        if (userList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(userList);
+        }
+    }
+
+    @GetMapping("/get5thMonthProbeEmp")
+    public ResponseEntity<List<ThirdAndFifthProbeDTO>> get5thMonthProbeEmp(){
+        List<ThirdAndFifthProbeDTO> userList = userServ.getAll3rdMonthProbeEmp("5th Probationary");
+
+        if (userList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(userList);
+        }
+    }
+
+    //return user counts by dept
+    @GetMapping("/userCounts/{department}")
+    public ResponseEntity<UserCountDTO> getUserCounts(@PathVariable String department) {
+        UserCountDTO counts = userServ.getUserCountsByDept(department);
+        return ResponseEntity.ok(counts);
+    }
+
+    //return user counts by array of depts
+    @GetMapping("/counts-by-departments")
+    public List<UserCountDTO> getCountsByDepartments(@RequestParam String[] departments) {
+        return userServ.getEmployeeCountsByDepartments(departments);
+    }
+
 }
 
