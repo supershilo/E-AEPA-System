@@ -17,6 +17,8 @@ public class EvaluationDTO {
     private String sjbpStatus;
     private String svbpaStatus;
     private String pvbpaStatus;
+    private String hjbpStatus;
+    private String hvbpaStatus;
     private String dateHired;
 
     
@@ -25,6 +27,22 @@ public class EvaluationDTO {
 
     public String getDateHired() {
         return dateHired;
+    }
+
+    public String getHjbpStatus() {
+        return hjbpStatus;
+    }
+
+    public void setHjbpStatus(String hjbpStatus) {
+        this.hjbpStatus = hjbpStatus;
+    }
+
+    public String getHvbpaStatus() {
+        return hvbpaStatus;
+    }
+
+    public void setHvbpaStatus(String hvbpaStatus) {
+        this.hvbpaStatus = hvbpaStatus;
     }
 
     public void setDateHired(String dateHired) {

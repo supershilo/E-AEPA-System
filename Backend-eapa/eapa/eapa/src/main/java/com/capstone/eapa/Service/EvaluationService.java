@@ -18,12 +18,15 @@ import com.capstone.eapa.Repository.UserRepository;
 
 import io.jsonwebtoken.lang.Objects;
 import jakarta.transaction.Transactional;
+
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
@@ -143,10 +146,13 @@ public class EvaluationService {
     public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String period, String stage, String evalType, int peerID) {
         return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID, period, stage, evalType, peerID);
     }
-//    public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String period, String stage, String evalType, int peerID) {
-//        Integer evalID = evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID, period, stage, evalType, peerID);
-//        return evalID != null ? evalID : null;
-//    }
+    // public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String
+    // period, String stage, String evalType, int peerID) {
+    // Integer evalID =
+    // evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID,
+    // period, stage, evalType, peerID);
+    // return evalID != null ? evalID : null;
+    // }
 
     // Get evaluation ID for HEAD
     public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage,
@@ -173,19 +179,30 @@ public class EvaluationService {
     }
 
     // returns true if annual evaluation is done
-    public boolean isEvaluationCompletedAnnual(int userID, String period, String stage, String evalType, String schoolYear) {
-        String status = evalRepo.findStatusByUserIDPeriodStageEvalTypeAndSchoolYear(userID, period, stage, evalType, schoolYear);
+    public boolean isEvaluationCompletedAnnual(int userID, String period, String stage, String evalType,
+            String schoolYear) {
+        String status = evalRepo.findStatusByUserIDPeriodStageEvalTypeAndSchoolYear(userID, period, stage, evalType,
+                schoolYear);
         return "COMPLETED".equals(status);
     }
 
     public List<EvaluationEntity> getEvaluationsByUser(int userID) {
         return evalRepo.findByUserID(userID);
     }
-//ANGELA
+
+    // ANGELA
     public List<EvaluationDTO> getAggregatedEvaluations() {
         List<EvaluationEntity> evaluations = evalRepo.findAll();
-
         Map<Integer, String> overallStatuses = apeServ.getOverallStatus();
+
+        // Collect user IDs for HEAD evaluations
+        Set<Integer> userIdsForHeadEval = evaluations.stream()
+                .filter(eval -> "HEAD".equals(eval.getEvalType()) && eval.getPeer() != null)
+                .map(eval -> eval.getPeer().getUserID())
+                .collect(Collectors.toSet());
+
+        // Get head evaluation statuses
+        List<EvaluationDTO> headEvalStatuses = getHeadEvalStatus(userIdsForHeadEval);
 
         return evaluations.stream()
                 .collect(Collectors.groupingBy(EvaluationEntity::getUserId))
@@ -195,7 +212,7 @@ public class EvaluationService {
                     UserEntity user = userRepo.findByUserID(userId).orElse(null);
 
                     if (user == null) {
-                        return null; // Handle missing user case
+                        return null; 
                     }
 
                     String workID = user.getWorkID();
@@ -220,8 +237,16 @@ public class EvaluationService {
                     dto.setDateHired(dateHired);
 
                     // Set overall status from AssignedPeerEvaluators
-                    String overallStatus = overallStatuses.get(userId); // assuming userId corresponds to assigned_peers_id
-                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "PENDING"); // Default to PENDING if not found
+                    String overallStatus = overallStatuses.get(userId); 
+                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "PENDING");
+
+                    headEvalStatuses.stream()
+                            .filter(headDto -> headDto.getUserId() == userId)
+                            .findFirst()
+                            .ifPresent(headDto -> {
+                                dto.setHjbpStatus(headDto.getHjbpStatus());
+                                dto.setHvbpaStatus(headDto.getHvbpaStatus());
+                            });
 
                     for (EvaluationEntity eval : userEvaluations) {
                         switch (eval.getEvalType() + "-" + eval.getStage()) {
@@ -231,97 +256,127 @@ public class EvaluationService {
                             case "SELF-VALUES":
                                 dto.setSvbpaStatus(eval.getStatus());
                                 break;
-                            // Add more cases as needed
                         }
                     }
                     return dto;
                 })
-                // .filter(Objects::nonNull) // Remove any null entries
                 .collect(Collectors.toList());
     }
 
- //total employee for recommendation
- public long countRecommendedEmployees() {
-    return evalRepo.countByPeriodAndStatus();
-}
+    public List<EvaluationDTO> getHeadEvalStatus(Set<Integer> userIds) {
+        List<EvaluationEntity> evaluations = evalRepo.findAll();
+    
+        
+        Map<Integer, EvaluationDTO> dtoMap = new HashMap<>();
+    
+        evaluations.stream()
+            .filter(eval -> "HEAD".equals(eval.getEvalType()) && eval.getPeer() != null) 
+            .filter(eval -> userIds.contains(eval.getPeer().getUserID())) 
+            .forEach(eval -> {
+                int peerId = eval.getPeer().getUserID();
+                EvaluationDTO dto = dtoMap.computeIfAbsent(peerId, id -> {
+                    EvaluationDTO newDto = new EvaluationDTO();
+                    newDto.setUserId(eval.getPeer().getUserID()); 
+                    newDto.setRole(eval.getPeer().getRole());
+                    newDto.setWorkID(eval.getPeer().getWorkID());
+                    newDto.setDept(eval.getPeer().getDept());
+                    newDto.setEmpStatus(eval.getPeer().getEmpStatus());
+                    return newDto; 
+                });
+    
+                // Set the status based on evalType and stage
+                switch (eval.getStage()) {
+                    case "JOB":
+                        dto.setHjbpStatus(eval.getStatus()); 
+                        break;
+                    case "VALUES":
+                        dto.setHvbpaStatus(eval.getStatus()); 
+                        break;
+                }
+            });
+    
+        return new ArrayList<>(dtoMap.values()); 
+    }
 
-//3rd Month: Eligible takers
-public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
-List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
-List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
+    // total employee for recommendation
+    public long countRecommendedEmployees() {
+        return evalRepo.countByPeriodAndStatus();
+    }
 
-int totalEligible = eligibleUsers.size();
-int completed = completedEvaluations.size();
-int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+    // 3rd Month: Eligible takers
+    public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
+        List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
+        List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
 
-return new EvaluationStatusDTO(completed, notCompleted);
-}
+        int totalEligible = eligibleUsers.size();
+        int completed = completedEvaluations.size();
+        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
 
-public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
-    List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
-    List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
+        return new EvaluationStatusDTO(completed, notCompleted);
+    }
 
-    int totalEligible = eligibleUsers.size();
-    int completed = completedEvaluations.size();
-    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+    public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
+        List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
+        List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
 
-    return new EvaluationStatusDTO(completed, notCompleted);
-}
+        int totalEligible = eligibleUsers.size();
+        int completed = completedEvaluations.size();
+        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
 
-public EvaluationStatusDTO getAnnualEvaluationStatus() {
-    List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
-    List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
+        return new EvaluationStatusDTO(completed, notCompleted);
+    }
 
-    int totalEligible = eligibleUsers.size();
-    int completed = completedEvaluations.size();
-    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+    public EvaluationStatusDTO getAnnualEvaluationStatus() {
+        List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
+        List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
 
-    return new EvaluationStatusDTO(completed, notCompleted);
-}
+        int totalEligible = eligibleUsers.size();
+        int completed = completedEvaluations.size();
+        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
 
+        return new EvaluationStatusDTO(completed, notCompleted);
+    }
 
-// New methods for only completed counts
-public long getCompleted3rdMonthEvaluationCount() {
-    return evalRepo.getCompleted3rdMonthEvaluation().size();
-}
+    // New methods for only completed counts
+    public long getCompleted3rdMonthEvaluationCount() {
+        return evalRepo.getCompleted3rdMonthEvaluation().size();
+    }
 
-public long getCompleted5thMonthEvaluationCount() {
-    return evalRepo.getCompleted5thMonthEvaluation().size();
-}
+    public long getCompleted5thMonthEvaluationCount() {
+        return evalRepo.getCompleted5thMonthEvaluation().size();
+    }
 
-public long getCompletedAnnualEvaluationCount() {
-    return evalRepo.getCompletedAnnualEvaluation().size();
-}
+    public long getCompletedAnnualEvaluationCount() {
+        return evalRepo.getCompletedAnnualEvaluation().size();
+    }
 
+    public Long getTotalUniqueUserIds() {
+        return evalRepo.countUniqueUserIds();
+    }
 
-public Long getTotalUniqueUserIds() {
-    return evalRepo.countUniqueUserIds();
-}
+    // Evaluation Count per Department : 3rd Month
+    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForThirdMonth() {
+        List<Object[]> results = evalRepo.countCompletedForThirdMonthPerDept();
+        return results.stream()
+                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                .collect(Collectors.toList());
+    }
 
-//Evaluation Count per Department : 3rd Month
-public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForThirdMonth() {
-    List<Object[]> results = evalRepo.countCompletedForThirdMonthPerDept();
-    return results.stream()
-            .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
-            .collect(Collectors.toList());
-}
+    // Evaluation Count per Department : Annual
+    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForAnnual() {
+        List<Object[]> results = evalRepo.countCompletedForAnnualPerDept();
+        return results.stream()
+                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                .collect(Collectors.toList());
+    }
 
-//Evaluation Count per Department : Annual
-public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForAnnual() {
-    List<Object[]> results = evalRepo.countCompletedForAnnualPerDept();
-    return results.stream()
-            .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
-            .collect(Collectors.toList());
-}
-//Evaluation Count per Department : 5th Month
-public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForFifthMonth() {
-    List<Object[]> results = evalRepo.countCompletedForFifthMonthPerDept();
-    return results.stream()
-            .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
-            .collect(Collectors.toList());
-}
-
-
+    // Evaluation Count per Department : 5th Month
+    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForFifthMonth() {
+        List<Object[]> results = evalRepo.countCompletedForFifthMonthPerDept();
+        return results.stream()
+                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                .collect(Collectors.toList());
+    }
 
     public AveragesDTO getPeerEvaluationAverages(int peerID, int userID, String period, String evalType) {
         List<EvaluationEntity> evaluations = evalRepo.findByUserIDAndPeerIDAndPeriodAndEvalType(userID, peerID, period,
