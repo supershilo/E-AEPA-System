@@ -3,7 +3,7 @@
 // SI DATEHIRED D MO DISPLAY
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, CircularProgress, Stack } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
@@ -23,6 +23,7 @@ function HeadEvalResult() {
   const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
 
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
@@ -71,6 +72,7 @@ function HeadEvalResult() {
           ...item,
           name: `${item.fName} ${item.lName}`,
           userID: item.userID,
+          dateHired: item.dateHired,
         }));
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
@@ -98,6 +100,7 @@ function HeadEvalResult() {
   }, [showPasswordModal, updateFetch, userID]);
 
   const handleViewResultClick = async (userId) => {
+    setLoading(true); 
     try {
       const response = await fetch(`${apiUrl}user/getUser/${userId}`);
       if (!response.ok) {
@@ -108,9 +111,11 @@ function HeadEvalResult() {
       setEmployee(userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
+    } finally {
+      setLoading(false); // Stop the loader
     }
   };
-  
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -142,32 +147,14 @@ function HeadEvalResult() {
       label: "Date Hired",
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
-    },
-
-    {
-      id: "actions",
-      label: "Result",
-      minWidth: 150,
-      align: "center",
-      format: (value, row) => {
-        return (
-          <div>
-            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" && (
-              <Button sx={{
-                color: '#8c383e',
-                fontSize: '.9em', "&:hover": { color: "red", },
-                fontFamily: 'Poppins'
-              }}
-                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
-                onClick={() => handleViewResultClick(row.userId)}>
-                View
-              </Button>
-            )}
-
-          </div>
-        );
-      },
+      format: (value) => {
+        const date = new Date(value);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
     },
   ];
 
@@ -244,53 +231,59 @@ function HeadEvalResult() {
         )}
 
 
-<Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
           <Grid container
-              spacing={1.5}
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}>
+            spacing={1.5}
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}>
             {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
-              {showPasswordModal ? (
+            {showPasswordModal ? (
+              <Stack spacing={1}>
                 <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
-              ) : (
-                <TableContainer  sx={{ height: '30.68em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}>
-                  <Table stickyHeader aria-label="sticky table" size="small">
-                    <TableHead sx={{ height: "2em" }}>
-                      <TableRow>
-                        {columnsEmployees.map((column) => (
-                          <TableCell
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                          >
-                            {column.label}
+                <Skeleton variant="rectangular" width='80em' height={500} />
+              </Stack>
+              
+              
+            ) : (
+              <TableContainer sx={{ height: '29.5em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}>
+                <Table stickyHeader aria-label="sticky table" size="small">
+                  <TableHead sx={{ height: "2em" }}>
+                    <TableRow>
+                      {columnsEmployees.map((column) => (
+                        <TableCell
+                          sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                          key={column.id}
+                          align={column.align}
+                          style={{ minWidth: column.minWidth }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  {hasData ? (
+                    <TableBody>
+                      {paginatedRows.map((row) => (
+                        <TableRow
+                          sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
+                          key={row.id}
+                          onClick={() => handleViewResultClick(row.userId)}
+                        >
+                          {columnsEmployees.map((column) => (
+                            <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
+                            {column.id === "name" ?  row.name : column.format ? column.format(row[column.id]) : row[column.id]}
                           </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    {hasData ? (
-                      <TableBody>
-                        {paginatedRows.map((row) => (
-                          <TableRow
-                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
-                            key={row.id}
-                          >
-                            {columnsEmployees.map((column) => (
-                              <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
-                                {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    ) : (
-<TableBody>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  ) : (
+                    <TableBody>
                       <TableRow>
-                        <TableCell sx={{  height: '32.3em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
+                        <TableCell sx={{ height: '32.3em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
                           <Typography
                             sx={{
                               textAlign: "center",
@@ -305,18 +298,26 @@ function HeadEvalResult() {
                         </TableCell>
                       </TableRow>
                     </TableBody>
-                    )}
+                  )}
 
-                  </Table>
-                </TableContainer>
-              )}
+                </Table>
+              </TableContainer>
+            )}
             {/* </Card> */}
           </Grid>
-          <ViewResults
-            open={showViewRatingsModal}
-            onClose={() => setViewRatingsModal(false)}
-            employee={employee}
-          />
+          {loading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%',  }}>
+              <CircularProgress  color='inherit' />
+            </Box>
+          )}
+
+          {!loading && (
+            <ViewResults
+              open={showViewRatingsModal}
+              onClose={() => setViewRatingsModal(false)}
+              employee={employee}
+            />
+          )}
         </Box>
         {/* pagination */}
         {showPasswordModal ? (
