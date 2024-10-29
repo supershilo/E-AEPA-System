@@ -1005,17 +1005,59 @@ function EvaluationForm({
                       <React.Fragment key={index}>
                         <h2
                           style={{
-                            fontWeight: "500",
+                            fontWeight: "600",
                             margin: "15px 0px 15px 0px",
                           }}
                         >
-                          {formType === "PEER"
-                            ? "Suggestions / Insights for the Co-Worker"
-                            : "Personal Insights / Perspectives on my performance:"}
+                          Personal Insights / Perspectives on my performance:
                         </h2>
+
                         <div>
                           <label htmlFor={ques.quesID}>{ques.quesText}</label>
                           <textarea
+                            required
+                            id={ques.quesID}
+                            style={{
+                              margin: "8px 0px 5px 0px",
+                              height: "100px",
+                              width: "100%",
+                              border: "1px solid black",
+                              borderRadius: "5px",
+                              padding: "5px",
+                              boxSizing: "border-box",
+                              overflow: "hidden",
+                              resize: "none",
+                            }}
+                            onChange={(e) =>
+                              handleTextareaChange(ques.quesID, e.target.value)
+                            }
+                          ></textarea>
+                        </div>
+                      </React.Fragment>
+                    );
+                  }
+
+                  if (
+                    formType === "PEER-A" &&
+                    ques.kind === "FILL" &&
+                    !hasRenderedFillHeading
+                  ) {
+                    hasRenderedFillHeading = true;
+                    return (
+                      <React.Fragment key={index}>
+                        <h2
+                          style={{
+                            fontWeight: "600",
+                            margin: "15px 0px 15px 0px",
+                          }}
+                        >
+                          Suggestions / Insights for the Co-Worker
+                        </h2>
+
+                        <div>
+                          <label htmlFor={ques.quesID}>{ques.quesText}</label>
+                          <textarea
+                            required
                             id={ques.quesID}
                             style={{
                               margin: "8px 0px 5px 0px",
@@ -1071,6 +1113,7 @@ function EvaluationForm({
                             }}
                           >
                             <input
+                              required
                               type="radio"
                               id={`ques-${index}-opt-${value}`}
                               name={`question-${index}`}
@@ -1093,6 +1136,7 @@ function EvaluationForm({
                         <div key={index}>
                           <label htmlFor={ques.quesID}>{ques.quesText}</label>
                           <textarea
+                            required
                             id={ques.quesID}
                             style={{
                               margin: "8px 0px 15px 0px",
@@ -1225,6 +1269,7 @@ function EvaluationForm({
                               onChange={(e) =>
                                 handleHeadJobScoreChange(index, e.target.value)
                               }
+                              required
                             >
                               <MenuItem value={1}>1</MenuItem>
                               <MenuItem value={2}>2</MenuItem>
@@ -1260,6 +1305,7 @@ function EvaluationForm({
                             boxSizing: "border-box",
                             overflow: "hidden",
                             resize: "none",
+                            required,
                           }}
                           onChange={(e) =>
                             handleJobTextareaChange(i, e.target.value)
@@ -1302,6 +1348,7 @@ function EvaluationForm({
                               onChange={(e) =>
                                 handleJobScoreChange(i, e.target.value)
                               }
+                              required
                             >
                               <MenuItem value={1}>1</MenuItem>
                               <MenuItem value={2}>2</MenuItem>

@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-//import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
-import { Box, Grid, Typography, Paper, Container } from "@mui/material";
-import EvaluationStatusChart from "../components/EvaluationStatusChart";
-import EmployeeStatusChart from "../components/EmployeeStatusChart";
-import AccomplishmentRateChart from "../components/AccomplishmentRateChart";
-import ThirdMonthCompletion from "../components/ThirdMonthCompletion";
-import FifthMonthCompletion from "../components/FifthMonthCompletion";
-import AnnualCompletion from "../components/AnnualCompletion";
+import { Typography } from "@mui/material";
 import SchoolYearModal from "../modals/SchoolYearModal";
 import Button from "@mui/material/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,26 +8,26 @@ import {
   faHandshake,
   faUsers,
   faUser,
+  faUsersSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import ReactApexChart from "react-apexcharts";
 import Loader from "../components/Loader";
 import axios from "axios";
 import { apiUrl } from "../config/config";
-import { format, differenceInMonths, isSameMonth } from "date-fns";
+import { isSameMonth } from "date-fns";
 
 function AdminDashboard() {
-  const [currentDate, setCurrentDate] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [openSYModal, setOpenSYModal] = useState(false);
   const [isOpenView, setIsOpenView] = useState(false);
   const [openAddSY, setOpenAddSY] = useState(false);
   const [openEditView, setOpenEditView] = useState(false);
-  const [month, setMonth] = useState("3rd Month");
-  const data = {
-    "3rd Month": [2, 2, 1],
-    "5th Month": [20, 25, 55],
-  };
+  const [pieMonth, setPieMonth] = useState("3rd Month");
+  const [pieData, setPieData] = useState({
+    "3rd Month": [0, 0, 0],
+    "5th Month": [0, 0, 0],
+  });
 
   const [thirdMonthEmpCount, setThirdMonthEmpCount] = useState(0);
   const [fifthMonthEmpCount, setFifthMonthEmpCount] = useState(0);
@@ -54,12 +46,6 @@ function AdminDashboard() {
 
   const { month: currentMonth, year: currentYear } = getCurrentMonthAndYear();
   console.log("Current month and year:", currentMonth, currentYear);
-
-  useEffect(() => {
-    const now = new Date();
-    const formattedDate = format(now, "MMMM dd, yyyy | EEEE");
-    setCurrentDate(formattedDate);
-  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
@@ -208,6 +194,9 @@ function AdminDashboard() {
     fetchProbationaryEmp();
   }, []);
 
+  console.log("third month emps: ", thirdMonthEmp);
+  console.log("fifth month emps: ", fifthMonthEmp);
+
   const abbreviateDept = (deptName) => {
     if (!deptName) {
       return "";
@@ -226,13 +215,13 @@ function AdminDashboard() {
       .join("");
   };
 
-  const handleMonthChange = (event) => {
-    setMonth(event.target.value);
+  const handlePieMonthChange = (event) => {
+    setPieMonth(event.target.value);
   };
 
   //pie chart
   const [pieChartData, setPieChartData] = useState({
-    series: data[month], // Use the data for the selected month
+    series: pieData[pieMonth],
     options: {
       chart: {
         type: "donut",
@@ -246,13 +235,120 @@ function AdminDashboard() {
     },
   });
 
+  const [evalStatuses, setEvalStatuses] = useState([]);
+  const [filtered3rdEvalStats, setFiltered3rdEvalStats] = useState([]);
+  const [filtered5thEvalStats, setFiltered5thEvalStats] = useState([]);
+
+  //fetch user evaluations statuses
+  useEffect(() => {
+    const fetchEvalStatus = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}evaluation/evaluations`);
+
+        setEvalStatuses(response.data);
+      } catch (error) {
+        console.log("Error fetching user evaluation statuses: ", error);
+      }
+    };
+
+    fetchEvalStatus();
+  }, [thirdMonthEmp, fifthMonthEmp]);
+
+  //console.log("Eval statuses: ", evalStatuses);
+  useEffect(() => {
+    const filterStatsByMonth = () => {
+      const thirdMonthFiltered = evalStatuses.filter((status) =>
+        thirdMonthEmp.some((emp) => emp.userID === status.userId)
+      );
+      const fifthMonthFiltered = evalStatuses.filter((status) =>
+        fifthMonthEmp.some((emp) => emp.userID === status.userId)
+      );
+
+      setFiltered3rdEvalStats(thirdMonthFiltered);
+      setFiltered5thEvalStats(fifthMonthFiltered);
+    };
+
+    filterStatsByMonth();
+  }, [evalStatuses, thirdMonthEmp, fifthMonthEmp]);
+
+  // console.log("filtered third eval emps stats: ", filtered3rdEvalStats);
+  // console.log("Count of third eval emps: ", thirdMonthEmp.length);
+
+  // function to count pending user objects
+  const countPendingUsers = (users) =>
+    users.reduce((count, user) => {
+      const statuses = [
+        user.sjbpStatus,
+        user.svbpaStatus,
+        user.pvbpaStatus,
+        user.hjbpStatus,
+        user.hvbpaStatus,
+      ];
+
+      return statuses.every((status) => !status || status === "PENDING")
+        ? count + 1
+        : count;
+    }, 0);
+
+  // Function to count completed user objects
+  const countCompletedUsers = (users) => {
+    return users.reduce((count, user) => {
+      const isCompleted =
+        user.sjbpStatus === "COMPLETED" &&
+        user.svbpaStatus === "COMPLETED" &&
+        user.pvbpaStatus === "COMPLETED" &&
+        user.hjbpStatus === "COMPLETED" &&
+        user.hvbpaStatus === "COMPLETED";
+
+      return isCompleted ? count + 1 : count;
+    }, 0);
+  };
+
+  // Function to count "In-Progress" user objects
+  const countInProgressUsers = (users) => {
+    return users.reduce((count, user) => {
+      const statuses = [
+        user.sjbpStatus,
+        user.svbpaStatus,
+        user.pvbpaStatus,
+        user.hjbpStatus,
+        user.hvbpaStatus,
+      ];
+
+      const hasAtLeastOneCompleted = statuses.includes("COMPLETED");
+      const isNotFullyCompleted = statuses.some(
+        (status) => status !== "COMPLETED" && status !== null
+      );
+
+      return hasAtLeastOneCompleted && isNotFullyCompleted ? count + 1 : count;
+    }, 0);
+  };
+
+  useEffect(() => {
+    setPieData({
+      "3rd Month": [
+        thirdMonthEmp.length - countInProgressUsers(filtered3rdEvalStats),
+        countInProgressUsers(filtered3rdEvalStats),
+        countCompletedUsers(filtered3rdEvalStats),
+      ],
+      "5th Month": [
+        fifthMonthEmp.length - countInProgressUsers(filtered5thEvalStats),
+        countInProgressUsers(filtered5thEvalStats),
+        countCompletedUsers(filtered5thEvalStats),
+      ],
+    });
+  }, [filtered3rdEvalStats, filtered5thEvalStats]);
+
   // Update the pie chart data when the month changes
   useEffect(() => {
     setPieChartData((prevState) => ({
       ...prevState,
-      series: data[month], // Update series based on selected month
+      series: pieData[pieMonth],
     }));
-  }, [month]);
+  }, [pieMonth, pieData]);
+
+  const empPieCount =
+    pieMonth === "3rd Month" ? thirdMonthEmp.length : fifthMonthEmp.length;
 
   //line chart
   const [lineChartData, setLineChartData] = useState({
@@ -514,7 +610,6 @@ function AdminDashboard() {
         <Typography variant="h5" fontWeight="bolder" fontFamily="Poppins">
           Dashboard
         </Typography>
-        {/* <Typography variant="h7" fontFamily="Poppins">{currentDate}</Typography> */}
         <Button
           onClick={handleOpenSYModal}
           sx={{
@@ -794,14 +889,11 @@ function AdminDashboard() {
                   }}
                 >
                   <p style={{ fontSize: "13px" }}>
-                    Employee count:{" "}
-                    {month === "3rd Month"
-                      ? thirdMonthEmp.length
-                      : fifthMonthEmp.length}
+                    Employee count: {empPieCount}
                   </p>
                   <select
-                    value={month}
-                    onChange={handleMonthChange}
+                    value={pieMonth}
+                    onChange={handlePieMonthChange}
                     style={{ border: "2px solid #636E72", borderRadius: "5px" }}
                   >
                     <option value="3rd Month">3rd Month</option>
@@ -810,12 +902,47 @@ function AdminDashboard() {
                   </select>
                 </div>
 
-                <ReactApexChart
-                  options={pieChartData.options}
-                  series={pieChartData.series}
-                  type="donut"
-                  height={300}
-                />
+                {empPieCount === 0 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faUsersSlash}
+                      style={{ fontSize: "25px", color: "#808080" }}
+                    />
+                    <p
+                      style={{
+                        color: "#808080",
+                        fontSize: "14px",
+                        paddingTop: "15px",
+                      }}
+                    >
+                      No employees found
+                    </p>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    <ReactApexChart
+                      options={pieChartData.options}
+                      series={pieChartData.series}
+                      type="donut"
+                      height={300}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
