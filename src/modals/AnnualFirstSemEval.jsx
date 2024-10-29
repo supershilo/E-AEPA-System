@@ -6,13 +6,13 @@ import arrow from "../assets/arrow.png";
 import boxes from "../assets/matrixboxes.png";
 import bottomArrow from "../assets/bottomarrow.png";
 import Chart from "react-apexcharts";
-import ThirdMonthComments from "../modals/ThirdMonthComments";
+import AnnualFirstSemComments from "../modals/AnnualFirstSemComments";
 import axios from "axios";
 import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
+const AnnualFirstSemEval = ({ userId, filter }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -38,8 +38,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
         const filteredEvaluation = evaluations.find(evaluation => 
           evaluation.evalType === "SELF" &&
           evaluation.stage === "VALUES" &&
-          evaluation.period === "3rd Month" &&
-          evaluation.schoolYear === selectedYear
+          evaluation.period === "Annual-1st"
         );
 
   
@@ -179,8 +178,9 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
   //fetch Averages
   useEffect(() => {
     const fetchData = async () => {
+      //setLoading(true); 
       // SELF VALUES
-      const fetchSelfValuesThirdMonth = async () => {
+      const fetchSelfValuesAnnualFirst = async () => {
         try {
           const response = await axios.get(
             `${apiUrl}results/getAverages`,
@@ -189,7 +189,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
                 userId: userId,
                 evalType: "SELF",
                 stage: "VALUES",
-                period: "3rd Month",
+                period: "Annual-1st",
               },
             }
           );
@@ -231,7 +231,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
 
 
       // SELF JOB
-      const fetchSelfJobThirdMonth = async () => {
+      const fetchSelfJobAnnualFirst = async () => {
         try {
           const response = await axios.get(
             `${apiUrl}results/getAverages`,
@@ -240,7 +240,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
                 userId: userId,
                 evalType: "SELF",
                 stage: "JOB",
-                period: "3rd Month",
+                period: "Annual-1st",
               },
             }
           );
@@ -258,14 +258,14 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
 
 
       //PEER VALUES
-      const fetchPeerThirdMonth = async () => {
+      const fetchPeerAnnualFirst = async () => {
         try {
           // Fetch assigned peer ID
           const assignedPeerIdResponse = await axios.get(
             `${apiUrl}assignedPeers/getAssignedPeersId`,
             {
               params: {
-                period: "3rd Month",
+                period: "Annual-1st",
                 evaluateeId: userId,
               },
             }
@@ -303,7 +303,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
                 params: {
                   userID: evaluatorId,
                   peerID: userId,
-                  period: "3rd Month",
+                  period: "Annual-1st",
                   evalType: 'PEER-A',
                 },
               }
@@ -330,14 +330,14 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
       };
 
       //HEAD JOB
-      const fetchHeadJobThirdMonth = async () => {
+      const fetchHeadJobAnnualFirst = async () => {
         try {
           const response = await axios.get(
               `${apiUrl}results/getJobRespAverageByEmpId`,
               {
                   params: {
                       empId: userId,
-                      period: "3rd Month",
+                      period: "Annual", //SUBJECT TO CHANGE "Annual-1st"
                   },
               }
           );
@@ -351,7 +351,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
       };
       
 // HEAD VALUES
-const fetchHeadValuesThirdMonth = async () => {
+const fetchHeadValuesAnnualFirst = async () => {
   try {
     const response = await axios.get(
       `${apiUrl}results/getValuesAveragesByEmpIdAndEvalType`,
@@ -363,8 +363,8 @@ const fetchHeadValuesThirdMonth = async () => {
     );
 
     const data = response.data;
-
-    if (data.period === "3rd Month") {
+    console.log("HV: ", data);
+    if (data.period === "Annual") { //SUBJECT TO CHANGE "Annual-1st"
       const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
       const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
       const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));
@@ -389,7 +389,7 @@ const fetchHeadValuesThirdMonth = async () => {
 
       console.log("Overall Head Values Based PA:", parseFloat(overallHeadVBPA.toFixed(2)));
     } else {
-      console.log("The data is not for the 3rd Month period.");
+      console.log("The data is not for the Annual-1st period.");
     }
   } catch (error) {
     console.error(`Error: ${error.message}`);
@@ -398,11 +398,11 @@ const fetchHeadValuesThirdMonth = async () => {
 
 
 
-      fetchSelfValuesThirdMonth();
-      fetchSelfJobThirdMonth();
-      fetchHeadValuesThirdMonth();
-      fetchHeadJobThirdMonth();
-      fetchPeerThirdMonth();
+      fetchSelfValuesAnnualFirst();
+      fetchSelfJobAnnualFirst();
+      fetchHeadValuesAnnualFirst();
+      fetchHeadJobAnnualFirst();
+      fetchPeerAnnualFirst();
     };
 
     fetchData();
@@ -629,7 +629,7 @@ const fetchHeadValuesThirdMonth = async () => {
     ) : (
     <div className="justify-center items-center" >
 
-      {/* 3RD EVALUATION TAB*/}
+      {/* ANNUAL FIRST SEM EVALUATION TAB*/}
       <div className="mx-4 mb-4">
         <Typography
           variant="h5"
@@ -651,7 +651,7 @@ const fetchHeadValuesThirdMonth = async () => {
             fontFamily: "Poppins",
           }}
         >
-          3RD MONTH EVALUATION RESULT
+          ANNUAL EVALUATION RESULT (1st Semester)
         </Typography>
         <Divider
           sx={{
@@ -805,7 +805,7 @@ const fetchHeadValuesThirdMonth = async () => {
                         fontFamily: "Poppins",
                       }}
                     >
-                      {filter === "overall" ? "Overall AEPA" : `${filter.charAt(0).toUpperCase() + filter.slice(1)} AEPA`}
+                     {filter === "overall" ? "Overall AEPA" : `${filter.charAt(0).toUpperCase() + filter.slice(1)} AEPA`}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -922,7 +922,7 @@ const fetchHeadValuesThirdMonth = async () => {
                     fontFamily: "Poppins",
                   }}
                 >
-                  3RD MONTH PERIOD EVALUATION
+                  ANNUAL EVALUATION (1ST SEM)
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -1651,7 +1651,7 @@ const fetchHeadValuesThirdMonth = async () => {
             </>
           )}
         </div>
-        <ThirdMonthComments userId={userId} filter={filter} />
+        <AnnualFirstSemComments userId={userId} filter={filter} />
         <div
           style={{
             display: "flex",
@@ -1761,4 +1761,4 @@ const fetchHeadValuesThirdMonth = async () => {
   );
 }
 
-export default ThirdMonthEval;
+export default AnnualFirstSemEval;

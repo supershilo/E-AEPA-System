@@ -75,7 +75,11 @@ public class AcademicYearController {
     public List<AcademicYearEntity> getAllAcademicYears(){
         return acadYearServ.getAllAcademicYears();
     }
-
+    // Get all academic years formatted as "YYYY-YYYY"
+    @GetMapping("/getAllFormattedAcadYears")
+    public List<String> getAllFormattedAcademicYears() {
+        return acadYearServ.getAllFormattedAcademicYears();
+    }
     // New method to get the current academic year with semesters
     @GetMapping("/current-year-full")
     public ResponseEntity<AcademicYearEntity> getCurrentAcademicYearEntity() {

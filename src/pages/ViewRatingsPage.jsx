@@ -1,23 +1,23 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { apiUrl } from "../config/config";
 import {
   Box,
+  Button,
   Tabs,
   Tab,
   MenuItem,
   Select,
   FormControl,
-  Button,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
-import domtoimage from "dom-to-image";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import AnnualFirstSemEval from "../modals/AnnualFirstSemEval";
+import AnnualSecondSemEval from "../modals/AnnualSecondSemEval";
+import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGears } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faGears } from "@fortawesome/free-solid-svg-icons";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -35,13 +35,6 @@ const TabPanel = (props) => {
   );
 };
 
-const evaluationHeaderStyles = {
-  height: "8vh",
-  width: "100%",
-  alignItems: "center",
-  display: "flex",
-  paddingLeft: "45px",
-};
 
 const tabStyle = {
   textTransform: "none",
@@ -114,49 +107,113 @@ const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   },
 }));
 
+const wrapperVariants = {
+  open: {
+    scaleY: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+  closed: {
+    scaleY: 0,
+    transition: {
+      when: "afterChildren",
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const iconVariants = {
+  open: { rotate: 180 },
+  closed: { rotate: 0 },
+};
+
+const itemVariants = {
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      when: "beforeChildren",
+    },
+  },
+  closed: {
+    opacity: 0,
+    y: -15,
+    transition: {
+      when: "afterChildren",
+    },
+  },
+};
+
+const NoResults = ({ message }) => (
+  <div
+    style={{
+      height: "200px",
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "end",
+    }}
+  >
+    <div
+      style={{
+        height: "75px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        color: "#a8a7a9",
+      }}
+    >
+      <FontAwesomeIcon icon={faGears} style={{ fontSize: "30px", color: "#a8a7a9" }} />
+      <p>{message}</p>
+    </div>
+  </div>
+);
+
+
+
 const ViewRatingsPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [tabs, setTabs] = useState([]);
   const [filter, setFilter] = useState("overall");
   const userId = sessionStorage.getItem("userID");
   const contentRef = useRef(null);
   const [loggedUser, setLoggedUser] = useState({});
   const [dateHired, setDateHired] = useState("");
+  const [academicYears, setAcademicYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState("");
+  const [semesters, setSemesters] = useState(["1st Semester", "2nd Semester"]);
+  const [selectedSemester, setSelectedSemester] = useState("1st Semester");
+  const [openYearDropdown, setOpenYearDropdown] = useState(false);
+  const [openSemesterDropdown, setOpenSemesterDropdown] = useState(false);
 
   const handleTabChange = (event, newIndex) => {
+    console.log('Current tab index:', newIndex);
     setTabIndex(newIndex);
+  };
+
+  const handleYearChange = (value) => {
+    setSelectedYear(value);
+    setOpenYearDropdown(false);
+  };
+
+  const handleSemesterChange = (value) => {
+    setSelectedSemester(value);
+    setOpenSemesterDropdown(false);
   };
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
 
-  const exportToPDF = () => {
-    const input = contentRef.current;
-
-    html2canvas(input, { useCORS: true, scrollX: 0, scrollY: -window.scrollY })
-      .then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4", true);
-        const imgWidth = 210; // A4 width in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Use canvas dimensions
-
-        // Add the image to the PDF
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
-        pdf.save("invoice.pdf");
-      })
-      .catch((error) => {
-        console.error("Error generating PDF:", error);
-      });
-  };
-
-  //adi codes
   //Fetch user details
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(`${apiUrl}user/getUser/${userId}`);
         setLoggedUser(response.data);
+        console.log("dateHired: ", response.data.dateHired);
         setDateHired(response.data.dateHired);
       } catch (error) {
         if (error.response) {
@@ -176,6 +233,35 @@ const ViewRatingsPage = () => {
   evaluationStartDate.setMonth(evaluationStartDate.getMonth() + 2);
   const today = new Date();
 
+  // Fetch academic years
+  useEffect(() => {
+    const fetchAcademicYears = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}academicYear/all-years`);
+        setAcademicYears(response.data);
+        console.log("AY: ",response.data);
+        const activeYear = response.data.find(year => year.isActive);
+        if (activeYear) {
+          setSelectedYear(`${activeYear.startDate.slice(0, 4)} - ${activeYear.endDate.slice(0, 4)}`);
+        }
+      } catch (error) {
+        console.error("Error fetching academic years:", error);
+      }
+    };
+    fetchAcademicYears();
+  }, []);
+
+  // Extract the hire year from dateHired
+  const hireYear = new Date(dateHired).getFullYear();
+
+  // Filter academic years based on the hire year
+  const filteredAcademicYears = academicYears.filter(
+    (year) => new Date(year.startDate).getFullYear() >= hireYear
+  );
+  // Determine if the selected year matches the hire year
+  const isHireYear = selectedYear && selectedYear.startsWith(hireYear.toString());
+  console.log("isHireYear: ", isHireYear);
+
   return (
     <div
       style={{
@@ -185,18 +271,85 @@ const ViewRatingsPage = () => {
         alignItems: "center",
       }}
     >
-      <div style={evaluationHeaderStyles}>
-        <h1
-          style={{
-            flex: 1,
-            fontSize: "22px",
-            fontWeight: "bold",
-            marginLeft: "10px",
-          }}
-        >
-          Results
-        </h1>
-        <FormControl sx={{ m: 1, minWidth: 120, marginRight: "45px" }}>
+      <div className="w-full mt-4 mb-4 flex justify-items-start">
+      <div className="ml-14" style={{ width: '100%', display: "flex",  justifyContent: "flex-start", alignItems: "flex-start" }}>   
+      <div className="flex gap-4 justify-start">
+          <div className="relative">
+    
+            <button
+              onClick={() => setOpenYearDropdown(prev => !prev)}
+              className="flex items-center gap-2 px-3 py-2 rounded-md"
+              style={{ backgroundColor: "#8C383E", color: "#FFF" }}
+            >
+              <span className="font-medium text-sm">
+                {selectedYear || "Select Year"}
+              </span>
+              <motion.span animate={openYearDropdown ? "open" : "closed"} variants={iconVariants}>
+              <FontAwesomeIcon
+                  icon={faChevronDown}
+                  style={{ fontSize: "12px", color: "#FFF" }}
+                />
+              </motion.span>
+            </button>
+            
+            <motion.ul
+              initial={wrapperVariants.closed}
+              animate={openYearDropdown ? "open" : "closed"}
+              variants={wrapperVariants}
+              className="absolute top-full left-0 w-48 bg-white shadow-lg rounded-lg mt-2 overflow-hidden z-10"
+            >
+              {filteredAcademicYears.map((year) => (
+                <motion.li
+                  variants={itemVariants}
+                  key={`${year.startDate}-${year.endDate}`}
+                  onClick={() => handleYearChange(`${new Date(year.startDate).getFullYear()} - ${new Date(year.endDate).getFullYear()}`)}
+                  className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                >
+                   {`${new Date(year.startDate).getFullYear()} - ${new Date(year.endDate).getFullYear()}`}
+                </motion.li>
+              ))}
+            </motion.ul>
+          </div>
+          {!isHireYear && (
+          <div className="relative">
+            <button
+              onClick={() => setOpenSemesterDropdown(prev => !prev)}
+              className="flex items-center gap-2 px-3 py-2 rounded-md"
+              style={{ backgroundColor: "#8C383E", color: "#FFF" }}
+            >
+              <span className="font-medium text-sm">
+                {selectedSemester || "Select Semester"}
+              </span>
+              <motion.span animate={openSemesterDropdown ? "open" : "closed"} variants={iconVariants}>
+              <FontAwesomeIcon
+                  icon={faChevronDown}
+                  style={{ fontSize: "12px", color: "#FFF" }}
+                />
+              </motion.span>
+            </button>
+            <motion.ul
+              initial={wrapperVariants.closed}
+              animate={openSemesterDropdown ? "open" : "closed"}
+              variants={wrapperVariants}
+              className="absolute top-full left-0 w-48 bg-white shadow-lg rounded-lg mt-2 overflow-hidden z-10"
+            >
+              {semesters.map((semester, index) => (
+                <motion.li
+                  key={index}
+                  variants={itemVariants}
+                  onClick={() => handleSemesterChange(semester)}
+                  className="px-4 py-2 hover:bg-gray-200  cursor-pointer"
+                >
+                  {semester}
+                </motion.li>
+              ))}
+            </motion.ul>
+          </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mr-8">
           <CustomSelect
             value={filter}
             label="Filter"
@@ -207,70 +360,61 @@ const ViewRatingsPage = () => {
             <CustomMenuItem value="peer">Peer</CustomMenuItem>
             <CustomMenuItem value="head">Head</CustomMenuItem>
           </CustomSelect>
-        </FormControl>
+      </div>
         {/* <Button variant="contained" onClick={exportToPDF} sx={{ backgroundColor: "#8C383E", color: "#fff" }}>
           Export
         </Button> */}
+                
+
       </div>
       <Box
-        ref={contentRef}
-        sx={{
-          backgroundColor: "white",
-          borderRadius: 2,
-          boxShadow: 3,
-          width: "79vw",
-          height: "80vh",
-          overflowY: "auto",
-        }}
+  ref={contentRef}
+  sx={{
+    backgroundColor: "white",
+    borderRadius: 2,
+    boxShadow: 3,
+    width: "79vw",
+    height: "80vh",
+    overflowY: "auto",
+  }}
+>
+  {isHireYear ? (
+    <>
+      <Tabs
+        value={tabIndex}
+        onChange={handleTabChange}
+        className="ml-4"
+        sx={tabStyle}
       >
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          className="ml-4"
-          sx={tabStyle}
-        >
-          <Tab label="3rd Month" sx={tabStyle} />
-          <Tab label="5th Month" sx={tabStyle} />
-        </Tabs>
-        <TabPanel value={tabIndex} index={0}>
-          {today >= evaluationStartDate ? (
-            <ThirdMonthEval userId={userId} filter={filter} />
-          ) : (
-            <div
-              style={{
-                height: "200px",
-                width: "100%",
-                //backgroundColor: "tomato",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "end",
-              }}
-            >
-              <div
-                style={{
-                  height: "75px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  color: "#a8a7a9",
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={faGears}
-                  style={{ fontSize: "30px", color: "#a8a7a9" }}
-                />
-                <p>
-                  There are no results for the third-month evaluation at this
-                  time.
-                </p>
-              </div>
-            </div>
-          )}
-        </TabPanel>
-        <TabPanel value={tabIndex} index={1}>
-          <FifthMonthEval userId={userId} filter={filter} />
-        </TabPanel>
-      </Box>
+        <Tab key="3rd-month" label="3rd Month" sx={tabStyle} />
+        <Tab key="5th-month" label="5th Month" sx={tabStyle} />
+      </Tabs>
+
+      <TabPanel value={tabIndex} index={0}>
+        {today >= evaluationStartDate ? (
+          <ThirdMonthEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester} />
+        ) : (
+          <NoResults message="There are no results for the third-month evaluation at this time." />
+        )}
+      </TabPanel>
+
+      <TabPanel value={tabIndex} index={1}>
+        <FifthMonthEval userId={userId} filter={filter} />
+      </TabPanel>
+    </>
+  ) : (
+    // Non-hire year: Render the selected semester evaluation
+    <Box sx={{ marginTop: '20px' }}>
+      {selectedSemester === "1st Semester" ? (
+        <AnnualFirstSemEval userId={userId} filter={filter} />
+      ) : (
+        <AnnualSecondSemEval userId={userId} filter={filter} />
+      )}
+    </Box>
+
+  )}
+</Box>
+
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { apiUrl } from "../config/config";
+import '../index.css';
 
 const selfQuestionLabels = {
   21: "For this period that you are evaluating yourself, what is/are 1 or 2 of your accomplish/s or contribution/s that you are most proud of?",
@@ -17,7 +18,7 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?",
 };
 
-const FifthMonthComments = ({ userId, filter }) => {
+const AnnualFirstSemComments = ({ userId, filter }) => {
   const role = sessionStorage.getItem("userRole");
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
@@ -46,16 +47,16 @@ const FifthMonthComments = ({ userId, filter }) => {
       );
       const responses = responsesResponse.data;
   
-      // Filter for only 5th month evaluations
-      const headResponsesForFifthMonth = responses.filter((res) => {
+      // Filter for only Annual 1st sem evaluations
+      const headResponsesForAnnualFirstSem = responses.filter((res) => {
         const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
         const isCorrectPeriod = res.evaluation?.period === "5th Month";
         return res.user.userID === userId && isHeadEvaluation && isCorrectPeriod;
       });
   
-      // If no 5th Month evaluation, leave comments blank
-      if (headResponsesForFifthMonth.length === 0) {
-        console.log("No 5th Month evaluation found, setting blank comments.");
+      // If no Annual 1st sem evaluation, leave comments blank
+      if (headResponsesForAnnualFirstSem.length === 0) {
+        console.log("No Annual 1st sem evaluation found, setting blank comments.");
         setCommentsData({
           27: "",
           28: "",
@@ -83,7 +84,7 @@ const FifthMonthComments = ({ userId, filter }) => {
       };
   
       const ids = {};
-      headResponsesForFifthMonth.forEach((res) => {
+      headResponsesForAnnualFirstSem.forEach((res) => {
         ids[res.question.quesID] = res.responseID;
       });
   
@@ -155,7 +156,7 @@ const FifthMonthComments = ({ userId, filter }) => {
             response.question?.quesID
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
-          const isCorrectPeriod = response.evaluation?.period === "5th Month";
+          const isCorrectPeriod = response.evaluation?.period === "Annual-1st";
           return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod;
         });
 
@@ -243,7 +244,7 @@ const FifthMonthComments = ({ userId, filter }) => {
           `${apiUrl}assignedPeers/getAssignedPeersId`,
           {
             params: {
-              period: "5th Month",
+              period: "Annual-1st",
               evaluateeId: userId,
             },
           }
@@ -279,7 +280,7 @@ const FifthMonthComments = ({ userId, filter }) => {
                   res.question?.quesID
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
-                const isCorrectPeriod = res.evaluation?.period === "5th Month";
+                const isCorrectPeriod = res.evaluation?.period === "Annual-1st";
 
                 return (
                   isCorrectEvaluator &&
@@ -373,7 +374,7 @@ const FifthMonthComments = ({ userId, filter }) => {
                       resize: "none",
                     }}
                     defaultValue={
-                      comment ? comment.answers : ""
+                      comment ? comment.answers : " "
                     }
                   />
                 </Box>
@@ -428,36 +429,40 @@ const FifthMonthComments = ({ userId, filter }) => {
             { quesID: 30, label: "SUPPLEMENTARY NOTES / COMMENTS / REMINDERS" },
           ].map(({ quesID, label }) => (
             <React.Fragment key={quesID}>
-              <Typography
-                sx={{
-                  backgroundColor: "black",
-                  color: "white",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                  paddingLeft: "8px",
-                  fontFamily: "poppins",
-                }}
-              >
-                {label}
-                {role !== "EMPLOYEE" && (
-                  <IconButton
-                    onClick={() => handleEditComment(quesID)}
-                    sx={{
-                      color: "white",
-                      "&:hover": {
-                        color: "white", // Change the color on hover
-                        backgroundColor: "rgba(255, 255, 255, 0.3)", // Optional background change on hover
-                      },
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                )}
-              </Typography>
+<Typography
+  sx={{
+    backgroundColor: "black",
+    color: "white",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    paddingLeft: "8px",
+    fontFamily: "poppins",
+  }}
+>
+  {label}
+  {role !== "EMPLOYEE" && (
+    <div className="ml-auto">
+      <IconButton
+        onClick={() => handleEditComment(quesID)}
+        className="no-print"
+        sx={{
+          color: "white",
+          "&:hover": {
+            color: "white", // Change the color on hover
+            backgroundColor: "rgba(255, 255, 255, 0.3)", // Optional background change on hover
+          },
+        }}
+      >
+        <EditIcon />
+      </IconButton>
+    </div>
+  )}
+</Typography>
+
               <TextareaAutosize
                 disabled={role === "EMPLOYEE" || editingCommentID !== quesID}
                 variant="outlined"
@@ -528,4 +533,4 @@ const FifthMonthComments = ({ userId, filter }) => {
   );
 };
 
-export default FifthMonthComments;
+export default AnnualFirstSemComments;

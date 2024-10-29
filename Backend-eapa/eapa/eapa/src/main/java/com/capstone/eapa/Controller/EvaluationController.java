@@ -6,13 +6,17 @@ import com.capstone.eapa.DTO.DepartmentEvaluationCountDTO;
 import com.capstone.eapa.DTO.EvaluationStatusDTO;
 import com.capstone.eapa.DTO.PeerEvaluationDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
+import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.List;
 
 @RestController
@@ -188,5 +192,7 @@ public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluation
     List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForFifthMonth();
     return ResponseEntity.ok(counts);
 }
+
+
 
 }

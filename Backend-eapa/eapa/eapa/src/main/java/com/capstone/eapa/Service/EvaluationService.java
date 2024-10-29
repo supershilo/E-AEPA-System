@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -130,6 +131,7 @@ public class EvaluationService {
         return evalRepo.findAllEvals();
     }
 
+    
     // Get evaluation ID
     public Integer getEvalIDByUserIDAndPeriodAndStageAndEvalType(int userID, String period, String stage,
             String evalType) {
@@ -303,39 +305,39 @@ public class EvaluationService {
         return evalRepo.countByPeriodAndStatus();
     }
 
-    // 3rd Month: Eligible takers
-    public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
-        List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
-        List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
+    // // 3rd Month: Eligible takers
+    // public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
+    //     List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
+    //     List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
 
-        int totalEligible = eligibleUsers.size();
-        int completed = completedEvaluations.size();
-        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+    //     int totalEligible = eligibleUsers.size();
+    //     int completed = completedEvaluations.size();
+    //     int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
 
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
+    //     return new EvaluationStatusDTO(completed, notCompleted);
+    // }
 
-    public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
-        List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
-        List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
+    // public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
+    //     List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
+    //     List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
 
-        int totalEligible = eligibleUsers.size();
-        int completed = completedEvaluations.size();
-        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+    //     int totalEligible = eligibleUsers.size();
+    //     int completed = completedEvaluations.size();
+    //     int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
 
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
+    //     return new EvaluationStatusDTO(completed, notCompleted);
+    // }
 
-    public EvaluationStatusDTO getAnnualEvaluationStatus() {
-        List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
-        List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
+    // public EvaluationStatusDTO getAnnualEvaluationStatus() {
+    //     List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
+    //     List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
 
-        int totalEligible = eligibleUsers.size();
-        int completed = completedEvaluations.size();
-        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+    //     int totalEligible = eligibleUsers.size();
+    //     int completed = completedEvaluations.size();
+    //     int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
 
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
+    //     return new EvaluationStatusDTO(completed, notCompleted);
+    // }
 
     // New methods for only completed counts
     public long getCompleted3rdMonthEvaluationCount() {
@@ -379,8 +381,7 @@ public class EvaluationService {
     }
 
     public AveragesDTO getPeerEvaluationAverages(int peerID, int userID, String period, String evalType) {
-        List<EvaluationEntity> evaluations = evalRepo.findByUserIDAndPeerIDAndPeriodAndEvalType(userID, peerID, period,
-                evalType);
+        List<EvaluationEntity> evaluations = evalRepo.findByUserIDAndPeerIDAndPeriodAndEvalType(userID, peerID, period, evalType);
 
         if (evaluations.isEmpty()) {
             throw new RuntimeException("No evaluations found matching the criteria");
@@ -431,5 +432,9 @@ public class EvaluationService {
 
         return averages;
     }
+
+
+
+    
 
 }

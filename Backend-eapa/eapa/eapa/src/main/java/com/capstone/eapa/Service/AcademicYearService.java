@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AcademicYearService {
@@ -170,6 +171,13 @@ public class AcademicYearService {
     public List<AcademicYearEntity> getAllAcademicYears(){
         return acadYearRepo.findAll();
     }
+    //get all formatted academic years
+    public List<String> getAllFormattedAcademicYears() {
+    List<AcademicYearEntity> academicYears = acadYearRepo.findAll();
+    return academicYears.stream()
+        .map(year -> year.getStartDate().getYear() + "-" + year.getEndDate().getYear())
+        .collect(Collectors.toList());
+}
 
     // Get the current academic year with semesters included
 //    public Optional<AcademicYearEntity> getCurrentAcademicYearEntity() {

@@ -8,10 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity, Integer> {
+    List<AcademicYearEntity> findAll(); 
+    
     @Query("SELECT a FROM AcademicYearEntity a WHERE :date BETWEEN a.startDate AND a.endDate")
     Optional<AcademicYearEntity> findAcademicYearByDate(@Param("date") LocalDate date);
 

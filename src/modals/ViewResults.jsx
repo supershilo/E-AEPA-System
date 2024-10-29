@@ -4,9 +4,9 @@ import PrintIcon from '@mui/icons-material/Print';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
-import GeneratePDF from '../components/GeneratePDF';  // Import the GeneratePDF function
+import AnnualFirstSemEval from "../modals/AnnualFirstSemEval";
+import AnnualSecondSemEval from "../modals/AnnualSecondSemEval";
 import { jsPDF } from 'jspdf';
-import domtoimage from 'dom-to-image';
 import html2canvas from 'html2canvas';
 
 
@@ -70,6 +70,7 @@ const ViewResults = ({ open, onClose, employee }) => {
   };
 
   const handleTabChange = (event, newIndex) => {
+    console.log("Changing tab to:", newIndex);
     setTabIndex(newIndex);
   };
 
@@ -188,7 +189,9 @@ const ViewResults = ({ open, onClose, employee }) => {
         <Box sx={{ flex: 1, overflowY: 'auto' }}>
           <Tabs className='ml-4' value={tabIndex} onChange={handleTabChange} sx={tabStyle}>
             <Tab label="3rd Month" sx={tabStyle} />
-            <Tab disabled label="5th Month" sx={tabStyle} />
+            <Tab label="5th Month" sx={tabStyle} />
+            <Tab label="Annual 1st" sx={tabStyle} />
+            <Tab label="Annual 2nd" sx={tabStyle} />
           </Tabs>
 
           <Menu
@@ -223,10 +226,16 @@ const ViewResults = ({ open, onClose, employee }) => {
           </Menu>
           
           <TabPanel value={tabIndex} index={0}>
-            <ThirdMonthEval id="printArea" userId={employee.userID} employee={employee} filter={filter} />
+            <ThirdMonthEval userId={employee.userID} employee={employee} filter={filter} />
           </TabPanel>
           <TabPanel value={tabIndex} index={1}>
             <FifthMonthEval userId={employee.userID} employee={employee} filter={filter} />
+          </TabPanel>
+          <TabPanel value={tabIndex} index={2}>
+            <AnnualFirstSemEval userId={employee.userID} employee={employee} filter={filter} />
+          </TabPanel>
+          <TabPanel value={tabIndex} index={3}>
+            <AnnualSecondSemEval userId={employee.userID} employee={employee} filter={filter} />
           </TabPanel>
         </Box>
       </Box>

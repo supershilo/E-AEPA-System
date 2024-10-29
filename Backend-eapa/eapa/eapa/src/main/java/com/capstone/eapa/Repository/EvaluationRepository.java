@@ -2,11 +2,16 @@
 package com.capstone.eapa.Repository;
 
 import com.capstone.eapa.Entity.EvaluationEntity;
+import com.capstone.eapa.Entity.UserEntity;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EvaluationRepository extends JpaRepository<EvaluationEntity, Integer> {
@@ -228,4 +233,6 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID AND e.peer.userID = :peerID AND e.period = :period AND e.evalType = :evalType AND e.isDeleted = 0")
     List<EvaluationEntity> findByUserIDAndPeerIDAndPeriodAndEvalType(int userID, int peerID, String period, String evalType);
 
+
+    
 }

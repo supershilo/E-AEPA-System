@@ -293,7 +293,6 @@ useEffect(() => {
                       width: "100%",
                       paddingLeft: "8px",
                       fontFamily: "poppins",
-                      height: "50px",
                     }}
                   >
                     {questionId === 31

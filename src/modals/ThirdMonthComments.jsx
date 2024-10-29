@@ -9,6 +9,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { apiUrl } from "../config/config";
+import '../index.css';
 
 const selfQuestionLabels = {
   21: "For this period that you are evaluating yourself, what is/are 1 or 2 of your accomplish/s or contribution/s that you are most proud of?",
@@ -31,7 +32,7 @@ const ThirdMonthComments = ({ userId, filter }) => {
   const [editingCommentID, setEditingCommentID] = useState(null); // ID of the comment being edited
   const [responseIDs, setResponseIDs] = useState({});
 
-  // Fetch comments and response IDs on component mount and when userId changes
+  // HEAD COMMENTS
   const fetchCommentsAndResponseIDs = async () => {
     try {
       // Fetch comments
@@ -64,10 +65,14 @@ const ThirdMonthComments = ({ userId, filter }) => {
 
       const ids = {};
       responses.forEach((res) => {
-        if (res.user.userID === userId) {
+        const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
+        const isCorrectPeriod = res.evaluation?.period === "3rd Month";
+  
+        if (res.user.userID === userId && isHeadEvaluation && isCorrectPeriod) {
           ids[res.question.quesID] = res.responseID;
         }
       });
+  
 
       setCommentsData(initialData);
       setResponseIDs(ids);
@@ -136,7 +141,8 @@ const ThirdMonthComments = ({ userId, filter }) => {
             response.question?.quesID
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
-          return isCorrectUser && isCorrectQuestion && isSelfEvaluation;
+          const isCorrectPeriod = response.evaluation?.period === "3rd Month";
+          return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod;
         });
 
         setSelfComments(filteredComments);
@@ -240,7 +246,7 @@ const ThirdMonthComments = ({ userId, filter }) => {
           }
         );
         const evaluatorIds = evaluatorIdsResponse.data;
-        console.log("Evaluator IDs:", evaluatorIds);
+        //console.log("Evaluator IDs:", evaluatorIds);
 
         // Fetch comments for each evaluator
         const commentsPromises = evaluatorIds.map((evaluatorId) =>
@@ -259,12 +265,14 @@ const ThirdMonthComments = ({ userId, filter }) => {
                   res.question?.quesID
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
+                const isCorrectPeriod = res.evaluation?.period === "3rd Month";
 
                 return (
                   isCorrectEvaluator &&
                   isCorrectEvaluatee &&
                   isCorrectQuestion &&
-                  isPeerEvaluation
+                  isPeerEvaluation &&
+                  isCorrectPeriod
                 );
               });
 
@@ -351,7 +359,7 @@ const ThirdMonthComments = ({ userId, filter }) => {
                       resize: "none",
                     }}
                     defaultValue={
-                      comment ? comment.answers : "No comments available"
+                      comment ? comment.answers : " "
                     }
                   />
                 </Box>
@@ -406,36 +414,40 @@ const ThirdMonthComments = ({ userId, filter }) => {
             { quesID: 30, label: "SUPPLEMENTARY NOTES / COMMENTS / REMINDERS" },
           ].map(({ quesID, label }) => (
             <React.Fragment key={quesID}>
-              <Typography
-                sx={{
-                  backgroundColor: "black",
-                  color: "white",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                  paddingLeft: "8px",
-                  fontFamily: "poppins",
-                }}
-              >
-                {label}
-                {role !== "EMPLOYEE" && (
-                  <IconButton
-                    onClick={() => handleEditComment(quesID)}
-                    sx={{
-                      color: "white",
-                      "&:hover": {
-                        color: "white", // Change the color on hover
-                        backgroundColor: "rgba(255, 255, 255, 0.3)", // Optional background change on hover
-                      },
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                )}
-              </Typography>
+<Typography
+  sx={{
+    backgroundColor: "black",
+    color: "white",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    paddingLeft: "8px",
+    fontFamily: "poppins",
+  }}
+>
+  {label}
+  {role !== "EMPLOYEE" && (
+    <div className="ml-auto">
+      <IconButton
+        onClick={() => handleEditComment(quesID)}
+        className="no-print"
+        sx={{
+          color: "white",
+          "&:hover": {
+            color: "white", // Change the color on hover
+            backgroundColor: "rgba(255, 255, 255, 0.3)", // Optional background change on hover
+          },
+        }}
+      >
+        <EditIcon />
+      </IconButton>
+    </div>
+  )}
+</Typography>
+
               <TextareaAutosize
                 disabled={role === "EMPLOYEE" || editingCommentID !== quesID}
                 variant="outlined"
