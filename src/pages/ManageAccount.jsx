@@ -913,21 +913,21 @@ function ManageAccount() {
     <div>
       <Animated>
         <Typography
-          ml={6.5}
-          mt={3}
+          ml={4}
+          mt={1.7}
           sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}
         >
           User Accounts
         </Typography>
         {loggedUserRole === "ADMIN" && (
-          <label className="ml-12 text-sm text-gray-700">
+          <label className="ml-8 text-sm text-gray-700">
             All Employees ({rows.length})
           </label>
         )}
 
         <div className="ml-8 mt-2">
           <div className="mr-10 mb-4 flex items-center justify-between">
-            <div className="ml-4 flex items-center justify-start">
+            <div className=" flex items-center justify-start">
               <TextField
                 placeholder="Search ..."
                 value={searchTerm}
@@ -977,6 +977,7 @@ function ManageAccount() {
                   display: "flex-end",
                   height: "2.5em",
                   width: "9em",
+                  marginRight:"1.5em",
                   fontFamily: "Poppins",
                   backgroundColor: "#8c383e",
                   padding: "1px 1px 0 0 ",
@@ -995,7 +996,7 @@ function ManageAccount() {
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            "& > :not(style)": { ml: 6, mt: 0.1, width: "93%" },
+            "& > :not(style)": { ml: 4, mt: 0.1, width: "93%" },
           }}
         >
           <Grid
@@ -1120,13 +1121,13 @@ function ManageAccount() {
                           sx={{
                             textAlign: "center",
                             fontFamily: "Poppins",
-                            fontSize: "17px",
+                            fontSize: "15px",
                             color: "#1e1e1e",
                             fontWeight: 500,
-                            padding: "25px",
+                            padding: "10px",
                           }}
                         >
-                          No user is currently registered
+                          Oops! We couldn't find any results matching your search.
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -1140,7 +1141,7 @@ function ManageAccount() {
         </Box>
         {/* Pagination */}
         <div
-          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
+          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-5"
           style={{
             position: "relative", // Change to relative to keep it in place
             // bottom: 30,

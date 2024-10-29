@@ -26,6 +26,7 @@ import { faCheckCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
 import EmployeeProfile from "../pages/EmployeeProfile";
 import Animated from "../components/motion";
 
+
 function EmployeeData() {
 	const [tab, setTab] = useState(0);
 	const [isViewed, setViewed] = useState(false);
@@ -84,7 +85,6 @@ function EmployeeData() {
 	});
 
 	const tabStyle = {
-		//marginLeft: "25px",
 		textTransform: "none",
 		color: "#9D9D9D",
 		fontFamily: "Poppins",
@@ -101,7 +101,7 @@ function EmployeeData() {
 	const tableStyle = {
 		borderRadius: "5px 5px 0 0",
 		width: "93%",
-		marginTop: "5px",
+		margin: "5px 30px 0px 0px",
 		boxShadow: "2px 2px 5px rgba(157, 157, 157, 0.5)",
 	};
 
@@ -136,7 +136,7 @@ function EmployeeData() {
 		fontSize: "25px",
 		fontFamily: "Poppins",
 		fontWeight: "bold",
-		margin: "20px 0px 0px 45px",
+		margin: "12px 0px 0px 30px",
 		maxWidth: "11%",
 		display: "flex",
 		justifyContent: "center",
@@ -161,7 +161,7 @@ function EmployeeData() {
 							value={tab}
 							onChange={changeTab}
 							aria-label="Tabs"
-							sx={{ ml: 5.5, width: "93%", ...tabStyle }}
+							sx={{ ml: 3.8, width: "93%", ...tabStyle }}
 						>
 							<Tab
 								label={`All Employees (${filteredUsers.length})`}

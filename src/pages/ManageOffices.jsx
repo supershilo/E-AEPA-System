@@ -443,13 +443,13 @@ useEffect(() => {
 	return (
 		<Animated>
 			<div>
-				<h1 className="text-2xl font-bold text-left ml-12 mt-6 mb-1">
+				<h1 className="text-2xl font-bold text-left ml-8 mt-4 mb-1">
 					Department
 				</h1>
-				<label className="ml-12 text-sm text-gray-700">
+				<label className="ml-9 text-sm text-gray-700">
 					All Departments ({filteredDepartments.length})
 				</label>
-				<div className="ml-8 mt-2">
+				<div className="ml-5 mt-2">
 					<div className="mr-10 mb-4 flex items-center justify-between">
 						<div className="ml-4 flex items-center justify-start">
 							<TextField

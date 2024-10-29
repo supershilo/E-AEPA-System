@@ -5,6 +5,8 @@ import com.capstone.eapa.Entity.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
+import java.time.LocalDate;
+
 public class EvaluationDTO {
     private int userId;
     @Enumerated(value = EnumType.STRING)
@@ -17,6 +19,9 @@ public class EvaluationDTO {
     private String sjbpStatus;
     private String svbpaStatus;
     private String pvbpaStatus;
+    private LocalDate sjbpDateTaken;
+    private String period; // New field for period
+
 
     
 
@@ -103,4 +108,19 @@ public class EvaluationDTO {
         this.role = role;
     }
 
+    public void setSjbpDateTaken(LocalDate dateTaken) {
+        this.sjbpDateTaken = dateTaken;
+    }
+
+    public LocalDate getSjbDateTaken() {
+        return sjbpDateTaken;
+    }
+
+    public String getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(String period) {
+        this.period = period;
+    }
 }

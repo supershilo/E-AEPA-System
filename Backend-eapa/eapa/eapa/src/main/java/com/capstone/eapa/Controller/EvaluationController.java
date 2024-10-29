@@ -21,7 +21,6 @@ import java.util.List;
 public class EvaluationController {
     @Autowired
     EvaluationService evalServ;
-
     @PostMapping("/createEvaluation")
     public EvaluationEntity createEvaluation(@RequestBody EvaluationEntity evaluation) {
         return evalServ.createEvaluation(evaluation);

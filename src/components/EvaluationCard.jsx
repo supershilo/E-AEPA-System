@@ -124,6 +124,7 @@ function EvaluationCard({
                   width: "30%",
                   height: "30px",
                   color: "#636E72",
+                  textTransform:"none",
                   fontFamily: "Poppins",
                   "&:hover": {
                     color: "#353b48",
@@ -311,6 +312,7 @@ function EvaluationCard({
               sx={{
                 width: "14%",
                 height: "35px",
+                textTransform:"none",
                 backgroundColor: "#8C383E",
                 "&:hover": {
                   backgroundColor: "#7C2828",

@@ -146,9 +146,9 @@ function UserHome() {
         <div
           style={{
             //backgroundColor: "lavender",
-            width: "75%",
+            width: "100%",
             height: "100%",
-            padding: "0px 0px 0px 0px",
+            
           }}
         >
           <div

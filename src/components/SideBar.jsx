@@ -26,7 +26,7 @@ function SideBar() {
   };
 
   const sidebarStyles = {
-    height: "100vh",
+    height: "92vh",
     width: "229px",
     backgroundColor: "#FFFFFF",
     paddingTop: "10px",
