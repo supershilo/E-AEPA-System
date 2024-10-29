@@ -49,6 +49,8 @@ public class ResultsService {
                 evaluation.getEvalType(),
                 evaluation.getPeriod(),
                 evaluation.getStage(),
+                evaluation.getSchoolYear(),
+                evaluation.getSemester(),
                 0
         );
 
@@ -78,6 +80,8 @@ public class ResultsService {
                 evaluation.getEvalType(),
                 evaluation.getPeriod(),
                 evaluation.getStage(),
+                evaluation.getSchoolYear(),
+                evaluation.getSemester(),
                 0
         );
 

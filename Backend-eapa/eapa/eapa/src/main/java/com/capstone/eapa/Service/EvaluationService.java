@@ -303,39 +303,39 @@ public class EvaluationService {
         return evalRepo.countByPeriodAndStatus();
     }
 
-    // 3rd Month: Eligible takers
-    public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
-        List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
-        List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
-
-        int totalEligible = eligibleUsers.size();
-        int completed = completedEvaluations.size();
-        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
-
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
-
-    public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
-        List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
-        List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
-
-        int totalEligible = eligibleUsers.size();
-        int completed = completedEvaluations.size();
-        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
-
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
-
-    public EvaluationStatusDTO getAnnualEvaluationStatus() {
-        List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
-        List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
-
-        int totalEligible = eligibleUsers.size();
-        int completed = completedEvaluations.size();
-        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
-
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
+//    // 3rd Month: Eligible takers
+//    public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
+//        List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
+//        List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
+//
+//        int totalEligible = eligibleUsers.size();
+//        int completed = completedEvaluations.size();
+//        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+//
+//        return new EvaluationStatusDTO(completed, notCompleted);
+//    }
+//
+//    public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
+//        List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
+//        List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
+//
+//        int totalEligible = eligibleUsers.size();
+//        int completed = completedEvaluations.size();
+//        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+//
+//        return new EvaluationStatusDTO(completed, notCompleted);
+//    }
+//
+//    public EvaluationStatusDTO getAnnualEvaluationStatus() {
+//        List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
+//        List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
+//
+//        int totalEligible = eligibleUsers.size();
+//        int completed = completedEvaluations.size();
+//        int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+//
+//        return new EvaluationStatusDTO(completed, notCompleted);
+//    }
 
     // New methods for only completed counts
     public long getCompleted3rdMonthEvaluationCount() {
@@ -378,9 +378,9 @@ public class EvaluationService {
                 .collect(Collectors.toList());
     }
 
-    public AveragesDTO getPeerEvaluationAverages(int peerID, int userID, String period, String evalType) {
+    public AveragesDTO getPeerEvaluationAverages(int peerID, int userID, String period, String evalType, String schoolYear, String semester) {
         List<EvaluationEntity> evaluations = evalRepo.findByUserIDAndPeerIDAndPeriodAndEvalType(userID, peerID, period,
-                evalType);
+                evalType, schoolYear, semester);
 
         if (evaluations.isEmpty()) {
             throw new RuntimeException("No evaluations found matching the criteria");

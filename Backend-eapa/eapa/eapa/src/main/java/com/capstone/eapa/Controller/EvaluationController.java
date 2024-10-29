@@ -107,8 +107,8 @@ public class EvaluationController {
     }
 
     @GetMapping("/getPeerEvaluationAverages")
-    public ResponseEntity<AveragesDTO> getPeerEvaluationAverages(@RequestParam int peerID, @RequestParam int userID, @RequestParam String period, @RequestParam String evalType) {
-        AveragesDTO averages = evalServ.getPeerEvaluationAverages(peerID, userID, period, evalType);
+    public ResponseEntity<AveragesDTO> getPeerEvaluationAverages(@RequestParam int peerID, @RequestParam int userID, @RequestParam String period, @RequestParam String evalType, @RequestParam String schoolYear, @RequestParam String semester) {
+        AveragesDTO averages = evalServ.getPeerEvaluationAverages(peerID, userID, period, evalType, schoolYear, semester);
         return ResponseEntity.ok(averages);
     }
 

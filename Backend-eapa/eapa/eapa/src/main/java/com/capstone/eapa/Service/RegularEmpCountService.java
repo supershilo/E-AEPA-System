@@ -3,6 +3,8 @@ package com.capstone.eapa.Service;
 import com.capstone.eapa.Entity.RegularEmpCountEntity;
 import com.capstone.eapa.Repository.RegularEmpCountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,11 @@ public class RegularEmpCountService {
 
     @Autowired
     private UserService userServ;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void checkAndCreateOrUpdateCurrentMonthRecord() {
+        createMonthRegularEmpCount();
+    }
 
     //create
     //@Scheduled(cron = "0 * * * * *") // runs every minute
