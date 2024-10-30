@@ -1305,8 +1305,8 @@ function EvaluationForm({
                             boxSizing: "border-box",
                             overflow: "hidden",
                             resize: "none",
-                            required,
                           }}
+                          required
                           onChange={(e) =>
                             handleJobTextareaChange(i, e.target.value)
                           }

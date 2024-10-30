@@ -46,7 +46,7 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
         if (filteredEvaluation) {
           const dateTaken = filteredEvaluation.dateTaken; // Get the dateTaken
           setDateOfAppraisal(dateTaken);
-          console.log('Appraisal Date:', dateTaken);
+          console.log('Appraisal Dateeeee:', dateTaken);
         } else {
           console.log('No matching evaluation found.');
         }
@@ -190,6 +190,8 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
                 evalType: "SELF",
                 stage: "VALUES",
                 period: "3rd Month",
+                schoolYear: selectedYear,
+                semester: selectedSemester,
               },
             }
           );
@@ -241,6 +243,8 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
                 evalType: "SELF",
                 stage: "JOB",
                 period: "3rd Month",
+                schoolYear: selectedYear,
+                semester: selectedSemester,
               },
             }
           );
@@ -305,6 +309,9 @@ const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
                   peerID: userId,
                   period: "3rd Month",
                   evalType: 'PEER-A',
+                  schoolYear: selectedYear,
+                  semester: "First Semester",
+    
                 },
               }
             ).catch(error => {

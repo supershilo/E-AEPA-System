@@ -183,7 +183,7 @@ const ViewRatingsPage = () => {
   const [dateHired, setDateHired] = useState("");
   const [academicYears, setAcademicYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
-  const [semesters, setSemesters] = useState(["1st Semester", "2nd Semester"]);
+  const [semesters, setSemesters] = useState(["First Semester", "Second Semester"]);
   const [selectedSemester, setSelectedSemester] = useState("1st Semester");
   const [openYearDropdown, setOpenYearDropdown] = useState(false);
   const [openSemesterDropdown, setOpenSemesterDropdown] = useState(false);
@@ -242,7 +242,7 @@ const ViewRatingsPage = () => {
         console.log("AY: ",response.data);
         const activeYear = response.data.find(year => year.isActive);
         if (activeYear) {
-          setSelectedYear(`${activeYear.startDate.slice(0, 4)} - ${activeYear.endDate.slice(0, 4)}`);
+          setSelectedYear(`${activeYear.startDate.slice(0, 4)}-${activeYear.endDate.slice(0, 4)}`);
         }
       } catch (error) {
         console.error("Error fetching academic years:", error);
