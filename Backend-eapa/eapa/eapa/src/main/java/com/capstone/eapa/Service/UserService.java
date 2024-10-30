@@ -605,4 +605,35 @@ public class UserService implements UserDetailsService {
         return userCounts;
     }
 
+
+    //Check if 3rd Results is sent checkinn...
+    public void update3rdEvaluationStatus(int userId, boolean status) {
+        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new NoSuchElementException("User " + userId + " not found."));
+        user.setIs3rdEvalComplete(status);
+        userRepo.save(user);
+    }
+
+    //Check if 5th Results is sent
+    public void update5thEvaluationStatus(int userId, boolean status) {
+        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new NoSuchElementException("User " + userId + " not found."));
+        user.setIs5thEvalComplete(status);
+        userRepo.save(user);
+    }
+
+    public void promoteTo5thProbationary(int userId) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User " + userId + " not found."));
+
+        // Check if the user is currently in 3rd Probationary
+        if ("3rd Probationary".equals(user.getProbeStatus())) {
+            // Update the probe status to 5th Probationary
+            user.setProbeStatus("5th Probationary");
+
+            // Save the updated user entity to the database
+            userRepo.save(user);
+        } else {
+            throw new IllegalStateException("User is not in 3rd Probationary status.");
+        }
+    }
+
 }

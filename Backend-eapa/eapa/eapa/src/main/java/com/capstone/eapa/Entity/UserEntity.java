@@ -56,7 +56,29 @@ public class UserEntity implements UserDetails {
 //    private boolean isProbationary;
     @Column(name = "Probationary Status")
     private String probeStatus;
-    
+
+    // mao ni sa is3rd
+    private boolean is3rdEvalComplete= false;
+
+    private boolean is5thEvalComplete= false;
+
+
+    public boolean isIs3rdEvalComplete() {
+        return is3rdEvalComplete;
+    }
+
+    public void setIs3rdEvalComplete(boolean is3rdEvalComplete) {
+        this.is3rdEvalComplete = is3rdEvalComplete;
+    }
+
+    public boolean isIs5thEvalComplete() {
+        return is5thEvalComplete;
+    }
+
+    public void setIs5thEvalComplete(boolean is5thEvalComplete) {
+        this.is5thEvalComplete = is5thEvalComplete;
+    }
+
     private int isDeleted = 0;
 
     public UserEntity() {

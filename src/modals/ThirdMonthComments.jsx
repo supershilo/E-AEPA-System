@@ -20,6 +20,7 @@ const selfQuestionLabels = {
 
 const ThirdMonthComments = ({ userId, filter }) => {
   const role = sessionStorage.getItem("userRole");
+  console.log("Si role:", role);
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
   const [commentsData, setCommentsData] = useState({

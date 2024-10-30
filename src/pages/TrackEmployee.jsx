@@ -155,7 +155,10 @@ function TrackEmployee() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+    
   };
+
+  
 
   useEffect(() => {
     fetchData();
@@ -351,7 +354,7 @@ function TrackEmployee() {
             <div className="mr-10  flex items-center justify-between">
               <div className="ml-4 flex items-center justify-start">
                 <TextField
-                  placeholder="Search ..."
+                  placeholder="Search Employee..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                   sx={{

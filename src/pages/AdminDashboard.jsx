@@ -15,6 +15,7 @@ import Loader from "../components/Loader";
 import axios from "axios";
 import { apiUrl } from "../config/config";
 import { isSameMonth } from "date-fns";
+import Animated from "../components/motion";
 
 function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -231,7 +232,7 @@ function AdminDashboard() {
       legend: {
         position: "bottom",
       },
-      colors: ["#808080", "#F8C702", "#8C383E"],
+      colors: ["#636E72", "#F8C702", "#8c383e"],
     },
   });
 
@@ -486,9 +487,9 @@ function AdminDashboard() {
       },
       fill: {
         opacity: 1,
-        colors: ["#8C383E", "#808080", "#F8C702"], // Match your colors for each series
+        colors: ["#8c383e", "#636E72", "#F8C702"], // Match your colors for each series
       },
-      colors: ["#8C383E", "#808080", "#F8C702"],
+      colors: ["#8c383e", "#636E72", "#F8C702"],
       legend: {
         position: "top", // Legend position
         horizontalAlign: "center",
@@ -594,6 +595,7 @@ function AdminDashboard() {
   };
 
   return (
+    <Animated>
     <div style={{ minHeight: "91vh" }}>
       <div
         style={{
@@ -616,7 +618,7 @@ function AdminDashboard() {
             width: "12%",
             backgroundColor: "#8C383E",
             "&:hover": {
-              backgroundColor: "#7C2828",
+              backgroundColor: "#8c383e",
             },
             fontFamily: "poppins",
           }}
@@ -663,7 +665,7 @@ function AdminDashboard() {
                 style={{
                   height: "31%",
                   width: "100%",
-                  backgroundColor: "#8C383E",
+                  backgroundColor: "#8c383e",
                   borderRadius: "8px",
                   padding: "12px",
                   boxShadow:
@@ -1010,7 +1012,7 @@ function AdminDashboard() {
               >
                 <h2
                   style={{
-                    backgroundColor: "#8C383E",
+                    backgroundColor: "#8c383e",
                     borderRadius: "10px 10px 0px 0px",
                     padding: "5px 15px",
                     fontWeight: "500",
@@ -1035,8 +1037,6 @@ function AdminDashboard() {
                     style={{
                       backgroundColor: "white",
                       //padding: "5px 15px",
-                      fontWeight: "500",
-                      fontSize: "16px",
                       height: "5vh",
                       width: "95%",
                       margin: "auto",
@@ -1190,8 +1190,7 @@ function AdminDashboard() {
                     style={{
                       backgroundColor: "white",
                       //padding: "5px 15px",
-                      fontWeight: "500",
-                      fontSize: "16px",
+
                       height: "5vh",
                       width: "95%",
                       margin: "auto",
@@ -1328,6 +1327,7 @@ function AdminDashboard() {
         </div>
       )}
     </div>
+    </Animated>
   );
 }
 

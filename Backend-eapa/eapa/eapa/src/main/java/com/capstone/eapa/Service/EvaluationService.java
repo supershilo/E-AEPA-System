@@ -22,6 +22,9 @@ import jakarta.transaction.Transactional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
@@ -238,6 +241,8 @@ public class EvaluationService {
                     dto.setRole(role);
                     dto.setDateHired(dateHired);
 
+
+
                     // Set overall status from AssignedPeerEvaluators
                     String overallStatus = overallStatuses.get(userId); 
                     dto.setPvbpaStatus(overallStatus != null ? overallStatus : "PENDING");
@@ -250,10 +255,17 @@ public class EvaluationService {
                                 dto.setHvbpaStatus(headDto.getHvbpaStatus());
                             });
 
+                    List<LocalDate> evaluationDates = new ArrayList<>();
                     for (EvaluationEntity eval : userEvaluations) {
+                        LocalDate dateTaken = eval.getDateTaken();
+                        evaluationDates.add(dateTaken);
+
+                        dto.setPeriod(eval.getPeriod());
+
                         switch (eval.getEvalType() + "-" + eval.getStage()) {
                             case "SELF-JOB":
                                 dto.setSjbpStatus(eval.getStatus());
+                                dto.setSjbpDateTaken(dateTaken);
                                 break;
                             case "SELF-VALUES":
                                 dto.setSvbpaStatus(eval.getStatus());
