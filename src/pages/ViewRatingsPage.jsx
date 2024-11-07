@@ -184,7 +184,7 @@ const ViewRatingsPage = () => {
   const [academicYears, setAcademicYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
   const [semesters, setSemesters] = useState(["First Semester", "Second Semester"]);
-  const [selectedSemester, setSelectedSemester] = useState("1st Semester");
+  const [selectedSemester, setSelectedSemester] = useState("First Semester");
   const [openYearDropdown, setOpenYearDropdown] = useState(false);
   const [openSemesterDropdown, setOpenSemesterDropdown] = useState(false);
 
@@ -243,6 +243,7 @@ const ViewRatingsPage = () => {
         const activeYear = response.data.find(year => year.isActive);
         if (activeYear) {
           setSelectedYear(`${activeYear.startDate.slice(0, 4)}-${activeYear.endDate.slice(0, 4)}`);
+          console.log("Selected Year: ", selectedYear);
         }
       } catch (error) {
         console.error("Error fetching academic years:", error);
@@ -260,7 +261,6 @@ const ViewRatingsPage = () => {
   );
   // Determine if the selected year matches the hire year
   const isHireYear = selectedYear && selectedYear.startsWith(hireYear.toString());
-  console.log("isHireYear: ", isHireYear);
 
   return (
     <div
@@ -302,7 +302,7 @@ const ViewRatingsPage = () => {
                 <motion.li
                   variants={itemVariants}
                   key={`${year.startDate}-${year.endDate}`}
-                  onClick={() => handleYearChange(`${new Date(year.startDate).getFullYear()} - ${new Date(year.endDate).getFullYear()}`)}
+                  onClick={() => handleYearChange(`${new Date(year.startDate).getFullYear()}-${new Date(year.endDate).getFullYear()}`)}
                   className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                 >
                    {`${new Date(year.startDate).getFullYear()} - ${new Date(year.endDate).getFullYear()}`}
@@ -399,14 +399,14 @@ const ViewRatingsPage = () => {
       </TabPanel>
 
       <TabPanel value={tabIndex} index={1}>
-        <FifthMonthEval userId={userId} filter={filter} />
+        <FifthMonthEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester}/>
       </TabPanel>
     </>
   ) : (
     // Non-hire year: Render the selected semester evaluation
     <Box sx={{ marginTop: '20px' }}>
-      {selectedSemester === "1st Semester" ? (
-        <AnnualFirstSemEval userId={userId} filter={filter} />
+      {selectedSemester === "First Semester" ? (
+        <AnnualFirstSemEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester} />
       ) : (
         <AnnualSecondSemEval userId={userId} filter={filter} />
       )}
