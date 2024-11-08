@@ -11,7 +11,7 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?"
 };
 
-const ThirdComments = ({ userId, filter, role }) => {
+const FifthMonthComments = ({ userId, filter, role }) => {
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
   const [peerIds, setPeerIds] = useState([]);
@@ -458,4 +458,4 @@ useEffect(() => {
 };
 
 
-export default ThirdComments;
+export default FifthMonthComments;

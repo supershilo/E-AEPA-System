@@ -562,6 +562,7 @@ public class UserService implements UserDetailsService {
         } else {
             throw new IllegalStateException("User is not in 3rd Probationary status.");
         }
+
     }
 
 }

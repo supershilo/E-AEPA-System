@@ -25,9 +25,11 @@ import {
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
 import AdminViewResult from "../modals/AdminViewResults";
+import Admin5thViewResults from "../modals/Admin5thViewResults";
 import { apiUrl } from "../config/config";
 import ManagePeerModal from "../modals/ManagePeerModal";
-import SendResultsModal from "../components/SendResultsModal";
+import SendResultsModal from "../modals/SendResultsModal";
+import Send5thResultsModal from "../modals/Send5thResultsModal";
 
 const theme = createTheme({
 	palette: {
@@ -61,14 +63,19 @@ function EmployeeProfile({ user, handleBack }) {
 	const [userData, setUserData] = useState([]);
 	const [years, setYears] = useState([]);
 	const [show3rd, setShow3rd] = useState(false);
+	const [show5th, setShow5th] = useState(false);
 	const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] =
 		useState("3rd Month");
 	const [evaluationsData, setEvaluationsData] = useState([]);
 	const [peerData, setPeerData] = useState([]);
 	const role = sessionStorage.getItem("userRole");
-	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-	const [buttonText, setButtonText] = useState(false);
+	const [is3rdModal, setIs3rdModal] = useState(false);
 	const [is3rdEvalComplete, setIs3rdEvalComplete] = useState(false);
+	const [is5thModalOpen, setIs5thModal] = useState(false);
+	const [is5thEvalComplete, setIs5thEvalComplete] = useState(false);
+	const [buttonText, setButtonText] = useState(false);
+	const [buttonText5th, setButtonText5th] = useState(false);
+
 	console.log(role);
 
 	//adi changes
@@ -166,6 +173,7 @@ function EmployeeProfile({ user, handleBack }) {
 
 				// Set the is3rdEvalComplete state
 				setIs3rdEvalComplete(data.is3rdEvalComplete);
+				setIs5thEvalComplete(data.is5thEvalComplete);
 			} catch (error) {
 				console.error("Error fetching user data:", error);
 			}
@@ -174,7 +182,8 @@ function EmployeeProfile({ user, handleBack }) {
 		fetchUser();
 	}, [user.userID]);
 
-	console.log("ANG DATA", is3rdEvalComplete);
+	console.log("ANG 3rd", is3rdEvalComplete);
+	console.log("ANG 5th", is5thEvalComplete);
 
 	const handleYearEvaluationChange = (event) => {
 		setSelectedYearEvaluation(event.target.value);
@@ -187,24 +196,46 @@ function EmployeeProfile({ user, handleBack }) {
 		setSelectedEvaluationPeriod(period);
 	};
 
-	const handleViewResultsClick = () => {
+	const handleViewResults = () => {
 		setShow3rd(true);
 	};
 
-	const handleCloseModal = () => {
-		setShow3rd(false); // Close the modal
+	const handleClose3rdResults = () => {
+		setShow3rd(false);
+	};
+
+	const handleOpen5thViewResult = () => {
+		setShow5th(true);
+	};
+
+	const handleClose5thViewResult = () => {
+		setShow5th(false);
+	};
+
+	const handle5thModalOpen = () => {
+		setIs5thModal(true);
+	};
+
+	const handle5thModalConfirm = () => {
+		setIs5thModal(false);
+	};
+
+	const handleConfirm5th = () => {
+		setIs5thEvalComplete(true);
+		setIs5thModal(false);
+		setButtonText5th(true);
 	};
 
 	const handleConfirmOpen = () => {
-		setIsConfirmOpen(true);
+		setIs3rdModal(true);
 	};
 
 	const handleCloseConfirm = () => {
-		setIsConfirmOpen(false);
+		setIs3rdModal(false);
 	};
 
 	const handleConfirmSent = () => {
-		setIsConfirmOpen(false);
+		setIs3rdModal(false);
 		setIs3rdEvalComplete(true);
 		setButtonText(true);
 	};
@@ -316,7 +347,7 @@ function EmployeeProfile({ user, handleBack }) {
 								Head
 							</TableCell>
 							<TableCell align="center" style={headStyle}>
-								Peer/s
+								Peer(s)
 							</TableCell>
 							<TableCell align="center" style={{ backgroundColor: "#8C383E" }}>
 								{" "}
@@ -350,7 +381,10 @@ function EmployeeProfile({ user, handleBack }) {
 											backgroundColor: "transparent",
 										},
 									}}
-									onClick={handleViewResultsClick}
+									onClick={() => {
+										handleViewResults();
+										handleOpen5thViewResult();
+									}}
 									disabled={!allValuesStagesCompleted}
 								>
 									View Results
@@ -617,7 +651,8 @@ function EmployeeProfile({ user, handleBack }) {
 							>
 								<Tab label="3rd Month" style={tabStyle} />
 								<Tab label="5th Month" style={tabStyle} />
-								<Tab label="Annual" style={tabStyle} />
+								<Tab label="Annual- 1st Semester" style={tabStyle} />
+                <Tab label="Annual- 2nd Semester" style={tabStyle} />
 							</Tabs>
 							{selectedTab === 0 && (
 								<Animated>
@@ -640,7 +675,7 @@ function EmployeeProfile({ user, handleBack }) {
 											<AdminViewResult
 												userId={user.userID}
 												open={show3rd}
-												onClose={handleCloseModal}
+												onClose={handleClose3rdResults}
 												employee={user}
 												role={role}
 											/>
@@ -670,6 +705,7 @@ function EmployeeProfile({ user, handleBack }) {
 											}}
 											onClick={handleConfirmOpen}
 											disabled={is3rdEvalComplete}
+                      
 										>
 											{is3rdEvalComplete || buttonText ? (
 												<>
@@ -681,6 +717,7 @@ function EmployeeProfile({ user, handleBack }) {
 												</>
 											) : (
 												<>
+                        
 													<FontAwesomeIcon
 														icon={faPaperPlane}
 														style={{ fontSize: "15px", marginRight: "10px" }}
@@ -693,7 +730,7 @@ function EmployeeProfile({ user, handleBack }) {
 								</Animated>
 							)}
 							<SendResultsModal
-								isOpen={isConfirmOpen}
+								isOpen={is3rdModal}
 								onCancel={handleCloseConfirm}
 								onConfirm={handleConfirmSent}
 								empUserId={user.userID}
@@ -715,9 +752,68 @@ function EmployeeProfile({ user, handleBack }) {
 											5TH MONTH EVALUATION
 										</Typography>
 										{renderEvaluationTable()}
+										{show5th && (
+											<Admin5thViewResults
+												userId={user.userID}
+												open={show5th}
+												onClose={handleClose5thViewResult}
+												employee={user}
+												role={role}
+											/>
+										)}
+										<Box
+											sx={{
+												display: "flex",
+												justifyContent: "flex-end",
+												mt: 2,
+												mb: 1,
+											}}
+										>
+											<Button
+												variant="contained"
+												sx={{
+													height: "2.5em",
+													width: "11em",
+													fontFamily: "Poppins",
+													backgroundColor: "#8c383e",
+													padding: "1px 1px 0 0",
+													textTransform: "none",
+													"&:hover": {
+														backgroundColor: "#762F34",
+														color: "white",
+													},
+												}}
+												onClick={handle5thModalOpen}
+												disabled={is5thEvalComplete}
+											>
+												{is5thEvalComplete || buttonText5th ? (
+													<>
+														<FontAwesomeIcon
+															icon={faCheck}
+															style={{ fontSize: "15px", marginRight: "10px" }}
+														/>{" "}
+														Result Sent
+													</>
+												) : (
+													<>
+														<FontAwesomeIcon
+															icon={faPaperPlane}
+															style={{ fontSize: "15px", marginRight: "10px" }}
+														/>{" "}
+														Send Results
+													</>
+												)}
+											</Button>
+										</Box>
 									</Box>
 								</Animated>
 							)}
+							<Send5thResultsModal
+								isOpen={is5thModalOpen}
+								onCancel={handle5thModalConfirm}
+								onConfirm={handleConfirm5th}
+								empUserId={user.userID}
+							/>
 							{selectedTab === 2 && (
 								<Animated>
 									<Box>
