@@ -6,7 +6,22 @@ so OPTION: DYNAMIC UPDATE probestat: IF kni, issue ani kay mawala ang prev perio
 */
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, Menu, Modal, TextField, InputAdornment, IconButton, Select, FormControl, ListItemIcon, ListItemText, Tooltip } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  Menu,
+  Modal,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Select,
+  FormControl,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -18,12 +33,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileLines, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import axios from "axios";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import Fade from "@mui/material/Fade";
 import EvaluationForm from "../components/EvaluationForm";
-import CheckIcon from '@mui/icons-material/Check';
+import CheckIcon from "@mui/icons-material/Check";
 import { set } from "date-fns";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 import Loader from "../components/Loader";
 
 function EvaluateEmployee() {
@@ -36,9 +51,9 @@ function EvaluateEmployee() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Adjust this based on your needs
   const pagesPerGroup = 5;
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   // Add state for probeStatus filter
-  const [probeStatusFilter, setProbeStatusFilter] = useState('');
+  const [probeStatusFilter, setProbeStatusFilter] = useState("");
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const openFilterMenu = Boolean(filterAnchorEl);
   //adi changes
@@ -55,6 +70,8 @@ function EvaluateEmployee() {
     useState(false);
   const [isEvaluationCompletedJob, setIsEvaluationCompletedJob] =
     useState(false);
+  const [schoolYear, setSchoolYear] = useState("");
+  const [semester, setSemester] = useState("");
 
   const modalStyle = {
     position: "absolute",
@@ -71,6 +88,30 @@ function EvaluateEmployee() {
     flexDirection: "column",
     textAlign: "left",
   };
+
+  //fetch school year and semester
+  useEffect(() => {
+    const fetchSchoolYearAndSem = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}academicYear/current-year`);
+        const response2 = await axios.get(
+          `${apiUrl}academicYear/current-semester`
+        );
+        setSchoolYear(response.data);
+        setSemester(response2.data);
+      } catch (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+
+    fetchSchoolYearAndSem();
+  }, []);
 
   const handleOpenModal = (stage, period) => {
     setSelectedStage(stage);
@@ -110,6 +151,8 @@ function EvaluateEmployee() {
       evalType: evalType,
       status: "OPEN",
       dateTaken: currentDate,
+      schoolYear: schoolYear,
+      semester: semester,
       isDeleted: 0,
     };
 
@@ -125,7 +168,7 @@ function EvaluateEmployee() {
           period: period,
           stage: selectedStage,
           evalType: "HEAD",
-        }
+        },
       });
       existingEvalID = response.data;
     } catch (error) {
@@ -173,8 +216,6 @@ function EvaluateEmployee() {
       }
     }
     // setIsLoading(false);
-
-
   };
 
   useEffect(() => {
@@ -198,7 +239,11 @@ function EvaluateEmployee() {
     setIsEvaluationCompletedValues(false);
     setIsEvaluationCompletedJob(false);
 
-    const period = getEvaluationPeriod(selectedUser.probeStatus);
+    const period = getEvaluationPeriod(
+      selectedUser.probeStatus,
+      selectedUser.empStatus
+    );
+    console.log("Adi ---- period: ", period);
     handleCompleteStatus(userID, selectedUser.userID, period, "VALUES", "HEAD");
     handleCompleteStatus(userID, selectedUser.userID, period, "JOB", "HEAD");
   };
@@ -206,10 +251,16 @@ function EvaluateEmployee() {
     setAnchorEl(null);
   };
 
-  const getEvaluationPeriod = (probeStatus) => {
+  const getEvaluationPeriod = (probeStatus, empStatus) => {
     if (probeStatus === "3rd Probationary") return "3rd Month";
     if (probeStatus === "5th Probationary") return "5th Month";
-    return "Annual";
+
+    if (empStatus === "Regular") {
+      if (semester) {
+        // check if semester is defined
+        return semester === "First Semester" ? "Annual-1st" : "Annual-2nd";
+      }
+    }
   };
 
   useEffect(() => {
@@ -290,19 +341,24 @@ function EvaluateEmployee() {
 
         const processedData = await Promise.all(
           allUsersData
-            .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
+            .filter(
+              (item) => item.role === "EMPLOYEE" && item.dept === userData.dept
+            )
             .filter((item) => {
-              if (probeStatusFilter === '') {
+              if (probeStatusFilter === "") {
                 return true;
               }
-              if (probeStatusFilter === 'Annually' && item.probeStatus === '') {
+              if (probeStatusFilter === "Annually" && item.probeStatus === "") {
                 return true;
               }
               return item.probeStatus === probeStatusFilter;
             })
             .map(async (item) => {
               const probationaryMonth = getProbationaryMonth(item.probeStatus);
-              const monthsSinceHired = calculateMonthsDifference(item.dateHired, currentDate);
+              const monthsSinceHired = calculateMonthsDifference(
+                item.dateHired,
+                currentDate
+              );
               const isRegularEmployee = item.empStatus === "Regular";
 
               const isEligibleForEvaluation =
@@ -342,23 +398,23 @@ function EvaluateEmployee() {
             })
         );
 
-        const filteredData = processedData.filter(item => item !== null);
+        const filteredData = processedData.filter((item) => item !== null);
         setRows(filteredData);
       } catch (error) {
         console.error("Error fetching data:", error);
-      }finally{
+      } finally {
         setIsLoading(false);
       }
     };
     if (!openForm && !isLoading) {
       fetchData();
     }
-  }, [userID, updateFetch, searchTerm, probeStatusFilter,openForm]);
-
+  }, [userID, updateFetch, searchTerm, probeStatusFilter, openForm]);
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
-  const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  const startPageGroup =
+    Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
   const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
 
   const handlePageChange = (newPage) => {
@@ -423,11 +479,11 @@ function EvaluateEmployee() {
     {
       id: "probeStatus",
       label: (
-        <div >
+        <div>
           <span style={{ paddingLeft: 26 }}>Evaluation Period</span>
           <IconButton
             onClick={handleFilterClick}
-            sx={{ color: 'white', width: '1.3em', height: '1.3em', ml: '.6vh' }}
+            sx={{ color: "white", width: "1.3em", height: "1.3em", ml: ".6vh" }}
           >
             <FilterAltIcon fontSize="medium" />
           </IconButton>
@@ -437,51 +493,76 @@ function EvaluateEmployee() {
             onClose={handleCloseFilter}
             PaperProps={{
               sx: {
-                '& .MuiMenuItem-root': {
-                  fontSize: '.7em',
-                  fontFamily: 'Poppins',
+                "& .MuiMenuItem-root": {
+                  fontSize: ".7em",
+                  fontFamily: "Poppins",
                 },
               },
             }}
           >
             <MenuItem
               dense
-              onClick={() => handleMenuClick('')}
-              selected={probeStatusFilter === ''}
-              sx={{ fontFamily: 'Poppins' }}
+              onClick={() => handleMenuClick("")}
+              selected={probeStatusFilter === ""}
+              sx={{ fontFamily: "Poppins" }}
             >
-              <ListItemIcon>{probeStatusFilter === '' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="All" style={{ fontFamily: 'Poppins', fontSize: '.5em', }} />
+              <ListItemIcon>
+                {probeStatusFilter === "" && <CheckIcon fontSize="small" />}
+              </ListItemIcon>
+              <ListItemText
+                primary="All"
+                style={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
             <MenuItem
               dense
-              onClick={() => handleMenuClick('Annually')}
-              selected={probeStatusFilter === 'Annually'}
-              sx={{ fontFamily: 'Poppins', fontSize: '.5em' }}
+              onClick={() => handleMenuClick("Annually")}
+              selected={probeStatusFilter === "Annually"}
+              sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
             >
-              <ListItemIcon>{probeStatusFilter === 'Annually' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="Annually" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
+              <ListItemIcon>
+                {probeStatusFilter === "Annually" && (
+                  <CheckIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary="Annually"
+                sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
             <MenuItem
               dense
-              onClick={() => handleMenuClick('3rd Probationary')}
-              selected={probeStatusFilter === '3rd Probationary'}
-              sx={{ fontFamily: 'Poppins', fontSize: '.5em' }}
+              onClick={() => handleMenuClick("3rd Probationary")}
+              selected={probeStatusFilter === "3rd Probationary"}
+              sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
             >
-              <ListItemIcon>{probeStatusFilter === '3rd Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="3rd Probationary" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
+              <ListItemIcon>
+                {probeStatusFilter === "3rd Probationary" && (
+                  <CheckIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary="3rd Probationary"
+                sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
             <MenuItem
               dense
-              onClick={() => handleMenuClick('5th Probationary')}
-              selected={probeStatusFilter === '5th Probationary'}
-              style={{ fontFamily: 'Poppins', fontSize: '.5em' }}
+              onClick={() => handleMenuClick("5th Probationary")}
+              selected={probeStatusFilter === "5th Probationary"}
+              style={{ fontFamily: "Poppins", fontSize: ".5em" }}
             >
-              <ListItemIcon>{probeStatusFilter === '5th Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="5th Probationary" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
+              <ListItemIcon>
+                {probeStatusFilter === "5th Probationary" && (
+                  <CheckIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary="5th Probationary"
+                sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
           </Menu>
-
         </div>
       ),
       minWidth: 150,
@@ -513,7 +594,7 @@ function EvaluateEmployee() {
                 "&:hover": { color: "red" },
               }}
               onClick={(event) => handleClick(event, row)}
-              style={{ textTransform: "none", fontFamily: 'Poppins' }}
+              style={{ textTransform: "none", fontFamily: "Poppins" }}
               startIcon={
                 <FontAwesomeIcon
                   icon={faFileLines}
@@ -535,11 +616,11 @@ function EvaluateEmployee() {
               PaperProps={{
                 elevation: 0, // Remove shadow
                 sx: {
-                  border: '1px solid #d3d4d5',
-                  boxShadow: 'none', // Remove shadow
-                  '& .MuiMenuItem-root': {
-                    fontSize: '.8em',
-                    fontFamily: 'Poppins',
+                  border: "1px solid #d3d4d5",
+                  boxShadow: "none", // Remove shadow
+                  "& .MuiMenuItem-root": {
+                    fontSize: ".8em",
+                    fontFamily: "Poppins",
                   },
                 },
               }}
@@ -586,7 +667,7 @@ function EvaluateEmployee() {
           mt={3}
           sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}
         >
-          {openForm ? "Evaluation" : "List of Staff"}{" "} 
+          {openForm ? "Evaluation" : "List of Staff"}{" "}
         </Typography>
         <div className="ml-8 mt-2">
           <div className="mr-10  flex items-center justify-between">
@@ -596,7 +677,6 @@ function EvaluateEmployee() {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 sx={{
-
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "#ffffff", // Set the background color for the entire input area
                   },
@@ -605,9 +685,9 @@ function EvaluateEmployee() {
                     borderColor: "#e0e0e0",
                   },
                   "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                  {
-                    borderColor: "#e0e0e0",
-                  },
+                    {
+                      borderColor: "#e0e0e0",
+                    },
                   "&:focus-within": {
                     "& fieldset": {
                       borderColor: "#8C383E !important",
@@ -670,16 +750,21 @@ function EvaluateEmployee() {
                 alignItems: "center",
               }}
             >
-
               <TableContainer
-                sx={{ height: '30.68em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}
+                sx={{
+                  height: "30.68em",
+                  borderRadius: "5px 5px 0 0 ",
+                  maxHeight: "100%",
+                  border: "1px solid lightgray",
+                }}
               >
                 <Table stickyHeader aria-label="a dense table" size="small">
                   <TableHead sx={{ height: "2em" }}>
                     <TableRow>
                       {columnsEmployees.map((column) => (
                         <TableCell
-                          component="th" scope="row"
+                          component="th"
+                          scope="row"
                           sx={{
                             fontFamily: "Poppins",
                             bgcolor: "#8c383e",
@@ -698,8 +783,11 @@ function EvaluateEmployee() {
                   {isLoading ? ( // Show loading indicator if loading
                     <TableBody>
                       <TableRow>
-                        <TableCell colSpan={columnsEmployees.length} align="center">
-                          <Loader/>
+                        <TableCell
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
+                          <Loader />
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -708,7 +796,6 @@ function EvaluateEmployee() {
                       {paginatedRows.map((row) => (
                         <TableRow
                           sx={{
-
                             bgcolor: "white",
                             "&:hover": {
                               backgroundColor: "rgba(248, 199, 2, 0.5)",
@@ -719,20 +806,21 @@ function EvaluateEmployee() {
                         >
                           {columnsEmployees.map((column) => (
                             <TableCell
-                              component="th" scope="row"
-                              sx={{ fontFamily: "Poppins", fontSize: '.8em' }}
+                              component="th"
+                              scope="row"
+                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
                               key={`${row.id}-${column.id}`}
                               align={column.align}
                             >
                               {column.id === "name"
                                 ? row.name
                                 : column.id === "actions"
-                                  ? column.format
-                                    ? column.format(row[column.id], row)
-                                    : null
-                                  : column.format
-                                    ? column.format(row[column.id])
-                                    : row[column.id]}
+                                ? column.format
+                                  ? column.format(row[column.id], row)
+                                  : null
+                                : column.format
+                                ? column.format(row[column.id])
+                                : row[column.id]}
                             </TableCell>
                           ))}
                         </TableRow>
@@ -741,7 +829,11 @@ function EvaluateEmployee() {
                   ) : (
                     <TableBody>
                       <TableRow>
-                        <TableCell sx={{  height: '32em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
+                        <TableCell
+                          sx={{ height: "32em", borderRadius: "5px 5px 0 0" }}
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
                           <Typography
                             sx={{
                               textAlign: "center",
@@ -752,19 +844,19 @@ function EvaluateEmployee() {
                               padding: "25px",
                             }}
                           >
-                            There are currently no data in this table</Typography>
+                            There are currently no data in this table
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     </TableBody>
                   )}
-
                 </Table>
               </TableContainer>
             </Grid>
           </Box>
         )}
         {/* Pagination */}
-        < div
+        <div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
             position: "relative", // Change to relative to keep it in place
@@ -799,20 +891,24 @@ function EvaluateEmployee() {
               </a>
             </li>
 
-            {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
-              <li key={startPageGroup + index}>
-                <a
-                  href="#"
-                  className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
-                    ? "border-pink-900 bg-pink-900 text-white"
-                    : "border-gray-100 bg-white text-gray-900"
+            {Array.from(
+              { length: endPageGroup - startPageGroup + 1 },
+              (_, index) => (
+                <li key={startPageGroup + index}>
+                  <a
+                    href="#"
+                    className={`block h-8 w-8 rounded border ${
+                      currentPage === startPageGroup + index
+                        ? "border-pink-900 bg-pink-900 text-white"
+                        : "border-gray-100 bg-white text-gray-900"
                     } text-center leading-8`}
-                  onClick={() => handlePageChange(startPageGroup + index)}
-                >
-                  {startPageGroup + index}
-                </a>
-              </li>
-            ))}
+                    onClick={() => handlePageChange(startPageGroup + index)}
+                  >
+                    {startPageGroup + index}
+                  </a>
+                </li>
+              )
+            )}
 
             <li>
               <a
