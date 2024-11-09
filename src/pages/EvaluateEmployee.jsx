@@ -72,6 +72,7 @@ function EvaluateEmployee() {
     useState(false);
   const [schoolYear, setSchoolYear] = useState("");
   const [semester, setSemester] = useState("");
+  const [selectedEmpPeriod, setSelectedEmpPeriod] = useState("");
 
   const modalStyle = {
     position: "absolute",
@@ -147,7 +148,7 @@ function EvaluateEmployee() {
         userID: selectedEmp.userID,
       },
       stage: selectedStage,
-      period: period,
+      period: selectedEmpPeriod,
       evalType: evalType,
       status: "OPEN",
       dateTaken: currentDate,
@@ -239,11 +240,6 @@ function EvaluateEmployee() {
     setIsEvaluationCompletedValues(false);
     setIsEvaluationCompletedJob(false);
 
-    // const period = getEvaluationPeriod(
-    //   selectedUser.probeStatus,
-    //   selectedUser.empStatus
-    // );
-
     const period =
       selectedUser.empStatus === "Regular"
         ? semester === "First Semester"
@@ -257,9 +253,11 @@ function EvaluateEmployee() {
 
     handleCompleteStatus(userID, selectedUser.userID, period, "VALUES", "HEAD");
     handleCompleteStatus(userID, selectedUser.userID, period, "JOB", "HEAD");
-
-    console.log("Adi ---- period: ", period);
+    setSelectedEmpPeriod(period);
   };
+
+  console.log("Adi ---- selected period: ", selectedEmpPeriod);
+
   const handleClose = () => {
     setAnchorEl(null);
   };
