@@ -736,7 +736,7 @@ function EvaluateEmployee() {
             }}
           >
             <EvaluationForm
-              period={period}
+              period={selectedEmpPeriod}
               loggedUser={user}
               selectedEmp={selectedEmp}
               stage={stage}
