@@ -166,7 +166,7 @@ function EvaluateEmployee() {
         params: {
           userID: userID,
           empID: selectedEmp.userID,
-          period: period,
+          period: selectedEmpPeriod,
           stage: selectedStage,
           evalType: "HEAD",
         },
@@ -280,11 +280,17 @@ function EvaluateEmployee() {
       handleCompleteStatus(
         userID,
         selectedEmp.userID,
-        period,
+        selectedEmpPeriod,
         "VALUES",
         "HEAD"
       );
-      handleCompleteStatus(userID, selectedEmp.userID, period, "JOB", "HEAD");
+      handleCompleteStatus(
+        userID,
+        selectedEmp.userID,
+        selectedEmpPeriod,
+        "JOB",
+        "HEAD"
+      );
     }
   }, [selectedEmp]);
 
@@ -303,7 +309,7 @@ function EvaluateEmployee() {
           params: {
             userID: userID,
             empID: empID,
-            period: period,
+            period: selectedEmpPeriod,
             stage: stage,
             evalType: evalType,
           },
