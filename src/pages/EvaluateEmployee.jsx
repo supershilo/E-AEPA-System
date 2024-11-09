@@ -239,13 +239,26 @@ function EvaluateEmployee() {
     setIsEvaluationCompletedValues(false);
     setIsEvaluationCompletedJob(false);
 
-    const period = getEvaluationPeriod(
-      selectedUser.probeStatus,
-      selectedUser.empStatus
-    );
-    console.log("Adi ---- period: ", period);
+    // const period = getEvaluationPeriod(
+    //   selectedUser.probeStatus,
+    //   selectedUser.empStatus
+    // );
+
+    const period =
+      selectedUser.empStatus === "Regular"
+        ? semester === "First Semester"
+          ? "Annual-1st"
+          : semester === "Second Semester"
+          ? "Annual-2nd"
+          : "Invalid Semester"
+        : selectedUser.probeStatus === "3rd Probationary"
+        ? "3rd Month"
+        : "5th Month";
+
     handleCompleteStatus(userID, selectedUser.userID, period, "VALUES", "HEAD");
     handleCompleteStatus(userID, selectedUser.userID, period, "JOB", "HEAD");
+
+    console.log("Adi ---- period: ", period);
   };
   const handleClose = () => {
     setAnchorEl(null);
