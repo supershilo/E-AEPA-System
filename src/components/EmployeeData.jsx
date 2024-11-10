@@ -20,12 +20,11 @@ import {
 	MenuItem,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 
 import { faCheckCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
 import EmployeeProfile from "../pages/EmployeeProfile";
 import Animated from "../components/motion";
-
 
 function EmployeeData() {
 	const [tab, setTab] = useState(0);
@@ -38,9 +37,7 @@ function EmployeeData() {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				const response = await axios.get(
-					`${apiUrl}user/getAllUser`
-				);
+				const response = await axios.get(`${apiUrl}user/getAllUser`);
 				const sortedUsers = response.data
 					.filter((user) => user.role === "EMPLOYEE")
 					.sort((a, b) => b.userID - a.userID);
@@ -99,9 +96,9 @@ function EmployeeData() {
 	};
 
 	const tableStyle = {
-		borderRadius: "5px 5px 0 0",
-		width: "93%",
-		margin: "5px 30px 0px 0px",
+		borderRadius: "5px 5px 5px 5px",
+		width: "95%",
+		margin: "5px 0px 0px 0px",
 		boxShadow: "2px 2px 5px rgba(157, 157, 157, 0.5)",
 	};
 
@@ -179,7 +176,18 @@ function EmployeeData() {
 								>
 									<TableContainer
 										component={Paper}
-										sx={{ maxHeight: 550, ...tableStyle }}
+										sx={{
+											maxHeight: 550,
+											...tableStyle,
+											"&::-webkit-scrollbar": {
+												width: "16px",
+											},
+											"&::-webkit-scrollbar-thumb": {
+												borderRadius: "16px",
+												border: "4px solid transparent", 
+												backgroundClip: "padding-box",
+											},
+										}}
 									>
 										<Table>
 											<TableHead>
@@ -217,7 +225,10 @@ function EmployeeData() {
 																	<InputAdornment>
 																		<FontAwesomeIcon
 																			icon={faSearch}
-																			style={{ fontSize: "13px", padding: "0" }}
+																			style={{
+																				fontSize: "13px",
+																				padding: "0",
+																			}}
 																		/>
 																	</InputAdornment>
 																),
