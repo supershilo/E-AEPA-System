@@ -3,7 +3,7 @@
 // SI DATEHIRED D MO DISPLAY
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, CircularProgress, Stack } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, CircularProgress, Stack, Tabs, Tab } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
@@ -24,7 +24,7 @@ function HeadEvalResult() {
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
@@ -51,6 +51,36 @@ function HeadEvalResult() {
 
   const hasData = rows.length > 0;
 
+  const handleTabChange = (event, newValue) => {
+    setCurrentPage(1);
+    setSelectedTab(newValue);
+    setUpdateFetch((prev) => !prev);
+  };
+
+  const tabStyle = {
+    textTransform: "none",
+    mb: 1,
+    color: "#9D9D9D",
+    fontFamily: "Poppins",
+    fontSize: "14px",
+    fontWeight: 600,
+    "& .MuiTabs-indicator": {
+      backgroundColor: "#8C383E", //nig click makita maroon
+    },
+    "&.Mui-selected": {
+      color: "#8C383E", //kung unsa selected
+    },
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [selectedTab]);
+
 
   const fetchData = async () => {
     try {
@@ -60,12 +90,15 @@ function HeadEvalResult() {
       }
       const userData = await userResponse.json();
       setLoggedUserData(userData);
-
+  
       const allUsersResponse = await fetch(`${apiUrl}evaluation/evaluations`);
       if (!allUsersResponse.ok) {
         throw new Error("Failed to fetch all users data");
       }
       const allUsersData = await allUsersResponse.json();
+      console.log(allUsersData);
+      
+      // Filter processed data based on selected tab
       const processedData = allUsersData
         .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
         .map((item) => ({
@@ -73,7 +106,9 @@ function HeadEvalResult() {
           name: `${item.fName} ${item.lName}`,
           userID: item.userID,
           dateHired: item.dateHired,
-        }));
+        }))
+        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete) : (item.empStatus === 'Regular' /*& item.is1stAnnualComplete*/) ); // Filter based on selected tab
+      
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
         Object.values(item).some(
@@ -82,8 +117,9 @@ function HeadEvalResult() {
             value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
+      
       setRows(searchFilteredData);
-
+  
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -91,7 +127,7 @@ function HeadEvalResult() {
 
   useEffect(() => {
     fetchData();
-  }, [userID, updateFetch, searchTerm]);
+  }, [userID, updateFetch, searchTerm,selectedTab]);
 
   useEffect(() => {
     if (!showPasswordModal) {
@@ -100,7 +136,7 @@ function HeadEvalResult() {
   }, [showPasswordModal, updateFetch, userID]);
 
   const handleViewResultClick = async (userId) => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const response = await fetch(`${apiUrl}user/getUser/${userId}`);
       if (!response.ok) {
@@ -126,17 +162,17 @@ function HeadEvalResult() {
     setPage(0);
   };
 
-  const columnsEmployees = [
+  const columnsProbe = [
     {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 100,
+      minWidth: 90,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 170,
+      minWidth: 100,
       align: "center",
       format: (value) => formatName(value),
     },
@@ -155,6 +191,90 @@ function HeadEvalResult() {
           day: 'numeric'
         });
       }
+    },
+    {
+      id: "is3rdEvalComplete",
+      label: "3rd Month Result Status",
+      align: "center",
+      minWidth: 150,
+      format: (value) => {
+        if (!value) {
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+        } else  {
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+        }
+      },
+    },
+    {
+      id: "is5thEvalComplete",
+      label: "5th Month Result Status",
+      align: "center",
+      minWidth: 150,
+      format: (value) => {
+        if (!value) {
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+        } else  {
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+        }
+      },
+    },
+  ];
+
+  const columnsRegular = [
+    {
+      id: "workID",
+      label: "ID No.",
+      align: "center",
+      minWidth: 90,
+    },
+    {
+      id: "name",
+      label: "Name",
+      minWidth: 100,
+      align: "center",
+      format: (value) => formatName(value),
+    },
+
+
+    {
+      id: "dateHired",
+      label: "Date Hired",
+      minWidth: 150,
+      align: "center",
+      format: (value) => {
+        const date = new Date(value);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+    },
+    {
+      id: "is1stAnnualEvalComplete",
+      label: "First Semester Result Status",
+      align: "center",
+      minWidth: 150,
+      format: (value) => {
+        if (!value) {
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+        } else  {
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+        }
+      },
+    },
+    {
+      id: "is2ndAnnualEvalComplete",
+      label: "Second Semester Result Status",
+      align: "center",
+      minWidth: 150,
+      format: (value) => {
+        if (!value) {
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+        } else  {
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+        }
+      },
     },
   ];
 
@@ -231,83 +351,98 @@ function HeadEvalResult() {
         )}
 
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": {mt: 4, width: "93.5%" } }}>
           <Grid container
             spacing={1.5}
             sx={{
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
-            }}>
+            }}
+          >
             {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
             {showPasswordModal ? (
               <Stack spacing={1}>
                 <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
                 <Skeleton variant="rectangular" width='80em' height={500} />
               </Stack>
-              
-              
             ) : (
-              <TableContainer sx={{ height: '29.5em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}>
-                <Table stickyHeader aria-label="sticky table" size="small">
-                  <TableHead sx={{ height: "2em" }}>
-                    <TableRow>
-                      {columnsEmployees.map((column) => (
-                        <TableCell
-                          sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
-                          key={column.id}
-                          align={column.align}
-                          style={{ minWidth: column.minWidth }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  {hasData ? (
-                    <TableBody>
-                      {paginatedRows.map((row) => (
-                        <TableRow
-                          sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
-                          key={row.id}
-                          onClick={() => handleViewResultClick(row.userId)}
-                        >
-                          {columnsEmployees.map((column) => (
-                            <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
-                            {column.id === "name" ?  row.name : column.format ? column.format(row[column.id]) : row[column.id]}
-                          </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  ) : (
-                    <TableBody>
+              <>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em",ml:5 }}
+                >
+                  <Tabs
+                    value={selectedTab}
+                    onChange={handleTabChange}
+                    sx={tabStyle}
+                  >
+                    <Tab label={`Probationary Employees`} sx={tabStyle} />
+                    <Tab label={`Regular Employees`} sx={tabStyle} />
+                  </Tabs>
+                </Grid>
+                <TableContainer sx={{ height: '29.5em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' ,ml:6}}>
+                  <Table stickyHeader aria-label="sticky table" size="small">
+                    <TableHead sx={{ height: "2em" }}>
                       <TableRow>
-                        <TableCell sx={{ height: '32.3em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
-                          <Typography
-                            sx={{
-                              textAlign: "center",
-                              fontFamily: "Poppins",
-                              fontSize: "17px",
-                              color: "#1e1e1e",
-                              fontWeight: 500,
-                              padding: "25px",
-                            }}
+                        {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
+                          <TableCell
+                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                            key={column.id}
+                            align={column.align}
+                            style={{ minWidth: column.minWidth }}
                           >
-                            There are currently no data in this table</Typography>
-                        </TableCell>
+                            {column.label}
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    </TableBody>
-                  )}
-
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    {hasData ? (
+                      <TableBody>
+                        {paginatedRows.map((row) => (
+                          <TableRow
+                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
+                            key={row.id}
+                            onClick={() => handleViewResultClick(row.userId)}
+                          >
+                            {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
+                              <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
+                                {column.id === "name" ? row.name : column.format ? column.format(row[column.id]) : row[column.id]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    ) : (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell sx={{ height: '32.3em', borderRadius: '5px 5px 0 0' }} colSpan={columnsProbe.length || columnsRegular.length} align="center">
+                            <Typography
+                              sx={{
+                                textAlign: "center",
+                                fontFamily: "Poppins",
+                                fontSize: "17px",
+                                color: "#1e1e1e",
+                                fontWeight: 500,
+                                padding: "25px",
+                              }}
+                            >
+                              There are currently no data in this table
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    )}
+                  </Table>
+                </TableContainer>
+              </>
             )}
             {/* </Card> */}
           </Grid>
           {loading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%',  }}>
-              <CircularProgress  color='inherit' />
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', }}>
+              <CircularProgress color='inherit' />
             </Box>
           )}
 
