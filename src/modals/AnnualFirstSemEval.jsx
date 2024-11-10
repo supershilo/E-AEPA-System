@@ -12,7 +12,7 @@ import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const AnnualFirstSemEval = ({ userId, filter }) => {
+const AnnualFirstSemEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -190,6 +190,8 @@ const AnnualFirstSemEval = ({ userId, filter }) => {
                 evalType: "SELF",
                 stage: "VALUES",
                 period: "Annual-1st",
+                schoolYear: selectedYear,
+                semester: selectedSemester,
               },
             }
           );
@@ -241,6 +243,8 @@ const AnnualFirstSemEval = ({ userId, filter }) => {
                 evalType: "SELF",
                 stage: "JOB",
                 period: "Annual-1st",
+                schoolYear: selectedYear,
+                semester: selectedSemester,
               },
             }
           );
@@ -305,6 +309,8 @@ const AnnualFirstSemEval = ({ userId, filter }) => {
                   peerID: userId,
                   period: "Annual-1st",
                   evalType: 'PEER-A',
+                  schoolYear: selectedYear,
+                  semester: selectedSemester,
                 },
               }
             ).catch(error => {
@@ -337,7 +343,7 @@ const AnnualFirstSemEval = ({ userId, filter }) => {
               {
                   params: {
                       empId: userId,
-                      period: "Annual", //SUBJECT TO CHANGE "Annual-1st"
+                      period: "Annual-1st", //SUBJECT TO CHANGE "Annual-1st"
                   },
               }
           );
@@ -364,7 +370,7 @@ const fetchHeadValuesAnnualFirst = async () => {
 
     const data = response.data;
     console.log("HV: ", data);
-    if (data.period === "Annual") { //SUBJECT TO CHANGE "Annual-1st"
+    if (data.period === "Annual-1st") { //SUBJECT TO CHANGE "Annual-1st"
       const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
       const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
       const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));

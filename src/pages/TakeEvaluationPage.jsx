@@ -1133,8 +1133,6 @@ function TakeEvaluationPage() {
       schoolYear: schoolYear,
       semester: semester,
       dateTaken: currentDate,
-      schoolYear: schoolYear,
-      semester: semester,
       isDeleted: 0,
     };
 

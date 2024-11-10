@@ -12,7 +12,7 @@ import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const FifthMonthEval = ({ userId, filter}) => {
+const FifthMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -190,6 +190,8 @@ const FifthMonthEval = ({ userId, filter}) => {
                 evalType: "SELF",
                 stage: "VALUES",
                 period: "5th Month",
+                schoolYear: selectedYear,
+                semester: selectedSemester,
               },
             }
           );
@@ -241,6 +243,8 @@ const FifthMonthEval = ({ userId, filter}) => {
                 evalType: "SELF",
                 stage: "JOB",
                 period: "5th Month",
+                schoolYear: selectedYear,
+                semester: selectedSemester,
               },
             }
           );
@@ -292,7 +296,6 @@ const FifthMonthEval = ({ userId, filter}) => {
             uni: '-',
           };
           const initialPeerEvaluationAverages = evaluatorIds.map(() => defaultAverages);
-
           setPeerEvaluationAverages(initialPeerEvaluationAverages);
 
           // Fetch peer evaluation averages for each evaluator
@@ -305,6 +308,8 @@ const FifthMonthEval = ({ userId, filter}) => {
                   peerID: userId,
                   period: "5th Month",
                   evalType: 'PEER-A',
+                  schoolYear: selectedYear,
+                  semester: "First Semester",
                 },
               }
             ).catch(error => {

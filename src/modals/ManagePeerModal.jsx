@@ -7,6 +7,7 @@ import Tab from "@mui/material/Tab";
 import Button from "@mui/material/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { apiUrl } from "../config/config";
 import axios from "axios";
 
 function CustomTabPanel(props) {
@@ -68,15 +69,13 @@ function ManagePeerModal({
   const [deptUsers, setDeptUsers] = useState([]);
   const [openEditPeer, setOpenEditPeer] = useState(false);
   const [viewedUser, setViewedUser] = useState();
-  const [selectedEvaluators, setSelectedEvaluators] = useState("");
+  const [selectedEvaluators, setSelectedEvaluators] = useState([]);
 
   //fetch user
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userId}`
-        );
+        const response = await axios.get(`${apiUrl}user/getUser/${userId}`);
         setViewedUser(response.data);
       } catch (error) {
         if (error.response) {
@@ -97,7 +96,7 @@ function ManagePeerModal({
     const fetchAssignPeerID = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/assignedPeers/getAssignedPeersId`,
+          `${apiUrl}assignedPeers/getAssignedPeersId`,
           {
             params: {
               period: selectedEvaluationPeriod,
@@ -126,7 +125,7 @@ function ManagePeerModal({
       const fetchAssignedEvaluators = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/assignedPeers/getEvaluatorIds`,
+            `${apiUrl}assignedPeers/getEvaluatorIds`,
             {
               params: {
                 assignedPeersId: assignPeerId,
@@ -134,7 +133,7 @@ function ManagePeerModal({
             }
           );
           setAssignedEvaluators(response.data);
-          console.log("Fetched evaluators id: " + assignedEvaluators);
+          setSelectedEvaluators(response.data);
         } catch (error) {
           if (error.response) {
             console.log(error.response.data);
@@ -148,15 +147,16 @@ function ManagePeerModal({
 
       fetchAssignedEvaluators();
     }
-  }, [assignPeerId, selectedEvaluators]);
+  }, [assignPeerId]);
+
+  console.log("Fetched assigned evaluators id: " + assignedEvaluators);
+  console.log("Fetched selected evaluators id: " + selectedEvaluators);
 
   //fetching all users
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/user/getAllUser`
-        );
+        const response = await axios.get(`${apiUrl}user/getAllUser`);
         setDeptUsers(response.data);
         console.log("Fetched Users: " + deptUsers);
       } catch (error) {
@@ -207,7 +207,7 @@ function ManagePeerModal({
   const fetchAssignedEvaluators = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/assignedPeers/getEvaluatorIds`,
+        `${apiUrl}assignedPeers/getEvaluatorIds`,
         {
           params: {
             assignedPeersId: assignPeerId,
@@ -231,7 +231,7 @@ function ManagePeerModal({
   const updateEvaluators = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:8080/assignedPeers/updateAssignedEvaluators/${assignPeerId}`,
+        `${apiUrl}assignedPeers/updateAssignedEvaluators/${assignPeerId}`,
         selectedEvaluators
       );
       console.log(response.data);
@@ -239,6 +239,8 @@ function ManagePeerModal({
       console.error("Error updating evaluators:", error);
     }
   };
+
+  console.log("SELECTED EVALUATORS: " + selectedEvaluators);
 
   const handleSaveEditPeer = async () => {
     await updateEvaluators();
@@ -316,7 +318,7 @@ function ManagePeerModal({
                           border: "1px solid #898989",
                           borderRadius: "4px",
                         }}
-                        value={selectedEvaluators[index] || evaluatorId}
+                        value={selectedEvaluators[index]}
                         onChange={(e) => handleSelectChange(index, e)}
                       >
                         <option value={evaluatorId}>
