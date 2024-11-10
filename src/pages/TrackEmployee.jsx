@@ -188,7 +188,7 @@ function TrackEmployee() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 50,
+      minWidth: 80,
     },
     {
       id: "name",

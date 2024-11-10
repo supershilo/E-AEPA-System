@@ -119,12 +119,12 @@ function ActivityLogs() {
         </div>
       ),
       align: "left",
-      minWidth: 100,
+      minWidth: 90,
     },
     {
       id: "actDetails",
       label: "Details",
-      minWidth: 300,
+      minWidth: 500,
       align: "center",
     },
     {
@@ -187,7 +187,7 @@ function ActivityLogs() {
           }}
         >
           <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-              <TableContainer  sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%",position:'relative', border:'1px solid lightgray'}}>
+              <TableContainer  sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%",height:'27.5em',position:'relative', border:'1px solid lightgray'}}>
                 <Table stickyHeader aria-label="sticky table" size="small">
                   <TableHead sx={{ height: "3em" }}>
                     <TableRow>
@@ -265,13 +265,14 @@ function ActivityLogs() {
         <div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 100,
-            left: '24%',
-            transform: "translateX(-50%)",
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 30,
+            // left: '21.5%',
+            // transform: "translateX(-50%",
             display: "flex",
             alignItems: "center",
-            ml: '4em'
+
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">

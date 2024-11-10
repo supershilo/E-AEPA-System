@@ -3,7 +3,7 @@
 // SI DATEHIRED D MO DISPLAY
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, CircularProgress, Stack, Tabs, Tab } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment,  Stack, Tabs, Tab } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
@@ -107,7 +107,7 @@ function HeadEvalResult() {
           userID: item.userID,
           dateHired: item.dateHired,
         }))
-        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete) : (item.empStatus === 'Regular' /*& item.is1stAnnualComplete*/) ); // Filter based on selected tab
+        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete || item.is5thEvalComplete) : (item.empStatus === 'Regular' /*& item.is1stAnnualComplete*/) ); // Filter based on selected tab
       
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
@@ -199,9 +199,9 @@ function HeadEvalResult() {
       minWidth: 150,
       format: (value) => {
         if (!value) {
-          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
         } else  {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
         }
       },
     },
@@ -212,9 +212,9 @@ function HeadEvalResult() {
       minWidth: 150,
       format: (value) => {
         if (!value) {
-          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
         } else  {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
         }
       },
     },
@@ -225,7 +225,7 @@ function HeadEvalResult() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 90,
+      minWidth: 50,
     },
     {
       id: "name",
@@ -257,9 +257,9 @@ function HeadEvalResult() {
       minWidth: 150,
       format: (value) => {
         if (!value) {
-          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
         } else  {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
         }
       },
     },
@@ -270,9 +270,9 @@ function HeadEvalResult() {
       minWidth: 150,
       format: (value) => {
         if (!value) {
-          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Result Not Yet Available</span>;
+          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
         } else  {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>Result is now Available</span>;
+          return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
         }
       },
     },
@@ -350,8 +350,11 @@ function HeadEvalResult() {
           </div>
         )}
 
-
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": {mt: 4, width: "93.5%" } }}>
+            {showPasswordModal ? (
+                <Skeleton variant="rectangular" width='80em' height={500} sx={{marginLeft: 6, marginTop:3}}  />
+            ) : (
+              <>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml:0.4,mt: 4, width: "93.5%" } }}>
           <Grid container
             spacing={1.5}
             sx={{
@@ -361,13 +364,7 @@ function HeadEvalResult() {
             }}
           >
             {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
-            {showPasswordModal ? (
-              <Stack spacing={1}>
-                <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
-                <Skeleton variant="rectangular" width='80em' height={500} />
-              </Stack>
-            ) : (
-              <>
+
                 <Grid
                   item
                   xs={12}
@@ -436,24 +433,18 @@ function HeadEvalResult() {
                     )}
                   </Table>
                 </TableContainer>
-              </>
-            )}
+              
             {/* </Card> */}
           </Grid>
-          {loading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', }}>
-              <CircularProgress color='inherit' />
-            </Box>
-          )}
 
-          {!loading && (
             <ViewResults
               open={showViewRatingsModal}
               onClose={() => setViewRatingsModal(false)}
               employee={employee}
             />
-          )}
         </Box>
+        </>
+            )}
         {/* pagination */}
         {showPasswordModal ? (
           <Skeleton variant="rectangular" width="100%" height="100%" />
