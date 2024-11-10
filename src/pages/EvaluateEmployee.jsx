@@ -689,46 +689,49 @@ function EvaluateEmployee() {
         <div className="ml-8 mt-2">
           <div className="mr-10  flex items-center justify-between">
             <div className="ml-4 flex items-center justify-start">
-              <TextField
-                placeholder="Search ..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#ffffff", // Set the background color for the entire input area
-                  },
-                  "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                    borderWidth: "1px",
-                    borderColor: "#e0e0e0",
-                  },
-                  "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                    {
-                      borderColor: "#e0e0e0",
+              {openForm ? null : (
+                <TextField
+                  placeholder="Search ..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#ffffff", // Set the background color for the entire input area
                     },
-                  "&:focus-within": {
-                    "& fieldset": {
-                      borderColor: "#8C383E !important",
-                      borderWidth: "1px !important",
+                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderWidth: "1px",
+                        borderColor: "#e0e0e0",
+                      },
+                    "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderColor: "#e0e0e0",
+                      },
+                    "&:focus-within": {
+                      "& fieldset": {
+                        borderColor: "#8C383E !important",
+                        borderWidth: "1px !important",
+                      },
                     },
-                  },
-                  "& .MuiInputBase-input": {
-                    padding: "10px 10px",
-                    fontSize: "13px",
-                    fontFamily: "Poppins",
-                  },
-                  minWidth: "110%",
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment>
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        style={{ fontSize: "13px", padding: "0" }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                    "& .MuiInputBase-input": {
+                      padding: "10px 10px",
+                      fontSize: "13px",
+                      fontFamily: "Poppins",
+                    },
+                    minWidth: "110%",
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment>
+                        <FontAwesomeIcon
+                          icon={faSearch}
+                          style={{ fontSize: "13px", padding: "0" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
