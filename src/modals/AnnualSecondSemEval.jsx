@@ -174,6 +174,28 @@ const AnnualSecondSemEval = ({ userId, filter, selectedYear, selectedSemester  }
     setOverallEAPAAverage(overallAverage);
   }, [overallSelfVBPA, overallHeadVBPA, overallSelfJBPA, overallHeadJBPA]);
 
+  // Function to calculate peer averages
+  const calculatePeerAverage = (coreValue) => {
+    if (peerEvaluationAverages.length === 0) return 0;
+    const total = peerEvaluationAverages.reduce((sum, peer) => sum + (peer[coreValue] || 0), 0);
+    return total / peerEvaluationAverages.length;
+  };
+
+  useEffect(() => {
+    const cultAve = calculatePeerAverage('coe');
+    const intAve = calculatePeerAverage('int');
+    const teamAve = calculatePeerAverage('tea');
+    const univAve = calculatePeerAverage('uni');
+
+    setPeerCultAve(cultAve.toFixed(2));
+    setPeerIntAve(intAve.toFixed(2));
+    setPeerTeamAve(teamAve.toFixed(2));
+    setPeerUnivAve(univAve.toFixed(2));
+
+    const overallPeerAve = ((cultAve + intAve + teamAve + univAve) / 4).toFixed(2);
+    console.log("overallPeerAve: ", overallPeerAve);
+    setOverallPeerVBPA(overallPeerAve);
+  }, [peerEvaluationAverages]);
 
   //fetch Averages
   useEffect(() => {
@@ -408,35 +430,14 @@ const fetchHeadValuesAnnualSecond = async () => {
       fetchSelfJobAnnualSecond();
       fetchHeadValuesAnnualSecond();
       fetchHeadJobAnnualSecond();
-      fetchPeerAnnualSecond();
+      if (userId && selectedYear && selectedSemester) {
+        fetchPeerAnnualSecond();
+      }
+
     };
 
     fetchData();
-  }, [userId]);
-
-  // Function to calculate peer averages
-  const calculatePeerAverage = (coreValue) => {
-    if (peerEvaluationAverages.length === 0) return 0;
-    const total = peerEvaluationAverages.reduce((sum, peer) => sum + (peer[coreValue] || 0), 0);
-    return total / peerEvaluationAverages.length;
-  };
-
-  useEffect(() => {
-    const cultAve = calculatePeerAverage('coe');
-    const intAve = calculatePeerAverage('int');
-    const teamAve = calculatePeerAverage('tea');
-    const univAve = calculatePeerAverage('uni');
-
-    setPeerCultAve(cultAve.toFixed(2));
-    setPeerIntAve(intAve.toFixed(2));
-    setPeerTeamAve(teamAve.toFixed(2));
-    setPeerUnivAve(univAve.toFixed(2));
-
-    const overallPeerAve = ((cultAve + intAve + teamAve + univAve) / 4).toFixed(2);
-    console.log("overallPeerAve: ", overallPeerAve);
-    setOverallPeerVBPA(overallPeerAve);
-  }, [peerEvaluationAverages]);
-
+  }, [userId, selectedYear, selectedSemester]);
 
   const formatValue = (value) => {
     const num = parseFloat(value);

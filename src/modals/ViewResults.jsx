@@ -53,9 +53,10 @@ const selectedMenuItemStyles = {
 const ViewResults = ({ open, onClose, employee }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [filter, setFilter] = useState("overall");
-
   const [anchorEl, setAnchorEl] = useState(null);
 
+  console.log("Employee userID:", employee?.userID);
+  
   const handleFilterButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
   };

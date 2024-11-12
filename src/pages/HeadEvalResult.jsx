@@ -109,6 +109,7 @@ function HeadEvalResult() {
       const userData = await response.json();
       setViewRatingsModal(true);
       setEmployee(userData);
+      console.log("Emp id:", employee?.userID);
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
