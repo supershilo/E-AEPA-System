@@ -228,6 +228,10 @@ public class EvaluationService {
                     String lName = user.getlName();
                     Role role = user.getRole();
                     String dateHired = user.getDateHired();
+                    String schoolYear = entry.getValue().stream()
+                            .findFirst()
+                            .map(EvaluationEntity::getSchoolYear)
+                            .orElse("Unknown"); // Default to "Unknown" if no schoolYear found
 
                     List<EvaluationEntity> userEvaluations = entry.getValue();
 
@@ -240,6 +244,7 @@ public class EvaluationService {
                     dto.setlName(lName);
                     dto.setRole(role);
                     dto.setDateHired(dateHired);
+                    dto.setSchoolYear(schoolYear);
 
 
 

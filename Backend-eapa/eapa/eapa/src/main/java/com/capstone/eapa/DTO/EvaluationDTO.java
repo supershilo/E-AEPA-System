@@ -22,6 +22,20 @@ public class EvaluationDTO {
     private String hjbpStatus;
     private String hvbpaStatus;
     private String dateHired;
+
+    public String getSchoolYear() {
+        return schoolYear;
+    }
+
+    public void setSchoolYear(String schoolYear) {
+        this.schoolYear = schoolYear;
+    }
+
+    public LocalDate getSjbpDateTaken() {
+        return sjbpDateTaken;
+    }
+
+    private String schoolYear;
     private LocalDate sjbpDateTaken;
     private String period; // New field for period
 
