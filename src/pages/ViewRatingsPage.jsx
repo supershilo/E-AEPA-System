@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
+import React, {useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { apiUrl } from "../config/config";
 import {
@@ -243,7 +243,7 @@ const ViewRatingsPage = () => {
         const activeYear = response.data.find(year => year.isActive);
         if (activeYear) {
           setSelectedYear(`${activeYear.startDate.slice(0, 4)}-${activeYear.endDate.slice(0, 4)}`);
-          console.log("Selected Year: ", selectedYear);
+         
         }
       } catch (error) {
         console.error("Error fetching academic years:", error);
@@ -373,7 +373,7 @@ const ViewRatingsPage = () => {
     backgroundColor: "white",
     borderRadius: 2,
     boxShadow: 3,
-    width: "79vw",
+    width: { xs: "100vw", md: "79vw" }, 
     height: "80vh",
     overflowY: "auto",
   }}
