@@ -72,6 +72,7 @@ function EvaluateEmployee() {
     useState(false);
   const [schoolYear, setSchoolYear] = useState("");
   const [semester, setSemester] = useState("");
+  const [selectedEmpPeriod, setSelectedEmpPeriod] = useState("");
 
   const modalStyle = {
     position: "absolute",
@@ -147,7 +148,7 @@ function EvaluateEmployee() {
         userID: selectedEmp.userID,
       },
       stage: selectedStage,
-      period: period,
+      period: selectedEmpPeriod,
       evalType: evalType,
       status: "OPEN",
       dateTaken: currentDate,
@@ -165,7 +166,7 @@ function EvaluateEmployee() {
         params: {
           userID: userID,
           empID: selectedEmp.userID,
-          period: period,
+          period: selectedEmpPeriod,
           stage: selectedStage,
           evalType: "HEAD",
         },
@@ -239,14 +240,24 @@ function EvaluateEmployee() {
     setIsEvaluationCompletedValues(false);
     setIsEvaluationCompletedJob(false);
 
-    const period = getEvaluationPeriod(
-      selectedUser.probeStatus,
-      selectedUser.empStatus
-    );
-    console.log("Adi ---- period: ", period);
+    const period =
+      selectedUser.empStatus === "Regular"
+        ? semester === "First Semester"
+          ? "Annual-1st"
+          : semester === "Second Semester"
+          ? "Annual-2nd"
+          : "Invalid Semester"
+        : selectedUser.probeStatus === "3rd Probationary"
+        ? "3rd Month"
+        : "5th Month";
+
     handleCompleteStatus(userID, selectedUser.userID, period, "VALUES", "HEAD");
     handleCompleteStatus(userID, selectedUser.userID, period, "JOB", "HEAD");
+    setSelectedEmpPeriod(period);
   };
+
+  console.log("Adi ---- selected period: ", selectedEmpPeriod);
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -269,11 +280,17 @@ function EvaluateEmployee() {
       handleCompleteStatus(
         userID,
         selectedEmp.userID,
-        period,
+        selectedEmpPeriod,
         "VALUES",
         "HEAD"
       );
-      handleCompleteStatus(userID, selectedEmp.userID, period, "JOB", "HEAD");
+      handleCompleteStatus(
+        userID,
+        selectedEmp.userID,
+        selectedEmpPeriod,
+        "JOB",
+        "HEAD"
+      );
     }
   }, [selectedEmp]);
 
@@ -292,7 +309,7 @@ function EvaluateEmployee() {
           params: {
             userID: userID,
             empID: empID,
-            period: period,
+            period: selectedEmpPeriod,
             stage: stage,
             evalType: evalType,
           },
@@ -725,7 +742,7 @@ function EvaluateEmployee() {
             }}
           >
             <EvaluationForm
-              period={period}
+              period={selectedEmpPeriod}
               loggedUser={user}
               selectedEmp={selectedEmp}
               stage={stage}
