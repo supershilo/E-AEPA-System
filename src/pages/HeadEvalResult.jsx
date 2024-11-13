@@ -1,15 +1,33 @@
-//SAYOP PA ANG PAG DISPLAY ANI, DAPAT ANG MO DISPLAY DRI KAY KTO NG MGA COMPLETED 
+//SAYOP PA ANG PAG DISPLAY ANI, DAPAT ANG MO DISPLAY DRI KAY KTO NG MGA COMPLETED
 //OR ANG MGA EMPLOYEES NA GSEND NA ANG RESULT GIKAN SA ADMIN
 // SI DATEHIRED D MO DISPLAY
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, CircularProgress, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  TableContainer,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Skeleton,
+  Card,
+  TextField,
+  InputAdornment,
+  CircularProgress,
+  Stack,
+} from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 
 function HeadEvalResult() {
   const userID = sessionStorage.getItem("userID");
@@ -22,13 +40,13 @@ function HeadEvalResult() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
-  const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  const startPageGroup =
+    Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
   const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
 
   const handlePageChange = (newPage) => {
@@ -51,7 +69,6 @@ function HeadEvalResult() {
 
   const hasData = rows.length > 0;
 
-
   const fetchData = async () => {
     try {
       const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
@@ -67,7 +84,9 @@ function HeadEvalResult() {
       }
       const allUsersData = await allUsersResponse.json();
       const processedData = allUsersData
-        .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
+        .filter(
+          (item) => item.role === "EMPLOYEE" && item.dept === userData.dept
+        )
         .map((item) => ({
           ...item,
           name: `${item.fName} ${item.lName}`,
@@ -83,7 +102,6 @@ function HeadEvalResult() {
         )
       );
       setRows(searchFilteredData);
-
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -100,7 +118,7 @@ function HeadEvalResult() {
   }, [showPasswordModal, updateFetch, userID]);
 
   const handleViewResultClick = async (userId) => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const response = await fetch(`${apiUrl}user/getUser/${userId}`);
       if (!response.ok) {
@@ -116,7 +134,6 @@ function HeadEvalResult() {
       setLoading(false); // Stop the loader
     }
   };
-
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -142,7 +159,6 @@ function HeadEvalResult() {
       format: (value) => formatName(value),
     },
 
-
     {
       id: "dateHired",
       label: "Date Hired",
@@ -150,12 +166,12 @@ function HeadEvalResult() {
       align: "center",
       format: (value) => {
         const date = new Date(value);
-        return date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
-      }
+      },
     },
   ];
 
@@ -173,16 +189,30 @@ function HeadEvalResult() {
       />
       <Animated>
         {showPasswordModal ? (
-          <Skeleton variant="text" sx={{ fontSize: '3em', width: '8em', ml: '1em', mt: '.3em' }}></Skeleton>
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "3em", width: "8em", ml: "1em", mt: ".3em" }}
+          ></Skeleton>
         ) : (
-          <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>
+          <Typography
+            ml={4}
+            mt={3}
+            sx={{
+              fontFamily: "Poppins",
+              fontWeight: "bold",
+              fontSize: "1.5em",
+            }}
+          >
             Employee Evaluation Results
           </Typography>
         )}
         {showPasswordModal ? (
-          <Skeleton variant="text" sx={{ fontSize: '3em', width: '6em', ml: '1em', }}></Skeleton>
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "3em", width: "6em", ml: "1em" }}
+          ></Skeleton>
         ) : (
-          <div className="ml-8 mt-2">
+          <div className="ml-4 mt-2">
             <div className="mr-10  flex items-center justify-between">
               <div className="ml-4 flex items-center justify-start">
                 <TextField
@@ -190,18 +220,18 @@ function HeadEvalResult() {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   sx={{
-
                     "& .MuiOutlinedInput-root": {
                       backgroundColor: "#ffffff", // Set the background color for the entire input area
                     },
-                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                      borderWidth: "1px",
-                      borderColor: "#e0e0e0",
-                    },
+                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderWidth: "1px",
+                        borderColor: "#e0e0e0",
+                      },
                     "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                    {
-                      borderColor: "#e0e0e0",
-                    },
+                      {
+                        borderColor: "#e0e0e0",
+                      },
                     "&:focus-within": {
                       "& fieldset": {
                         borderColor: "#8C383E !important",
@@ -231,31 +261,53 @@ function HeadEvalResult() {
           </div>
         )}
 
-
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
-          <Grid container
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            "& > :not(style)": { ml: 4, mt: 2, width: "95%" },
+          }}
+        >
+          <Grid
+            container
             spacing={1.5}
             sx={{
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
-            }}>
+            }}
+          >
             {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
             {showPasswordModal ? (
               <Stack spacing={1}>
-                <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
-                <Skeleton variant="rectangular" width='80em' height={500} />
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height="100%"
+                ></Skeleton>
+                <Skeleton variant="rectangular" width="80em" height={500} />
               </Stack>
-              
-              
             ) : (
-              <TableContainer sx={{ height: '29.5em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}>
+              <TableContainer
+                sx={{
+                  height: "29.5em",
+                  borderRadius: "5px 5px 0 0 ",
+                  maxHeight: "100%",
+                  border: "1px solid lightgray",
+                }}
+              >
                 <Table stickyHeader aria-label="sticky table" size="small">
                   <TableHead sx={{ height: "2em" }}>
                     <TableRow>
                       {columnsEmployees.map((column) => (
                         <TableCell
-                          sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                          sx={{
+                            fontFamily: "Poppins",
+                            bgcolor: "#8c383e",
+                            color: "white",
+                            fontWeight: "bold",
+                            maxWidth: "2em",
+                          }}
                           key={column.id}
                           align={column.align}
                           style={{ minWidth: column.minWidth }}
@@ -269,14 +321,29 @@ function HeadEvalResult() {
                     <TableBody>
                       {paginatedRows.map((row) => (
                         <TableRow
-                          sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
+                          sx={{
+                            bgcolor: "white",
+                            "&:hover": {
+                              backgroundColor: "rgba(248, 199, 2, 0.5)",
+                              color: "black",
+                            },
+                            height: "3em",
+                          }}
                           key={row.id}
                           onClick={() => handleViewResultClick(row.userId)}
                         >
                           {columnsEmployees.map((column) => (
-                            <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
-                            {column.id === "name" ?  row.name : column.format ? column.format(row[column.id]) : row[column.id]}
-                          </TableCell>
+                            <TableCell
+                              sx={{ fontFamily: "Poppins" }}
+                              key={`${row.id}-${column.id}`}
+                              align={column.align}
+                            >
+                              {column.id === "name"
+                                ? row.name
+                                : column.format
+                                ? column.format(row[column.id])
+                                : row[column.id]}
+                            </TableCell>
                           ))}
                         </TableRow>
                       ))}
@@ -284,7 +351,11 @@ function HeadEvalResult() {
                   ) : (
                     <TableBody>
                       <TableRow>
-                        <TableCell sx={{ height: '32.3em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
+                        <TableCell
+                          sx={{ height: "32.3em", borderRadius: "5px 5px 0 0" }}
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
                           <Typography
                             sx={{
                               textAlign: "center",
@@ -295,20 +366,27 @@ function HeadEvalResult() {
                               padding: "25px",
                             }}
                           >
-                            There are currently no data in this table</Typography>
+                            There are currently no data in this table
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     </TableBody>
                   )}
-
                 </Table>
               </TableContainer>
             )}
             {/* </Card> */}
           </Grid>
           {loading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%',  }}>
-              <CircularProgress  color='inherit' />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <CircularProgress color="inherit" />
             </Box>
           )}
 
@@ -324,8 +402,8 @@ function HeadEvalResult() {
         {showPasswordModal ? (
           <Skeleton variant="rectangular" width="100%" height="100%" />
         ) : (
-          < div
-            className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
+          <div
+            className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-4"
             style={{
               position: "relative", // Change to relative to keep it in place
               // bottom: 200,
@@ -333,7 +411,7 @@ function HeadEvalResult() {
               // transform: "translateX(-50%)",
               display: "flex",
               alignItems: "center",
-              ml: '4em'
+              ml: "4em",
             }}
           >
             <ol className="flex justify-end gap-1 text-xs font-medium">
@@ -359,20 +437,24 @@ function HeadEvalResult() {
                 </a>
               </li>
 
-              {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
-                <li key={startPageGroup + index}>
-                  <a
-                    href="#"
-                    className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
-                      ? "border-pink-900 bg-pink-900 text-white"
-                      : "border-gray-100 bg-white text-gray-900"
+              {Array.from(
+                { length: endPageGroup - startPageGroup + 1 },
+                (_, index) => (
+                  <li key={startPageGroup + index}>
+                    <a
+                      href="#"
+                      className={`block h-8 w-8 rounded border ${
+                        currentPage === startPageGroup + index
+                          ? "border-pink-900 bg-pink-900 text-white"
+                          : "border-gray-100 bg-white text-gray-900"
                       } text-center leading-8`}
-                    onClick={() => handlePageChange(startPageGroup + index)}
-                  >
-                    {startPageGroup + index}
-                  </a>
-                </li>
-              ))}
+                      onClick={() => handlePageChange(startPageGroup + index)}
+                    >
+                      {startPageGroup + index}
+                    </a>
+                  </li>
+                )
+              )}
 
               <li>
                 <a
@@ -398,9 +480,8 @@ function HeadEvalResult() {
             </ol>
           </div>
         )}
-
-      </Animated >
-    </div >
+      </Animated>
+    </div>
   );
 }
 
