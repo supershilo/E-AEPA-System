@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import imageSources from "../data/imageSource";
 import evaluate from "../assets/evaluate.png";
+import defaultProfie from "../assets/default-profile.png";
 import select from "../assets/select.png";
 import done from "../assets/done.png";
 import ManageAccoount from "../assets/ManageAccount.png";
@@ -148,7 +149,6 @@ function UserHome() {
             //backgroundColor: "lavender",
             width: "100%",
             height: "100%",
-            
           }}
         >
           <div
@@ -578,7 +578,7 @@ function UserHome() {
                           height: "50px",
                           width: "50px",
                           borderRadius: "50%",
-                          //border: "1px solid black",
+                          border: "5px solid white",
                         }}
                       >
                         <img
@@ -589,7 +589,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : null
+                              : defaultProfie
                           }
                           alt=""
                         />

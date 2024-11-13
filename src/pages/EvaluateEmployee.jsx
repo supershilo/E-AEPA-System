@@ -680,13 +680,13 @@ function EvaluateEmployee() {
     <div>
       <Animated>
         <Typography
-          ml={6.5}
+          ml={4}
           mt={3}
           sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}
         >
           {openForm ? "Evaluation" : "List of Staff"}{" "}
         </Typography>
-        <div className="ml-8 mt-2">
+        <div className="ml-4 mt-2">
           <div className="mr-10  flex items-center justify-between">
             <div className="ml-4 flex items-center justify-start">
               {openForm ? null : (
@@ -741,7 +741,7 @@ function EvaluateEmployee() {
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              "& > :not(style)": { ml: 4, mt: 2, mr: 4, width: "93.5%" },
+              "& > :not(style)": { ml: 4, mt: 0, mr: 4, width: "93.5%" },
             }}
           >
             <EvaluationForm
@@ -758,7 +758,9 @@ function EvaluateEmployee() {
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              "& > :not(style)": { ml: 6, mt: 2, width: "93%" },
+              "& > :not(style)": { ml: 4, mt: 2, width: "95%" },
+              //backgroundColor: "tomato",
+              //height: "65vh",
             }}
           >
             <Grid
@@ -772,10 +774,11 @@ function EvaluateEmployee() {
             >
               <TableContainer
                 sx={{
-                  height: "30.68em",
+                  height: "63vh",
                   borderRadius: "5px 5px 0 0 ",
                   maxHeight: "100%",
                   border: "1px solid lightgray",
+                  //backgroundColor: "lightgreen",
                 }}
               >
                 <Table stickyHeader aria-label="a dense table" size="small">
@@ -876,83 +879,85 @@ function EvaluateEmployee() {
           </Box>
         )}
         {/* Pagination */}
-        <div
-          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
-          style={{
-            position: "relative", // Change to relative to keep it in place
-            // bottom: 45,
-            // left: '21.5%',
-            // transform: "translateX(-50%)",
-            display: "flex",
-            alignItems: "center",
-            // ml: '4em'
-          }}
-        >
-          <ol className="flex justify-end gap-1 text-xs font-medium">
-            <li>
-              <a
-                href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-                onClick={handlePrevPage}
-              >
-                <span className="sr-only">Prev Page</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+        {openForm ? null : (
+          <div
+            className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-4"
+            style={{
+              position: "relative", // Change to relative to keep it in place
+              // bottom: 45,
+              // left: '21.5%',
+              // transform: "translateX(-50%)",
+              display: "flex",
+              alignItems: "center",
+              // ml: '4em'
+            }}
+          >
+            <ol className="flex justify-end gap-1 text-xs font-medium">
+              <li>
+                <a
+                  href="#"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                  onClick={handlePrevPage}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
-            </li>
-
-            {Array.from(
-              { length: endPageGroup - startPageGroup + 1 },
-              (_, index) => (
-                <li key={startPageGroup + index}>
-                  <a
-                    href="#"
-                    className={`block h-8 w-8 rounded border ${
-                      currentPage === startPageGroup + index
-                        ? "border-pink-900 bg-pink-900 text-white"
-                        : "border-gray-100 bg-white text-gray-900"
-                    } text-center leading-8`}
-                    onClick={() => handlePageChange(startPageGroup + index)}
+                  <span className="sr-only">Prev Page</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    {startPageGroup + index}
-                  </a>
-                </li>
-              )
-            )}
+                    <path
+                      fillRule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+              </li>
 
-            <li>
-              <a
-                href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-                onClick={handleNextPage}
-              >
-                <span className="sr-only">Next Page</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+              {Array.from(
+                { length: endPageGroup - startPageGroup + 1 },
+                (_, index) => (
+                  <li key={startPageGroup + index}>
+                    <a
+                      href="#"
+                      className={`block h-8 w-8 rounded border ${
+                        currentPage === startPageGroup + index
+                          ? "border-pink-900 bg-pink-900 text-white"
+                          : "border-gray-100 bg-white text-gray-900"
+                      } text-center leading-8`}
+                      onClick={() => handlePageChange(startPageGroup + index)}
+                    >
+                      {startPageGroup + index}
+                    </a>
+                  </li>
+                )
+              )}
+
+              <li>
+                <a
+                  href="#"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                  onClick={handleNextPage}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
-            </li>
-          </ol>
-        </div>
+                  <span className="sr-only">Next Page</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+              </li>
+            </ol>
+          </div>
+        )}
       </Animated>
 
       <Modal
