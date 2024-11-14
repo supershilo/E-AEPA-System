@@ -428,6 +428,7 @@ function EvaluateEmployee() {
     }
   }, [userID, updateFetch, searchTerm, probeStatusFilter, openForm]);
 
+
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
   const startPageGroup =
@@ -686,27 +687,25 @@ function EvaluateEmployee() {
         >
           {openForm ? "Evaluation" : "List of Staff"}{" "}
         </Typography>
-        <div className="ml-4 mt-2">
-          <div className="mr-10  flex items-center justify-between">
-            <div className="ml-4 flex items-center justify-start">
-              {openForm ? null : (
+        {!openForm && (
+          <div className="ml-8 mt-2">
+            <div className="mr-10 flex items-center justify-between">
+              <div className="ml-4 flex items-center justify-start">
                 <TextField
                   placeholder="Search ..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#ffffff", // Set the background color for the entire input area
+                      backgroundColor: "#ffffff",
                     },
-                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderWidth: "1px",
-                        borderColor: "#e0e0e0",
-                      },
-                    "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#e0e0e0",
-                      },
+                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                      borderWidth: "1px",
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
                     "&:focus-within": {
                       "& fieldset": {
                         borderColor: "#8C383E !important",
@@ -731,10 +730,10 @@ function EvaluateEmployee() {
                     ),
                   }}
                 />
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
         {/** Diri ko mag conditional rendering */}
         {openForm ? (
           <Box
@@ -774,7 +773,7 @@ function EvaluateEmployee() {
             >
               <TableContainer
                 sx={{
-                  height: "63vh",
+                  height: '30.34em',
                   borderRadius: "5px 5px 0 0 ",
                   maxHeight: "100%",
                   border: "1px solid lightgray",
@@ -810,6 +809,7 @@ function EvaluateEmployee() {
                           colSpan={columnsEmployees.length}
                           align="center"
                         >
+
                           <Loader />
                         </TableCell>
                       </TableRow>
@@ -852,11 +852,8 @@ function EvaluateEmployee() {
                   ) : (
                     <TableBody>
                       <TableRow>
-                        <TableCell
-                          sx={{ height: "32em", borderRadius: "5px 5px 0 0" }}
-                          colSpan={columnsEmployees.length}
-                          align="center"
-                        >
+                        <TableCell sx={{ height: '32em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
+
                           <Typography
                             sx={{
                               textAlign: "center",
@@ -879,60 +876,56 @@ function EvaluateEmployee() {
           </Box>
         )}
         {/* Pagination */}
-        {openForm ? null : (
-          <div
-            className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-4"
-            style={{
-              position: "relative", // Change to relative to keep it in place
-              // bottom: 45,
-              // left: '21.5%',
-              // transform: "translateX(-50%)",
-              display: "flex",
-              alignItems: "center",
-              // ml: '4em'
-            }}
-          >
-            <ol className="flex justify-end gap-1 text-xs font-medium">
-              <li>
-                <a
-                  href="#"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-                  onClick={handlePrevPage}
+        {!openForm && (
+          < div
+          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
+          style={{
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 45,
+            // left: '21.5%',
+            // transform: "translateX(-50%)",
+            display: "flex",
+            alignItems: "center",
+            // ml: '4em'
+          }}
+        >
+          <ol className="flex justify-end gap-1 text-xs font-medium">
+            <li>
+              <a
+                href="#"
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                onClick={handlePrevPage}
+              >
+                <span className="sr-only">Prev Page</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
                 >
-                  <span className="sr-only">Prev Page</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </li>
+                  <path
+                    fillRule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </a>
+            </li>
 
-              {Array.from(
-                { length: endPageGroup - startPageGroup + 1 },
-                (_, index) => (
-                  <li key={startPageGroup + index}>
-                    <a
-                      href="#"
-                      className={`block h-8 w-8 rounded border ${
-                        currentPage === startPageGroup + index
-                          ? "border-pink-900 bg-pink-900 text-white"
-                          : "border-gray-100 bg-white text-gray-900"
+              {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
+                <li key={startPageGroup + index}>
+                  <a
+                    href="#"
+                    className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
+                      ? "border-pink-900 bg-pink-900 text-white"
+                      : "border-gray-100 bg-white text-gray-900"
                       } text-center leading-8`}
-                      onClick={() => handlePageChange(startPageGroup + index)}
-                    >
-                      {startPageGroup + index}
-                    </a>
-                  </li>
-                )
-              )}
+                    onClick={() => handlePageChange(startPageGroup + index)}
+                  >
+                    {startPageGroup + index}
+                  </a>
+                </li>
+              ))}
 
               <li>
                 <a
