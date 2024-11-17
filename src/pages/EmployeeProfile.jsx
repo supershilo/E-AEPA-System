@@ -30,11 +30,14 @@ import Animated from "../components/motion";
 import AdminViewResult from "../modals/AdminViewResults";
 import Admin5thViewResults from "../modals/Admin5thViewResults";
 import AdminAnnual1stResults from "../modals/AdminAnnual1stViewResults";
+import AdminAnnual2ndResults from "../modals/AdminAnnual2ndViewResults";
 import { apiUrl } from "../config/config";
 import ManagePeerModal from "../modals/ManagePeerModal";
 import SendResultsModal from "../modals/SendResultsModal";
 import Send5thResultsModal from "../modals/Send5thResultsModal";
-
+import SendAnnual1st from "../modals/SendAnnual1stModal";
+import SendAnnual2nd from "../modals/SendAnnual2ndModal";
+import ThirdMonthEval from "../modals/3rdMonthEval";
 
 const theme = createTheme({
 	palette: {
@@ -81,9 +84,11 @@ function EmployeeProfile({ user, handleBack }) {
 	const [hasAnnualPeriod, setHasAnnualPeriod] = useState(false);
 	const [isAnnual1stComplete, setIsAnnual1stComplete] = useState(false);
 	const [isAnnual2ndComplete, setIsAnnual2ndComplete] = useState(false);
+	const [annual1stModal, setAnnual1stModal] = useState(false);
+	const [annual2ndModal, setAnnual2ndModal] = useState(false);
 	const [showAnnual1st, setShowAnnual1st] = useState(false);
 	const [showAnnual2nd, setShowAnnual2nd] = useState(false);
-
+	const [semester, setSemesters] = useState(" ");
 
 	//adi changes
 	const [openModal, setOpenModal] = useState(false);
@@ -171,8 +176,19 @@ function EmployeeProfile({ user, handleBack }) {
 					setSelectedTab(0); // Default to "3rd Month" tab
 				}
 
-				// Set the flag for "Annual" period presence
+				// Set the flag Annual word present siya
 				setHasAnnualPeriod(hasAnnualPeriod);
+
+				const filteredBySchoolYear = filteredEvaluations.filter(
+					(evaluation) => evaluation.schoolYear === selectedYearEvaluation
+				);
+
+				// Extract unique semesters for the filtered evaluations
+				const semesters = filteredBySchoolYear.map(
+					(evaluation) => evaluation.semester
+				);
+
+				setSemesters(semesters);
 
 				console.log(userData);
 			} catch (error) {
@@ -181,8 +197,9 @@ function EmployeeProfile({ user, handleBack }) {
 		};
 
 		fetchEvaluations();
-	}, []);
+	}, [selectedYearEvaluation]);
 	console.log("user Data ", userData);
+	console.log("Selected Semester:", semester);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -263,11 +280,27 @@ function EmployeeProfile({ user, handleBack }) {
 		setShowAnnual2nd(false);
 	};
 
+	const handleAnnualModalOpen = () => {
+		setAnnual1stModal(true);
+	};
+
+	const handleAnnualModalClose = () => {
+		setAnnual1stModal(false);
+	};
+
+	const handleAnnual2ndModalOpen = () => {
+		setAnnual2ndModal(true);
+	};
+
+	const handleAnnual2ndModalClose = () => {
+		setAnnual2ndModal(false);
+	};
+
 	const handle5thModalOpen = () => {
 		setIs5thModal(true);
 	};
 
-	const handle5thModalConfirm = () => {
+	const handle5thModalClose = () => {
 		setIs5thModal(false);
 	};
 
@@ -371,8 +404,8 @@ function EmployeeProfile({ user, handleBack }) {
 			hasCompletedValuesSelf &&
 			// hasCompletedValuesPeer &&
 			hasCompletedJobSelf;
-			// hasCompletedHeadValues &&
-			// hasCompletedHeadJob;
+		// hasCompletedHeadValues &&
+		// hasCompletedHeadJob;
 
 		return (
 			<TableContainer style={tableStyle}>
@@ -571,7 +604,7 @@ function EmployeeProfile({ user, handleBack }) {
 									color: "white",
 								},
 							}}
-							onClick={handleAnnual1stViewResult}
+							onClick={handleAnnualModalOpen}
 							disabled={!allValuesStagesCompleted || isAnnual1stComplete}
 						>
 							{isAnnual1stComplete ? (
@@ -607,7 +640,7 @@ function EmployeeProfile({ user, handleBack }) {
 									color: "white",
 								},
 							}}
-							onClick={handleConfirmOpen}
+							onClick={handleAnnual2ndModalOpen}
 							disabled={!allValuesStagesCompleted || isAnnual2ndComplete}
 						>
 							{isAnnual2ndComplete ? (
@@ -900,13 +933,19 @@ function EmployeeProfile({ user, handleBack }) {
 										</Typography>
 										{renderEvaluationTable()}
 										{show3rd && (
-											<AdminViewResult
-												userId={user.userID}
-												open={show3rd}
-												onClose={handleClose3rdResults}
-												employee={user}
-												role={role}
-											/>
+											<>
+												<AdminViewResult
+													userId={user.userID}
+													open={show3rd}
+													onClose={handleClose3rdResults}
+													employee={user}
+													role={role}
+												/>
+												{/* <ThirdMonthEval
+													selectedYear={selectedYearEvaluation}
+													selectedSemester={semester}
+												/> */}
+											</>
 										)}
 									</Box>
 								</Animated>
@@ -948,7 +987,7 @@ function EmployeeProfile({ user, handleBack }) {
 							)}
 							<Send5thResultsModal
 								isOpen={is5thModalOpen}
-								onCancel={handle5thModalConfirm}
+								onCancel={handle5thModalClose}
 								onConfirm={handleConfirm5th}
 								empUserId={user.userID}
 							/>
@@ -981,6 +1020,12 @@ function EmployeeProfile({ user, handleBack }) {
 									</Box>
 								</Animated>
 							)}
+							<SendAnnual1st
+								isOpen={annual1stModal}
+								onCancel={handleAnnualModalClose}
+								onConfirm={handleConfirm5th}
+								empUserId={user.userID}
+							/>
 							{selectedEvaluationPeriod === "Annual-2nd" && (
 								<Animated>
 									<Box>
@@ -999,7 +1044,7 @@ function EmployeeProfile({ user, handleBack }) {
 										</Typography>
 										{renderEvaluationTable()}
 										{showAnnual2nd && (
-											<Admin5thViewResults
+											<AdminAnnual2ndResults
 												userId={user.userID}
 												open={showAnnual2nd}
 												onClose={handleCloseAnnual2nd}
@@ -1010,6 +1055,12 @@ function EmployeeProfile({ user, handleBack }) {
 									</Box>
 								</Animated>
 							)}
+							<SendAnnual2nd
+								isOpen={annual2ndModal}
+								onCancel={handleAnnual2ndModalClose}
+								onConfirm={handleConfirm5th}
+								empUserId={user.userID}
+							/>
 						</Box>
 					)}
 				</Box>
