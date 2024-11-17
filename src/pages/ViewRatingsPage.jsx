@@ -406,9 +406,9 @@ const ViewRatingsPage = () => {
     // Non-hire year: Render the selected semester evaluation
     <Box sx={{ marginTop: '20px' }}>
       {selectedSemester === "First Semester" ? (
-        <AnnualFirstSemEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester} />
+        <AnnualFirstSemEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester="First Semester" />
       ) : (
-        <AnnualSecondSemEval userId={userId} filter={filter} />
+        <AnnualSecondSemEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester= "Second Semester" />
       )}
     </Box>
 
