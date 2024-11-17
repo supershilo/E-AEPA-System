@@ -812,7 +812,11 @@ const fetchHeadValuesThirdMonth = async () => {
                         fontFamily: "Poppins",
                       }}
                     >
-                      {filter === "overall" ? "Overall AEPA" : `${filter.charAt(0).toUpperCase() + filter.slice(1)} AEPA`}
+                      {filter === "overall" 
+          ? "Overall AEPA" 
+          : filter && typeof filter === 'string' 
+            ? `${filter.charAt(0).toUpperCase() + filter.slice(1)} AEPA` 
+            : "Invalid Filter"}
                     </TableCell>
                     <TableCell
                       sx={{

@@ -933,19 +933,15 @@ function EmployeeProfile({ user, handleBack }) {
 										</Typography>
 										{renderEvaluationTable()}
 										{show3rd && (
-											<>
-												<AdminViewResult
-													userId={user.userID}
-													open={show3rd}
-													onClose={handleClose3rdResults}
-													employee={user}
-													role={role}
-												/>
-												{/* <ThirdMonthEval
-													selectedYear={selectedYearEvaluation}
-													selectedSemester={semester}
-												/> */}
-											</>
+											<AdminViewResult
+												userId={user.userID}
+												open={show3rd}
+												onClose={handleClose3rdResults}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
+												employee={user}
+												role={role}
+											/>
 										)}
 									</Box>
 								</Animated>
@@ -978,6 +974,8 @@ function EmployeeProfile({ user, handleBack }) {
 												userId={user.userID}
 												open={show5th}
 												onClose={handleClose5thViewResult}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
 												employee={user}
 												role={role}
 											/>
@@ -1013,6 +1011,8 @@ function EmployeeProfile({ user, handleBack }) {
 												userId={user.userID}
 												open={showAnnual1st}
 												onClose={handleCloseAnnual1st}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
 												employee={user}
 												role={role}
 											/>
@@ -1048,6 +1048,8 @@ function EmployeeProfile({ user, handleBack }) {
 												userId={user.userID}
 												open={showAnnual2nd}
 												onClose={handleCloseAnnual2nd}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
 												employee={user}
 												role={role}
 											/>
