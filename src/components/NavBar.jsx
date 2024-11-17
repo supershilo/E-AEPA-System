@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/e-AEPA-logo.png";
+import defaultProfie from "../assets/default-profile.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -331,7 +332,7 @@ function NavBar() {
             src={
               loggedUserData?.profilePic
                 ? base64ToDataURL(loggedUserData.profilePic)
-                : "/user.png"
+                : defaultProfie
             }
             alt="nav-profile-picture"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -536,67 +537,132 @@ function NavBar() {
             />
           </IconButton>
         </Box>
-        <div style={{ display:'flex', justifyContent:'center',paddingLeft:'1em', paddingRight:'1em', paddingTop:'1em'}}>
-          <Box sx={{ bgcolor: 'rgba(128, 128, 128, 0.2)', height: '8.2vh', borderRadius: '.5em', display: 'flex', justifyContent: 'center' }}>
-            <Typography style={{ padding: '5px', fontFamily: 'Poppins', fontSize: '12px', }}> You're about to switch to <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>, your <span style={{ fontStyle: 'italic', fontWeight: 500 }}>{targetRole}</span> account. Please confirm the switch by entering the <span style={{ fontWeight: 700 }}>password</span> for <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>.</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            paddingLeft: "1em",
+            paddingRight: "1em",
+            paddingTop: "1em",
+          }}
+        >
+          <Box
+            sx={{
+              bgcolor: "rgba(128, 128, 128, 0.2)",
+              height: "8.2vh",
+              borderRadius: ".5em",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Typography
+              style={{
+                padding: "5px",
+                fontFamily: "Poppins",
+                fontSize: "12px",
+              }}
+            >
+              {" "}
+              You're about to switch to{" "}
+              <span
+                style={{
+                  fontStyle: "italic",
+                  color: "#8c383e",
+                  fontWeight: 600,
+                }}
+              >
+                '{targetUsername}'
+              </span>
+              , your{" "}
+              <span style={{ fontStyle: "italic", fontWeight: 500 }}>
+                {targetRole}
+              </span>{" "}
+              account. Please confirm the switch by entering the{" "}
+              <span style={{ fontWeight: 700 }}>password</span> for{" "}
+              <span
+                style={{
+                  fontStyle: "italic",
+                  color: "#8c383e",
+                  fontWeight: 600,
+                }}
+              >
+                '{targetUsername}'
+              </span>
+              .
+            </Typography>
           </Box>
         </div>
 
         <form
           onSubmit={handleSwitchConfirm}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-             // Center contents horizontally
-            padding: '.5em',
-              width: '100%',
+            display: "flex",
+            flexDirection: "column",
+            // Center contents horizontally
+            padding: ".5em",
+            width: "100%",
           }}
         >
           <DialogContent>
-            <DialogContentText style={{ fontFamily: 'Poppins', fontSize: '15px' }}>
+            <DialogContentText
+              style={{ fontFamily: "Poppins", fontSize: "15px" }}
+            >
               {/* <div style={{display: 'flex', gap: '0.5em' }}> */}
-                <div style={{ display: 'flex', alignItems: 'left',}}>
-                  <Typography
-                    color="text.secondary"
-                    sx={{ fontFamily: 'Poppins', fontSize: '.9em', mr: "10px", mt: '8px' }}
-
-                  >
-                    Password:
-                  </Typography>
-                  <TextField
-                    placeholder="Enter Password"
-                    size="small"
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    inputProps={{ style: { fontFamily: 'Poppins', fontSize: '.9em' } }}
-                    style={{ width: '60%' }}
-                  />
-                </div>
-                {message && (
-                  <FormHelperText style={{ color: 'red', fontSize: '12px', fontFamily: 'Poppins', marginLeft: "7em"}}>
-                    {message}
-                  </FormHelperText>
-                )}
+              <div style={{ display: "flex", alignItems: "left" }}>
+                <Typography
+                  color="text.secondary"
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: ".9em",
+                    mr: "10px",
+                    mt: "8px",
+                  }}
+                >
+                  Password:
+                </Typography>
+                <TextField
+                  placeholder="Enter Password"
+                  size="small"
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  inputProps={{
+                    style: { fontFamily: "Poppins", fontSize: ".9em" },
+                  }}
+                  style={{ width: "60%" }}
+                />
+              </div>
+              {message && (
+                <FormHelperText
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    fontFamily: "Poppins",
+                    marginLeft: "7em",
+                  }}
+                >
+                  {message}
+                </FormHelperText>
+              )}
               {/* </div> */}
             </DialogContentText>
           </DialogContent>
           <DialogActions
-            sx={{ display: 'flex', justifyContent: 'center', width: '100%', }}
+            sx={{ display: "flex", justifyContent: "center", width: "100%" }}
           >
             <Button
               type="submit"
               variant="contained"
               sx={{
-                bgcolor: '#8C383E',
-                borderRadius: '5px',
-                textTransform: 'none',
-                width: '35%',
-                fontFamily: 'Poppins',
-                color: 'white',
-                
-                '&:hover': { bgcolor: '#762F34', color: 'white' },
+                bgcolor: "#8C383E",
+                borderRadius: "5px",
+                textTransform: "none",
+                width: "35%",
+                fontFamily: "Poppins",
+                color: "white",
+
+                "&:hover": { bgcolor: "#762F34", color: "white" },
               }}
             >
               Confirm

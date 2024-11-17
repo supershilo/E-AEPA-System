@@ -345,7 +345,7 @@ function EvaluateEmployee() {
   //fetch the user data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      //setIsLoading(true);
       try {
         const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
         const userData = await userResponse.json();
@@ -417,13 +417,24 @@ function EvaluateEmployee() {
 
         const filteredData = processedData.filter((item) => item !== null);
         setRows(filteredData);
+
+        // Apply search filter
+        const searchFilteredData = filteredData.filter((item) =>
+          Object.values(item).some(
+            (value) =>
+              value &&
+              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        );
+        setRows(searchFilteredData);
       } catch (error) {
         console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
       }
+      // finally {
+      //   setIsLoading(false);
+      // }
     };
-    if (!openForm && !isLoading) {
+    if (!openForm) {
       fetchData();
     }
   }, [userID, updateFetch, searchTerm, probeStatusFilter, openForm]);
@@ -691,7 +702,7 @@ function EvaluateEmployee() {
             <div className="ml-4 flex items-center justify-start">
               {openForm ? null : (
                 <TextField
-                  placeholder="Search ..."
+                  placeholder="Search Employee..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                   sx={{

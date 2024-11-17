@@ -4,6 +4,9 @@ public class EvalStatusTrackerDTO {
     private int id;
     private boolean isCompleted;
     private String completedAt;
+    private boolean isSentResult;
+
+
 
     // Getters and Setters
     public int getId() {
@@ -28,5 +31,13 @@ public class EvalStatusTrackerDTO {
 
     public void setCompletedAt(String completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public boolean isSentResult() {
+        return isSentResult;
+    }
+
+    public void setSentResult(boolean sentResult) {
+        isSentResult = sentResult;
     }
 }

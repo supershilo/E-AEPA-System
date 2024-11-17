@@ -337,7 +337,8 @@ function TakeEvaluationPage() {
   }, [assignedEvaluators]);
 
   //5th
-  const is5thMonth = true;
+  console.log("Is third eval complete?", loggedUser.is3rdEvalComplete);
+  const is5thMonth = loggedUser.is3rdEvalComplete;
   const [assignPeerId3rd, setAssignPeerId3rd] = useState(null); //43
   const [assignedEvaluators3rd, setAssignedEvaluators3rd] = useState([]);
 

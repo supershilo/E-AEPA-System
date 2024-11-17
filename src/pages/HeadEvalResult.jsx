@@ -148,12 +148,12 @@ function HeadEvalResult() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 100,
+      minWidth: 150,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 170,
+      minWidth: 120,
       align: "center",
       format: (value) => formatName(value),
     },
@@ -351,7 +351,7 @@ function HeadEvalResult() {
                     <TableBody>
                       <TableRow>
                         <TableCell
-                          sx={{ height: "32.3em", borderRadius: "5px 5px 0 0" }}
+                          sx={{ height: "30em", borderRadius: "5px 5px 0 0" }}
                           colSpan={columnsEmployees.length}
                           align="center"
                         >
