@@ -68,6 +68,7 @@ function EvaluationForm({
     height: "68vh",
     overflow: "auto",
     paddingRight: "10px",
+    //backgroundColor: "tomato",
   };
 
   const overlayStyle = {
@@ -1170,7 +1171,7 @@ function EvaluationForm({
                   style={{
                     marginBottom: "10px",
                     display: "flex",
-                    height: "30px",
+                    minHeight: "30px",
                     alignItems: "center",
                     backgroundColor: "#1E1E1E",
                     color: "white",
@@ -1204,8 +1205,9 @@ function EvaluationForm({
                   </p>
                 </div>
               </div>
-              {evalType === "HEAD"
-                ? /** Job-based Questions for HEAD */
+              {evalType === "HEAD" ? (
+                /** Job-based Questions for HEAD */
+                selectedEmpJobResp && selectedEmpJobResp.length > 0 ? (
                   selectedEmpJobResp.map((resp, index) => (
                     <div key={index}>
                       <label htmlFor={index}>{index + 1}.</label>
@@ -1282,95 +1284,111 @@ function EvaluationForm({
                       </div>
                     </div>
                   ))
-                : /** Job-based Questions for other evalTypes */
-                  [1, 2, 3, 4, 5].map((i) => (
-                    <div key={i}>
-                      <label htmlFor={i}>{i}.</label>
+                ) : (
+                  <div>
+                    <p
+                      style={{
+                        color: "#636E72",
+                        textAlign: "center",
+                        padding: "25px 0px 25px 0px",
+                      }}
+                    >
+                      Employee did not answer the evaluation yet.
+                    </p>
+                  </div>
+                )
+              ) : (
+                /** Job-based Questions for other evalTypes */
+                [1, 2, 3, 4, 5].map((i) => (
+                  <div key={i}>
+                    <label htmlFor={i}>{i}.</label>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <textarea
+                        id={i}
+                        style={{
+                          margin: "8px 0px 15px 0px",
+                          height: "100px",
+                          width: "100%",
+                          border: "1px solid black",
+                          borderRadius: "5px",
+                          padding: "5px",
+                          boxSizing: "border-box",
+                          overflow: "hidden",
+                          resize: "none",
+                        }}
+                        required
+                        onChange={(e) =>
+                          handleJobTextareaChange(i, e.target.value)
+                        }
+                      ></textarea>
+
                       <div
                         style={{
+                          width: "10%",
+                          height: "100px",
                           display: "flex",
+                          flexDirection: "column",
                           alignItems: "center",
-                          marginBottom: "10px",
+                          justifyContent: "center",
                         }}
                       >
-                        <textarea
-                          id={i}
-                          style={{
-                            margin: "8px 0px 15px 0px",
-                            height: "100px",
-                            width: "100%",
-                            border: "1px solid black",
-                            borderRadius: "5px",
-                            padding: "5px",
-                            boxSizing: "border-box",
-                            overflow: "hidden",
-                            resize: "none",
-                          }}
-                          required
-                          onChange={(e) =>
-                            handleJobTextareaChange(i, e.target.value)
-                          }
-                        ></textarea>
-
                         <div
                           style={{
-                            width: "10%",
-                            height: "100px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
+                            backgroundColor: "#8C383E",
+                            border: "1px solid black",
+                            borderTopRightRadius: "3px",
+                            borderTopLeftRadius: "3px",
+
+                            color: "white",
+                            padding: "5px",
+                            fontSize: "14px",
+                            height: "30px",
+                            width: "75px",
+                            textAlign: "center",
                           }}
                         >
-                          <div
-                            style={{
-                              backgroundColor: "#8C383E",
-                              border: "1px solid black",
-                              borderTopRightRadius: "3px",
-                              borderTopLeftRadius: "3px",
-
-                              color: "white",
-                              padding: "5px",
-                              fontSize: "14px",
-                              height: "30px",
-                              width: "75px",
-                              textAlign: "center",
-                            }}
-                          >
-                            Ratings:
-                          </div>
-
-                          <FormControl sx={{ width: "75px" }}>
-                            <Select
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              value={scores[i] || ""}
-                              onChange={(e) =>
-                                handleJobScoreChange(i, e.target.value)
-                              }
-                              required
-                            >
-                              <MenuItem value={1}>1</MenuItem>
-                              <MenuItem value={2}>2</MenuItem>
-                              <MenuItem value={3}>3</MenuItem>
-                              <MenuItem value={4}>4</MenuItem>
-                              <MenuItem value={5}>5</MenuItem>
-                            </Select>
-                          </FormControl>
+                          Ratings:
                         </div>
+
+                        <FormControl sx={{ width: "75px" }}>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={scores[i] || ""}
+                            onChange={(e) =>
+                              handleJobScoreChange(i, e.target.value)
+                            }
+                            required
+                          >
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={2}>2</MenuItem>
+                            <MenuItem value={3}>3</MenuItem>
+                            <MenuItem value={4}>4</MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                          </Select>
+                        </FormControl>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))
+              )}
             </>
           )}
 
-          <div
+          {/* <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
               margin: "10px 0px 10px 0px",
             }}
           >
+            
             <Button
               type="submit"
               sx={{
@@ -1386,7 +1404,37 @@ function EvaluationForm({
             >
               Finish
             </Button>
-          </div>
+          </div> */}
+
+          {evalType === "HEAD" &&
+          selectedEmpJobResp.length === 0 &&
+          stageType === "JOB" ? null : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                margin: "10px 0px 10px 0px",
+              }}
+            >
+              <Button
+                type="submit"
+                sx={{
+                  marginTop: marginTopValueHead,
+                  width: "8%",
+                  backgroundColor: "#8C383E",
+                  "&:hover": {
+                    backgroundColor: "#7C2828",
+                  },
+                  fontFamily: "poppins",
+                }}
+                variant="contained"
+              >
+                Finish
+              </Button>
+            </div>
+          )}
+
+          {console.log("SELECTED EMP JOB RESP: ", selectedEmpJobResp)}
         </form>
       </div>
       <ConfirmationModal

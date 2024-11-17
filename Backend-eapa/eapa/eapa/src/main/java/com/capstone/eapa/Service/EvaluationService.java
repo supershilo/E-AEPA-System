@@ -228,10 +228,8 @@ public class EvaluationService {
                     String lName = user.getlName();
                     Role role = user.getRole();
                     String dateHired = user.getDateHired();
-                    String schoolYear = entry.getValue().stream()
-                            .findFirst()
-                            .map(EvaluationEntity::getSchoolYear)
-                            .orElse("Unknown"); // Default to "Unknown" if no schoolYear found
+                    boolean is3rdEvalComplete = user.isIs3rdEvalComplete();
+                    boolean is5thEvalComplete = user.isIs5thEvalComplete();
 
                     List<EvaluationEntity> userEvaluations = entry.getValue();
 
@@ -244,7 +242,8 @@ public class EvaluationService {
                     dto.setlName(lName);
                     dto.setRole(role);
                     dto.setDateHired(dateHired);
-                    dto.setSchoolYear(schoolYear);
+                    dto.setIs3rdEvalComplete(is3rdEvalComplete);
+                    dto.setIs5thEvalComplete(is5thEvalComplete);
 
 
 
