@@ -260,12 +260,15 @@ public class EvaluationService {
                             });
 
                     List<LocalDate> evaluationDates = new ArrayList<>();
+                    String schoolYear = null; // Initialize schoolYear variable
                     for (EvaluationEntity eval : userEvaluations) {
                         LocalDate dateTaken = eval.getDateTaken();
                         evaluationDates.add(dateTaken);
-
+                        if (schoolYear == null) {
+                            schoolYear = eval.getSchoolYear();
+                        }
                         dto.setPeriod(eval.getPeriod());
-
+                        dto.setSchoolYear(schoolYear != null ? schoolYear : "N/A");
                         switch (eval.getEvalType() + "-" + eval.getStage()) {
                             case "SELF-JOB":
                                 dto.setSjbpStatus(eval.getStatus());

@@ -171,7 +171,7 @@ function EmployeeProfile({ user, handleBack }) {
 
 				if (hasAnnualPeriod) {
 					setSelectedEvaluationPeriod("Annual-1st");
-					setSelectedTab(0); // Assuming the "Annual-1st" tab is index 2
+					setSelectedTab(0); // Assuming "Annual-1st" tab kay index 2
 				} else {
 					setSelectedTab(0); // Default to "3rd Month" tab
 				}
@@ -386,11 +386,11 @@ function EmployeeProfile({ user, handleBack }) {
 		);
 
 		const hasCompletedHeadValues = headEval.some(
-			(evaluation) => evaluation.hjbpStatus === "COMPLETED"
+			(evaluation) => evaluation.hvbpaStatus === "COMPLETED"
 		);
 
 		const hasCompletedHeadJob = headEval.some(
-			(evaluation) => evaluation.hvbpaStatus === "COMPLETED"
+			(evaluation) => evaluation.hjbpStatus === "COMPLETED"
 		);
 
 		const hasCompletedJobSelf = filteredEvaluations.some(
@@ -1011,10 +1011,10 @@ function EmployeeProfile({ user, handleBack }) {
 												userId={user.userID}
 												open={showAnnual1st}
 												onClose={handleCloseAnnual1st}
-												selectedYear={selectedYearEvaluation}
-												selectedSemester={semester}
 												employee={user}
 												role={role}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
 											/>
 										)}
 									</Box>

@@ -6,13 +6,13 @@ import arrow from "../assets/arrow.png";
 import boxes from "../assets/matrixboxes.png";
 import bottomArrow from "../assets/bottomarrow.png";
 import Chart from "react-apexcharts";
-import AnnualFirstSemComments from "../modals/AnnualFirstSemComments";
+import AnnualFirstSemComments from "../modals/Annual1stComments";
 import axios from "axios";
 import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
+const AnnualFirstSemEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -20,6 +20,10 @@ const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
   const [currentDate, setCurrentDate] = useState('');
   const [dateOfAppraisal, setDateOfAppraisal] = useState("");
   const [loading, setLoading] = useState(true);
+
+  console.log("Selected Year ni:", selectedYear);
+  console.log("Selected Semester:", selectedSemester);
+
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);
@@ -174,6 +178,28 @@ const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
     setOverallEAPAAverage(overallAverage);
   }, [overallSelfVBPA, overallHeadVBPA, overallSelfJBPA, overallHeadJBPA]);
 
+// Function to calculate peer averages
+const calculatePeerAverage = (coreValue) => {
+  if (peerEvaluationAverages.length === 0) return 0;
+  const total = peerEvaluationAverages.reduce((sum, peer) => sum + (peer[coreValue] || 0), 0);
+  return total / peerEvaluationAverages.length;
+};
+
+  useEffect(() => {
+    const cultAve = calculatePeerAverage('coe');
+    const intAve = calculatePeerAverage('int');
+    const teamAve = calculatePeerAverage('tea');
+    const univAve = calculatePeerAverage('uni');
+
+    setPeerCultAve(cultAve.toFixed(2));
+    setPeerIntAve(intAve.toFixed(2));
+    setPeerTeamAve(teamAve.toFixed(2));
+    setPeerUnivAve(univAve.toFixed(2));
+
+    const overallPeerAve = ((cultAve + intAve + teamAve + univAve) / 4).toFixed(2);
+    console.log("overallPeerAve: ", overallPeerAve);
+    setOverallPeerVBPA(overallPeerAve);
+  }, [peerEvaluationAverages]);
 
   //fetch Averages
   useEffect(() => {
@@ -191,7 +217,7 @@ const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
                 stage: "VALUES",
                 period: "Annual-1st",
                 schoolYear: selectedYear,
-                semester: selectedSemester,
+                //semester: 'First Semester',
               },
             }
           );
@@ -244,7 +270,7 @@ const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
                 stage: "JOB",
                 period: "Annual-1st",
                 schoolYear: selectedYear,
-                semester: selectedSemester,
+                //semester: selectedSemester,
               },
             }
           );
@@ -310,8 +336,9 @@ const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
                   period: "Annual-1st",
                   evalType: 'PEER-A',
                   schoolYear: selectedYear,
-                  semester: selectedSemester,
+                  // semester: 'First Semester',
                 },
+                
               }
             ).catch(error => {
               console.error(`Error fetching data for evaluator ${evaluatorId}:`, error);
@@ -333,7 +360,10 @@ const Annual1stEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
         } catch (error) {
           console.error('Error fetching peer evaluation data:', error);
         }
+        
       };
+      
+      
 
       //HEAD JOB
       const fetchHeadJobAnnualFirst = async () => {
@@ -408,35 +438,15 @@ const fetchHeadValuesAnnualFirst = async () => {
       fetchSelfJobAnnualFirst();
       fetchHeadValuesAnnualFirst();
       fetchHeadJobAnnualFirst();
-      fetchPeerAnnualFirst();
+      if (userId && selectedYear) {
+        fetchPeerAnnualFirst();
+      }
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, selectedYear]);
 
-  // Function to calculate peer averages
-  const calculatePeerAverage = (coreValue) => {
-    if (peerEvaluationAverages.length === 0) return 0;
-    const total = peerEvaluationAverages.reduce((sum, peer) => sum + (peer[coreValue] || 0), 0);
-    return total / peerEvaluationAverages.length;
-  };
-
-  useEffect(() => {
-    const cultAve = calculatePeerAverage('coe');
-    const intAve = calculatePeerAverage('int');
-    const teamAve = calculatePeerAverage('tea');
-    const univAve = calculatePeerAverage('uni');
-
-    setPeerCultAve(cultAve.toFixed(2));
-    setPeerIntAve(intAve.toFixed(2));
-    setPeerTeamAve(teamAve.toFixed(2));
-    setPeerUnivAve(univAve.toFixed(2));
-
-    const overallPeerAve = ((cultAve + intAve + teamAve + univAve) / 4).toFixed(2);
-    console.log("overallPeerAve: ", overallPeerAve);
-    setOverallPeerVBPA(overallPeerAve);
-  }, [peerEvaluationAverages]);
-
+  
 
   const formatValue = (value) => {
     const num = parseFloat(value);
@@ -1767,4 +1777,4 @@ const fetchHeadValuesAnnualFirst = async () => {
   );
 }
 
-export default Annual1stEval;
+export default AnnualFirstSemEval;

@@ -6,7 +6,7 @@ import arrow from "../assets/arrow.png";
 import boxes from "../assets/matrixboxes.png";
 import bottomArrow from "../assets/bottomarrow.png";
 import Chart from "react-apexcharts";
-import ThirdMonthComments from "../modals/ThirdMonthComments";
+import ThirdMonthComments from "../modals/3rdMonthComments";
 import axios from "axios";
 import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
@@ -213,7 +213,7 @@ useEffect(() => {
                 stage: "VALUES",
                 period: "3rd Month",
                 schoolYear: selectedYear,
-                semester: selectedSemester,
+                // semester: selectedSemester,
               },
             }
           );
@@ -266,7 +266,7 @@ useEffect(() => {
                 stage: "JOB",
                 period: "3rd Month",
                 schoolYear: selectedYear,
-                semester: selectedSemester,
+                // semester: selectedSemester,
               },
             }
           );
