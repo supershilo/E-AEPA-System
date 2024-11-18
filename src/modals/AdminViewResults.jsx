@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {Modal, Box, Menu, MenuItem, IconButton} from "@mui/material";
+import { Modal, Box, Menu, MenuItem, IconButton } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Third from "../modals/3rdMonthEval";
 import axios from "axios";
 import GeneratePDF from "../components/GeneratePDF"; // Import the GeneratePDF function
-import { apiUrl } from '../config/config';
-
+import { apiUrl } from "../config/config";
 
 const menuItemStyles = {
 	fontFamily: "Poppins",
@@ -28,7 +27,15 @@ const selectedMenuItemStyles = {
 	},
 };
 
-const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
+const AdminViewResults = ({
+	userId,
+	open,
+	onClose,
+	employee,
+	role,
+	selectedYear,
+	selectedSemester,
+}) => {
 	const [filter, setFilter] = useState("overall");
 	const [selectedStaff, setSelectedStaff] = useState(employee);
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -49,9 +56,7 @@ const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-				const response = await axios.get(
-					`${apiUrl}user/getUser/${userId}`
-				);
+				const response = await axios.get(`${apiUrl}user/getUser/${userId}`);
 				setSelectedStaff(response.data);
 			} catch (error) {
 				if (error.response) {
@@ -65,7 +70,6 @@ const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
 		};
 		fetchUser();
 	}, []);
-
 
 	const handlePrint = async () => {
 		const printAreaId = `tabPanel-${tabIndex}`;
@@ -171,7 +175,14 @@ const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
 							Head
 						</MenuItem>
 					</Menu>
-					<Third userId={employee.userID} employee={employee} filter={filter} role={role}  />
+					<Third
+						userId={employee.userID}
+						employee={employee}
+						filter={filter}
+						role={role}
+						selectedYear={selectedYear}
+						selectedSemester={selectedSemester}
+					/>
 				</Box>
 			</Box>
 		</Modal>

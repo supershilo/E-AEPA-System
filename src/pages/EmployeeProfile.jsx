@@ -20,16 +20,24 @@ import {
 	faUsers,
 	faPaperPlane,
 	faCheck,
-	faXmark,
+	faEye,
+	faScroll,
+	faGraduationCap,
+	faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
 import AdminViewResult from "../modals/AdminViewResults";
 import Admin5thViewResults from "../modals/Admin5thViewResults";
+import AdminAnnual1stResults from "../modals/AdminAnnual1stViewResults";
+import AdminAnnual2ndResults from "../modals/AdminAnnual2ndViewResults";
 import { apiUrl } from "../config/config";
 import ManagePeerModal from "../modals/ManagePeerModal";
 import SendResultsModal from "../modals/SendResultsModal";
 import Send5thResultsModal from "../modals/Send5thResultsModal";
+import SendAnnual1st from "../modals/SendAnnual1stModal";
+import SendAnnual2nd from "../modals/SendAnnual2ndModal";
+import ThirdMonthEval from "../modals/3rdMonthEval";
 
 const theme = createTheme({
 	palette: {
@@ -73,10 +81,14 @@ function EmployeeProfile({ user, handleBack }) {
 	const [is3rdEvalComplete, setIs3rdEvalComplete] = useState(false);
 	const [is5thModalOpen, setIs5thModal] = useState(false);
 	const [is5thEvalComplete, setIs5thEvalComplete] = useState(false);
-	const [buttonText, setButtonText] = useState(false);
-	const [buttonText5th, setButtonText5th] = useState(false);
-
-	console.log(role);
+	const [hasAnnualPeriod, setHasAnnualPeriod] = useState(false);
+	const [isAnnual1stComplete, setIsAnnual1stComplete] = useState(false);
+	const [isAnnual2ndComplete, setIsAnnual2ndComplete] = useState(false);
+	const [annual1stModal, setAnnual1stModal] = useState(false);
+	const [annual2ndModal, setAnnual2ndModal] = useState(false);
+	const [showAnnual1st, setShowAnnual1st] = useState(false);
+	const [showAnnual2nd, setShowAnnual2nd] = useState(false);
+	const [semester, setSemesters] = useState(" ");
 
 	//adi changes
 	const [openModal, setOpenModal] = useState(false);
@@ -147,11 +159,36 @@ function EmployeeProfile({ user, handleBack }) {
 				// Set the filtered evaluations to the state
 				setUserData(filteredEvaluations);
 
-				const evaluationYears = filteredEvaluations.map((evaluation) =>
-					new Date(evaluation.dateTaken).getFullYear()
+				const evaluationYears = filteredEvaluations.map(
+					(evaluation) => evaluation.schoolYear
 				);
 				const distinctYears = [...new Set(evaluationYears)];
 				setYears(distinctYears);
+
+				const hasAnnualPeriod = filteredEvaluations.some((evaluation) =>
+					evaluation.period.includes("Annual")
+				);
+
+				if (hasAnnualPeriod) {
+					setSelectedEvaluationPeriod("Annual-1st");
+					setSelectedTab(0); // Assuming "Annual-1st" tab kay index 2
+				} else {
+					setSelectedTab(0); // Default to "3rd Month" tab
+				}
+
+				// Set the flag Annual word present siya
+				setHasAnnualPeriod(hasAnnualPeriod);
+
+				const filteredBySchoolYear = filteredEvaluations.filter(
+					(evaluation) => evaluation.schoolYear === selectedYearEvaluation
+				);
+
+				// Extract unique semesters for the filtered evaluations
+				const semesters = filteredBySchoolYear.map(
+					(evaluation) => evaluation.semester
+				);
+
+				setSemesters(semesters);
 
 				console.log(userData);
 			} catch (error) {
@@ -160,8 +197,9 @@ function EmployeeProfile({ user, handleBack }) {
 		};
 
 		fetchEvaluations();
-	}, []);
+	}, [selectedYearEvaluation]);
 	console.log("user Data ", userData);
+	console.log("Selected Semester:", semester);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -190,10 +228,24 @@ function EmployeeProfile({ user, handleBack }) {
 	};
 
 	const handleTabChange = (event, newValue) => {
+		let period;
+		if (hasAnnualPeriod) {
+			if (newValue === 0) {
+				period = "Annual-1st";
+			} else if (newValue === 1) {
+				period = "Annual-2nd";
+			}
+		} else {
+			if (newValue === 0) {
+				period = "3rd Month";
+			} else if (newValue === 1) {
+				period = "5th Month";
+			}
+		}
+
 		setSelectedTab(newValue);
-		const period =
-			newValue === 0 ? "3rd Month" : newValue === 1 ? "5th Month" : "Annual";
 		setSelectedEvaluationPeriod(period);
+		console.log("Selected Evaluation Period:", period);
 	};
 
 	const handleViewResults = () => {
@@ -212,18 +264,49 @@ function EmployeeProfile({ user, handleBack }) {
 		setShow5th(false);
 	};
 
+	const handleAnnual1stViewResult = () => {
+		setShowAnnual1st(true);
+	};
+
+	const handleAnnual2ndViewResult = () => {
+		setShowAnnual2nd(true);
+	};
+
+	const handleCloseAnnual1st = () => {
+		setShowAnnual1st(false);
+	};
+
+	const handleCloseAnnual2nd = () => {
+		setShowAnnual2nd(false);
+	};
+
+	const handleAnnualModalOpen = () => {
+		setAnnual1stModal(true);
+	};
+
+	const handleAnnualModalClose = () => {
+		setAnnual1stModal(false);
+	};
+
+	const handleAnnual2ndModalOpen = () => {
+		setAnnual2ndModal(true);
+	};
+
+	const handleAnnual2ndModalClose = () => {
+		setAnnual2ndModal(false);
+	};
+
 	const handle5thModalOpen = () => {
 		setIs5thModal(true);
 	};
 
-	const handle5thModalConfirm = () => {
+	const handle5thModalClose = () => {
 		setIs5thModal(false);
 	};
 
 	const handleConfirm5th = () => {
 		setIs5thEvalComplete(true);
 		setIs5thModal(false);
-		setButtonText5th(true);
 	};
 
 	const handleConfirmOpen = () => {
@@ -237,7 +320,6 @@ function EmployeeProfile({ user, handleBack }) {
 	const handleConfirmSent = () => {
 		setIs3rdModal(false);
 		setIs3rdEvalComplete(true);
-		setButtonText(true);
 	};
 
 	const tabStyle = {
@@ -270,28 +352,24 @@ function EmployeeProfile({ user, handleBack }) {
 		// Check for Filter evaluations per user
 		const filteredEvaluations = userData.filter(
 			(evaluation) =>
-				new Date(evaluation.dateTaken).getFullYear() ===
-					parseInt(selectedYearEvaluation) &&
+				evaluation.schoolYear === selectedYearEvaluation &&
 				evaluation.userId === user.userID &&
 				evaluation.period === selectedEvaluationPeriod
 		);
 
 		const peerEval = peerData.filter((evaluation) => {
-			if (!evaluation.sjbDateTaken) return false; // Skip if sjbDateTaken is null
+			if (!evaluation.sjbDateTaken) return false;
 			return (
-				new Date(evaluation.sjbDateTaken).getFullYear() ===
-					parseInt(selectedYearEvaluation) &&
+				evaluation.schoolYear === selectedYearEvaluation &&
 				evaluation.period === selectedEvaluationPeriod &&
 				evaluation.userId === user.userID
 			);
 		});
 
-		// Check for Filter evaluations per user under the department
-		const headEval = evaluationsData.filter(
+		const headEval = peerData.filter(
 			(evaluation) =>
-				new Date(evaluation.dateTaken).getFullYear() ===
-					parseInt(selectedYearEvaluation) &&
-				evaluation.peer.userID === user.userID &&
+				evaluation.schoolYear === selectedYearEvaluation &&
+				evaluation.userId === user.userID &&
 				evaluation.period === selectedEvaluationPeriod
 		);
 
@@ -308,13 +386,11 @@ function EmployeeProfile({ user, handleBack }) {
 		);
 
 		const hasCompletedHeadValues = headEval.some(
-			(evaluation) =>
-				evaluation.stage === "VALUES" && evaluation.status === "COMPLETED"
+			(evaluation) => evaluation.hvbpaStatus === "COMPLETED"
 		);
 
 		const hasCompletedHeadJob = headEval.some(
-			(evaluation) =>
-				evaluation.stage === "JOB" && evaluation.status === "COMPLETED"
+			(evaluation) => evaluation.hjbpStatus === "COMPLETED"
 		);
 
 		const hasCompletedJobSelf = filteredEvaluations.some(
@@ -324,13 +400,12 @@ function EmployeeProfile({ user, handleBack }) {
 				evaluation.status === "COMPLETED"
 		);
 
-		// Determine if all stages for the selected year are completed for VALUES and JOB
 		const allValuesStagesCompleted =
 			hasCompletedValuesSelf &&
-			hasCompletedValuesPeer &&
-			hasCompletedJobSelf &&
-			hasCompletedHeadValues &&
-			hasCompletedHeadJob;
+			// hasCompletedValuesPeer &&
+			hasCompletedJobSelf;
+		// hasCompletedHeadValues &&
+		// hasCompletedHeadJob;
 
 		return (
 			<TableContainer style={tableStyle}>
@@ -358,7 +433,11 @@ function EmployeeProfile({ user, handleBack }) {
 						{/* Render VALUES based evaluations */}
 						<TableRow>
 							<TableCell align="center" style={{ width: "20%" }}>
-								Values Based
+								<FontAwesomeIcon
+									icon={faGraduationCap}
+									style={{ color: "#8C383E", marginRight: "8px" }}
+								/>
+								<span style={{ fontWeight: 500 }}>Values Based</span>
 							</TableCell>
 							<TableCell align="center">
 								<VerifiedIconWrapper verified={hasCompletedValuesSelf} />
@@ -384,9 +463,19 @@ function EmployeeProfile({ user, handleBack }) {
 									onClick={() => {
 										handleViewResults();
 										handleOpen5thViewResult();
+										handleAnnual1stViewResult();
+										handleAnnual2ndViewResult();
 									}}
 									disabled={!allValuesStagesCompleted}
 								>
+									<FontAwesomeIcon
+										icon={allValuesStagesCompleted ? faEye : faEyeSlash}
+										style={{
+											color: allValuesStagesCompleted ? "#8C383E" : "#A9A9A9",
+											marginRight: "10px",
+											marginLeft: "3.3em",
+										}}
+									/>
 									View Results
 								</Button>
 							</TableCell>
@@ -394,8 +483,16 @@ function EmployeeProfile({ user, handleBack }) {
 
 						{/* Render JOB based evaluations */}
 						<TableRow>
-							<TableCell align="center" style={{ width: "20%" }}>
-								Job Based
+							<TableCell style={{ width: "20%" }}>
+								<FontAwesomeIcon
+									icon={faScroll}
+									style={{
+										color: "#8C383E",
+										marginRight: "10px",
+										marginLeft: "4.3em",
+									}}
+								/>
+								<span style={{ fontWeight: 500 }}>Job Based</span>
 							</TableCell>
 							<TableCell align="center">
 								<VerifiedIconWrapper verified={hasCompletedJobSelf} />
@@ -404,10 +501,168 @@ function EmployeeProfile({ user, handleBack }) {
 								<VerifiedIconWrapper verified={hasCompletedHeadJob} />
 							</TableCell>
 							<TableCell align="center"></TableCell>
-							<TableCell align="center" style={{ width: "20%" }}></TableCell>
+							<TableCell align="center"></TableCell>
 						</TableRow>
 					</TableBody>
 				</Table>
+
+				{/* Send Results Button */}
+				<Box
+					sx={{
+						display: "flex",
+						justifyContent: "flex-end",
+						mt: 1,
+						mb: 1,
+						mr: 4,
+					}}
+				>
+					{/* Conditionally render the button based on the selected evaluation period */}
+					{selectedEvaluationPeriod === "3rd Month" ? (
+						<Button
+							variant="contained"
+							sx={{
+								height: "2.5em",
+								width: "11em",
+								fontFamily: "Poppins",
+								backgroundColor: "#8c383e",
+								padding: "1px 1px 0 0",
+								textTransform: "none",
+								"&:hover": {
+									backgroundColor: "#762F34",
+									color: "white",
+								},
+							}}
+							onClick={handleConfirmOpen}
+							disabled={!allValuesStagesCompleted || is3rdEvalComplete}
+						>
+							{is3rdEvalComplete ? (
+								<>
+									<FontAwesomeIcon
+										icon={faCheck}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Result Sent
+								</>
+							) : (
+								<>
+									<FontAwesomeIcon
+										icon={faPaperPlane}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Send Results
+								</>
+							)}
+						</Button>
+					) : selectedEvaluationPeriod === "5th Month" ? (
+						<Button
+							variant="contained"
+							sx={{
+								height: "2.5em",
+								width: "11em",
+								fontFamily: "Poppins",
+								backgroundColor: "#8c383e",
+								padding: "1px 1px 0 0",
+								textTransform: "none",
+								"&:hover": {
+									backgroundColor: "#762F34",
+									color: "white",
+								},
+							}}
+							onClick={handle5thModalOpen}
+							disabled={!allValuesStagesCompleted || is5thEvalComplete}
+						>
+							{is5thEvalComplete ? (
+								<>
+									<FontAwesomeIcon
+										icon={faCheck}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Result Sent
+								</>
+							) : (
+								<>
+									<FontAwesomeIcon
+										icon={faPaperPlane}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Send Results
+								</>
+							)}
+						</Button>
+					) : selectedEvaluationPeriod === "Annual-1st" ? (
+						<Button
+							variant="contained"
+							sx={{
+								height: "2.5em",
+								width: "11em",
+								fontFamily: "Poppins",
+								backgroundColor: "#8c383e",
+								padding: "1px 1px 0 0",
+								textTransform: "none",
+								"&:hover": {
+									backgroundColor: "#762F34",
+									color: "white",
+								},
+							}}
+							onClick={handleAnnualModalOpen}
+							disabled={!allValuesStagesCompleted || isAnnual1stComplete}
+						>
+							{isAnnual1stComplete ? (
+								<>
+									<FontAwesomeIcon
+										icon={faCheck}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Result Sent
+								</>
+							) : (
+								<>
+									<FontAwesomeIcon
+										icon={faPaperPlane}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Send Results
+								</>
+							)}
+						</Button>
+					) : selectedEvaluationPeriod === "Annual-2nd" ? (
+						<Button
+							variant="contained"
+							sx={{
+								height: "2.5em",
+								width: "11em",
+								fontFamily: "Poppins",
+								backgroundColor: "#8c383e",
+								padding: "1px 1px 0 0",
+								textTransform: "none",
+								"&:hover": {
+									backgroundColor: "#762F34",
+									color: "white",
+								},
+							}}
+							onClick={handleAnnual2ndModalOpen}
+							disabled={!allValuesStagesCompleted || isAnnual2ndComplete}
+						>
+							{isAnnual2ndComplete ? (
+								<>
+									<FontAwesomeIcon
+										icon={faCheck}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Result Sent
+								</>
+							) : (
+								<>
+									<FontAwesomeIcon
+										icon={faPaperPlane}
+										style={{ fontSize: "15px", marginRight: "10px" }}
+									/>{" "}
+									Send Results
+								</>
+							)}
+						</Button>
+					) : null}
+				</Box>
 			</TableContainer>
 		);
 	};
@@ -649,12 +904,18 @@ function EmployeeProfile({ user, handleBack }) {
 								indicatorColor="secondary"
 								textColor="secondary"
 							>
-								<Tab label="3rd Month" style={tabStyle} />
-								<Tab label="5th Month" style={tabStyle} />
-								<Tab label="Annual- 1st Semester" style={tabStyle} />
-                <Tab label="Annual- 2nd Semester" style={tabStyle} />
+								{hasAnnualPeriod && (
+									<Tab label="Annual-1st Sem" style={tabStyle} />
+								)}
+
+								{hasAnnualPeriod && (
+									<Tab label="Annual-2nd Sem" style={tabStyle} />
+								)}
+
+								{!hasAnnualPeriod && <Tab label="3rd Month" style={tabStyle} />}
+								{!hasAnnualPeriod && <Tab label="5th Month" style={tabStyle} />}
 							</Tabs>
-							{selectedTab === 0 && (
+							{selectedEvaluationPeriod === "3rd Month" && !hasAnnualPeriod && (
 								<Animated>
 									<Box>
 										<Typography
@@ -676,56 +937,12 @@ function EmployeeProfile({ user, handleBack }) {
 												userId={user.userID}
 												open={show3rd}
 												onClose={handleClose3rdResults}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
 												employee={user}
 												role={role}
 											/>
 										)}
-									</Box>
-									<Box
-										sx={{
-											display: "flex",
-											justifyContent: "flex-end",
-											mt: 2,
-											mb: 1,
-										}}
-									>
-										<Button
-											variant="contained"
-											sx={{
-												height: "2.5em",
-												width: "11em",
-												fontFamily: "Poppins",
-												backgroundColor: "#8c383e",
-												padding: "1px 1px 0 0",
-												textTransform: "none",
-												"&:hover": {
-													backgroundColor: "#762F34",
-													color: "white",
-												},
-											}}
-											onClick={handleConfirmOpen}
-											disabled={is3rdEvalComplete}
-                      
-										>
-											{is3rdEvalComplete || buttonText ? (
-												<>
-													<FontAwesomeIcon
-														icon={faCheck}
-														style={{ fontSize: "15px", marginRight: "10px" }}
-													/>{" "}
-													Result Sent
-												</>
-											) : (
-												<>
-                        
-													<FontAwesomeIcon
-														icon={faPaperPlane}
-														style={{ fontSize: "15px", marginRight: "10px" }}
-													/>{" "}
-													Send Results
-												</>
-											)}
-										</Button>
 									</Box>
 								</Animated>
 							)}
@@ -735,7 +952,7 @@ function EmployeeProfile({ user, handleBack }) {
 								onConfirm={handleConfirmSent}
 								empUserId={user.userID}
 							/>
-							{selectedTab === 1 && (
+							{selectedEvaluationPeriod === "5th Month" && !hasAnnualPeriod && (
 								<Animated>
 									<Box>
 										<Typography
@@ -757,64 +974,22 @@ function EmployeeProfile({ user, handleBack }) {
 												userId={user.userID}
 												open={show5th}
 												onClose={handleClose5thViewResult}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
 												employee={user}
 												role={role}
 											/>
 										)}
-										<Box
-											sx={{
-												display: "flex",
-												justifyContent: "flex-end",
-												mt: 2,
-												mb: 1,
-											}}
-										>
-											<Button
-												variant="contained"
-												sx={{
-													height: "2.5em",
-													width: "11em",
-													fontFamily: "Poppins",
-													backgroundColor: "#8c383e",
-													padding: "1px 1px 0 0",
-													textTransform: "none",
-													"&:hover": {
-														backgroundColor: "#762F34",
-														color: "white",
-													},
-												}}
-												onClick={handle5thModalOpen}
-												disabled={is5thEvalComplete}
-											>
-												{is5thEvalComplete || buttonText5th ? (
-													<>
-														<FontAwesomeIcon
-															icon={faCheck}
-															style={{ fontSize: "15px", marginRight: "10px" }}
-														/>{" "}
-														Result Sent
-													</>
-												) : (
-													<>
-														<FontAwesomeIcon
-															icon={faPaperPlane}
-															style={{ fontSize: "15px", marginRight: "10px" }}
-														/>{" "}
-														Send Results
-													</>
-												)}
-											</Button>
-										</Box>
 									</Box>
 								</Animated>
 							)}
 							<Send5thResultsModal
 								isOpen={is5thModalOpen}
-								onCancel={handle5thModalConfirm}
+								onCancel={handle5thModalClose}
 								onConfirm={handleConfirm5th}
 								empUserId={user.userID}
 							/>
-							{selectedTab === 2 && (
+							{selectedEvaluationPeriod === "Annual-1st" && (
 								<Animated>
 									<Box>
 										<Typography
@@ -828,12 +1003,66 @@ function EmployeeProfile({ user, handleBack }) {
 												fontWeight: "bold",
 											}}
 										>
-											ANNUAL EVALUATION
+											FIRST SEMESTER EVALUATION
 										</Typography>
 										{renderEvaluationTable()}
+										{showAnnual1st && (
+											<AdminAnnual1stResults
+												userId={user.userID}
+												open={showAnnual1st}
+												onClose={handleCloseAnnual1st}
+												employee={user}
+												role={role}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
+											/>
+										)}
 									</Box>
 								</Animated>
 							)}
+							<SendAnnual1st
+								isOpen={annual1stModal}
+								onCancel={handleAnnualModalClose}
+								onConfirm={handleConfirm5th}
+								empUserId={user.userID}
+							/>
+							{selectedEvaluationPeriod === "Annual-2nd" && (
+								<Animated>
+									<Box>
+										<Typography
+											variant="h6"
+											sx={{
+												fontSize: "20px",
+												display: "flex",
+												justifyContent: "center",
+												padding: 1,
+												color: "#1a1a1a",
+												fontWeight: "bold",
+											}}
+										>
+											SECOND SEMESTER EVALUATION
+										</Typography>
+										{renderEvaluationTable()}
+										{showAnnual2nd && (
+											<AdminAnnual2ndResults
+												userId={user.userID}
+												open={showAnnual2nd}
+												onClose={handleCloseAnnual2nd}
+												selectedYear={selectedYearEvaluation}
+												selectedSemester={semester}
+												employee={user}
+												role={role}
+											/>
+										)}
+									</Box>
+								</Animated>
+							)}
+							<SendAnnual2nd
+								isOpen={annual2ndModal}
+								onCancel={handleAnnual2ndModalClose}
+								onConfirm={handleConfirm5th}
+								empUserId={user.userID}
+							/>
 						</Box>
 					)}
 				</Box>
