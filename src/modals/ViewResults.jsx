@@ -371,18 +371,27 @@ const ViewResults = ({ open, onClose, employee }) => {
           {isRegular && (
             <>
               <TabPanel value={tabIndex} index={0}>
-                <AnnualFirstSemEval userId={employee.userID} filter={filter} selectedYear={selectedYear} selectedSemester='First Semester' />
-              </TabPanel>
-              <TabPanel value={tabIndex} index={1}>
-                <AnnualSecondSemEval userId={employee.userID} filter={filter} selectedYear={selectedYear} selectedSemester='Second Semester'/>
-              </TabPanel>
-            </>
-          )}
+              <AnnualFirstSemEval 
+                    userId={employee.userID} 
+                    filter={filter} 
+                    selectedYear={selectedYear} 
+                    selectedSemester='First Semester' 
+                  />
+                </TabPanel>
+                <TabPanel value={tabIndex} index={1}>
+                  <AnnualSecondSemEval 
+                    userId={employee.userID} 
+                    filter={filter} 
+                    selectedYear={selectedYear} 
+                    selectedSemester='Second Semester' 
+                  />
+                </TabPanel>
+              </>
+            )}
+          </Box>
         </Box>
-      </Box>
-    </Modal>
-  );
-};
+      </Modal>
+    );
+  };
 
-export default ViewResults;
-25
+  export default ViewResults;
