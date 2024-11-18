@@ -170,12 +170,12 @@ function HeadEvalResult() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 90,
+      minWidth: 150,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 100,
+      minWidth: 120,
       align: "center",
       format: (value) => formatName(value),
     },
@@ -400,12 +400,21 @@ function HeadEvalResult() {
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
                         {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
-                          <TableCell
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                          >
+                        <TableCell
+                          sx={{ height: "30em", borderRadius: "5px 5px 0 0" }}
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
+                          <Typography
+                            sx={{
+                              textAlign: "center",
+                              fontFamily: "Poppins",
+                              fontSize: "17px",
+                              color: "#1e1e1e",
+                              fontWeight: 500,
+                              padding: "25px",
+                            }}
+                          />
                             {column.label}
                           </TableCell>
                         ))}

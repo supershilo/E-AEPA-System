@@ -63,22 +63,6 @@ public class UserEntity implements UserDetails {
     private boolean is5thEvalComplete= false;
 
 
-    public boolean isIs3rdEvalComplete() {
-        return is3rdEvalComplete;
-    }
-
-    public void setIs3rdEvalComplete(boolean is3rdEvalComplete) {
-        this.is3rdEvalComplete = is3rdEvalComplete;
-    }
-
-    public boolean isIs5thEvalComplete() {
-        return is5thEvalComplete;
-    }
-
-    public void setIs5thEvalComplete(boolean is5thEvalComplete) {
-        this.is5thEvalComplete = is5thEvalComplete;
-    }
-
     private int isDeleted = 0;
 
     public UserEntity() {
@@ -94,6 +78,22 @@ public class UserEntity implements UserDetails {
                 ", position='" + position + '\'' +
                 ", empStatus='" + empStatus + '\'' +
                 '}';
+    }
+
+    public boolean getIs3rdEvalComplete() {
+        return is3rdEvalComplete;
+    }
+
+    public boolean getIs5thEvalComplete() {
+        return is5thEvalComplete;
+    }
+
+    public void setIs3rdEvalComplete(boolean is3rdEvalComplete) {
+        this.is3rdEvalComplete = is3rdEvalComplete;
+    }
+
+    public void setIs5thEvalComplete(boolean is5thEvalComplete) {
+        this.is5thEvalComplete = is5thEvalComplete;
     }
 
     public int getUserID() {
@@ -290,6 +290,8 @@ public class UserEntity implements UserDetails {
     public void setImageFormat(String imageFormat) {
         this.imageFormat = imageFormat;
     }
+
+
 
     
 }

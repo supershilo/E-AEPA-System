@@ -209,6 +209,10 @@ public class UserService implements UserDetailsService {
                 user.setGender(newDetails.getGender());
             if (newDetails.getContactNum() != null)
                 user.setContactNum(newDetails.getContactNum());
+
+            user.setIs3rdEvalComplete(newDetails.getIs3rdEvalComplete());
+            user.setIs5thEvalComplete(newDetails.getIs5thEvalComplete());
+
             return userRepo.save(user);
         } catch (Exception e) {
             throw e; 

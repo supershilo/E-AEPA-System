@@ -578,7 +578,7 @@ function UserHome() {
                           height: "50px",
                           width: "50px",
                           borderRadius: "50%",
-                          border: "5px solid white",
+                          border: "2px solid #c6c6c6",
                         }}
                       >
                         <img

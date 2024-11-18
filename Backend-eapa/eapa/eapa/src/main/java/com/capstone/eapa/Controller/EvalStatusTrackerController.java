@@ -50,6 +50,13 @@ public class EvalStatusTrackerController {
         return evalStatusService.updateEvaluationStatus(trackerId, isCompleted);
     }
 
+    //update evaluation status isSentResult
+    @PatchMapping("/update-sentResult/{trackerId}")
+    public EvalStatusTrackerDTO updateEvalStatusTrackerSentResult(@PathVariable int trackerId,
+                                                                  @RequestParam boolean isSentResult){
+        return evalStatusService.updateEvalStatusSentResult(trackerId, isSentResult);
+    }
+
     // Delete all evaluation status entries by academic year
     @DeleteMapping("/by-academic-year/{academicYearId}")
     public void deleteEvaluationStatusByAcademicYear(@PathVariable int academicYearId) {

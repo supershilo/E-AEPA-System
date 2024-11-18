@@ -68,13 +68,13 @@ public class AcademicYearService {
         for (UserEntity user : allUsers) {
             // Create one tracker for the first semester
             EvalStatusTrackerEntity firstSemEvalStatus = new EvalStatusTrackerEntity(
-                    user, academicYear, firstSemester, false, null
+                    user, academicYear, firstSemester, false, null, false
             );
             evalStatusRepo.save(firstSemEvalStatus);
 
             // Create another tracker for the second semester
             EvalStatusTrackerEntity secondSemEvalStatus = new EvalStatusTrackerEntity(
-                    user, academicYear, secondSemester, false, null
+                    user, academicYear, secondSemester, false, null, false
             );
             evalStatusRepo.save(secondSemEvalStatus);
         }
