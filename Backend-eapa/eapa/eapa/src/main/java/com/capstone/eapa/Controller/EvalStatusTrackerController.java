@@ -3,6 +3,7 @@ package com.capstone.eapa.Controller;
 import com.capstone.eapa.DTO.EvalStatusTrackerDTO;
 import com.capstone.eapa.Entity.EvalStatusTrackerEntity;
 import com.capstone.eapa.Service.EvalStatusTrackerService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,19 @@ public class EvalStatusTrackerController {
     private EvalStatusTrackerService evalStatusService;
 
     //create 2 entries manually if not yet in the table
+//    @PostMapping("/create-tracker")
+//    public ResponseEntity<String> createEvalStatusTrackerForUser(
+//            @RequestParam int academicYearId,
+//            @RequestParam int firstSemesterId,
+//            @RequestParam int secondSemesterId,
+//            @RequestParam int userId) {
+//        try {
+//            evalStatusService.createEvalStatusTrackerForUser(academicYearId, firstSemesterId, secondSemesterId, userId);
+//            return ResponseEntity.ok("Evaluation Status Tracker created successfully for user ID: " + userId);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating Evaluation Status Tracker: " + e.getMessage());
+//        }
+//    }
     @PostMapping("/create-tracker")
     public ResponseEntity<String> createEvalStatusTrackerForUser(
             @RequestParam int academicYearId,
@@ -25,10 +39,17 @@ public class EvalStatusTrackerController {
             @RequestParam int secondSemesterId,
             @RequestParam int userId) {
         try {
-            evalStatusService.createEvalStatusTrackerForUser(academicYearId, firstSemesterId, secondSemesterId, userId);
-            return ResponseEntity.ok("Evaluation Status Tracker created successfully for user ID: " + userId);
+            // Call the service and return the response message
+            String responseMessage = evalStatusService.createEvalStatusTrackerForUser(
+                    academicYearId, firstSemesterId, secondSemesterId, userId);
+            return ResponseEntity.ok(responseMessage);
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found exception
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating Evaluation Status Tracker: " + e.getMessage());
+            // Handle other exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error creating Evaluation Status Tracker: " + e.getMessage());
         }
     }
 
@@ -61,5 +82,15 @@ public class EvalStatusTrackerController {
     @DeleteMapping("/by-academic-year/{academicYearId}")
     public void deleteEvaluationStatusByAcademicYear(@PathVariable int academicYearId) {
         evalStatusService.deleteEvaluationStatusByAcademicYear(academicYearId);
+    }
+
+    @DeleteMapping("/remove-duplicates")
+    public ResponseEntity<String> removeDuplicateEntries() {
+        try {
+            evalStatusService.removeDuplicateEntries();
+            return ResponseEntity.ok("Duplicate entries removed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while removing duplicates: " + e.getMessage());
+        }
     }
 }
