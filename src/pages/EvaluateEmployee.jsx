@@ -699,7 +699,7 @@ function EvaluateEmployee() {
           {openForm ? "Evaluation" : "List of Staff"}{" "}
         </Typography>
         {!openForm && (
-          <div className="ml-8 mt-2">
+          <div className="ml-4 mt-2">
             <div className="mr-10 flex items-center justify-between">
               <div className="ml-4 flex items-center justify-start">
                 <TextField

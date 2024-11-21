@@ -370,7 +370,7 @@ function HeadEvalResult() {
                 <Skeleton variant="rectangular" width='80em' height={500} sx={{marginLeft: 6, marginTop:3}}  />
             ) : (
               <>
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml:0.4,mt: 4, width: "93.5%" } }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml:0.4,mt: 4, width: "100%", } }}>
           <Grid container
             spacing={1.5}
             sx={{
@@ -384,7 +384,7 @@ function HeadEvalResult() {
                 <Grid
                   item
                   xs={12}
-                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em",ml:5 }}
+                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em",ml:3 }}
                 >
                   <Tabs
                     value={selectedTab}
@@ -395,28 +395,19 @@ function HeadEvalResult() {
                     <Tab label={`Regular Employees`} sx={tabStyle} />
                   </Tabs>
                 </Grid>
-                <TableContainer sx={{ height: '29.5em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' ,ml:6}}>
+                <TableContainer sx={{ height: '28em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' , width: "95%", margin: "auto"}}>
                   <Table stickyHeader aria-label="sticky table" size="small">
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
                         {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
-                        <TableCell
-                          sx={{ height: "30em", borderRadius: "5px 5px 0 0" }}
-                          colSpan={columnsEmployees.length}
-                          align="center"
-                        >
-                          <Typography
-                            sx={{
-                              textAlign: "center",
-                              fontFamily: "Poppins",
-                              fontSize: "17px",
-                              color: "#1e1e1e",
-                              fontWeight: 500,
-                              padding: "25px",
-                            }}
-                          />
-                            {column.label}
-                          </TableCell>
+                       <TableCell
+                       sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                       key={column.id}
+                       align={column.align}
+                       style={{ minWidth: column.minWidth }}
+                     >
+                       {column.label}
+                     </TableCell>
                         ))}
                       </TableRow>
                     </TableHead>
