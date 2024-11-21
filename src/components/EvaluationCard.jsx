@@ -50,6 +50,7 @@ function EvaluationCard({
   const handleTakeEvalChange = () => {
     setTakeEval(!takeEval);
     setActiveCard(id);
+    setEvalType("SELF");
   };
 
   const modalStyle = {
@@ -124,7 +125,7 @@ function EvaluationCard({
                   width: "30%",
                   height: "30px",
                   color: "#636E72",
-                  textTransform:"none",
+                  textTransform: "none",
                   fontFamily: "Poppins",
                   "&:hover": {
                     color: "#353b48",
@@ -195,9 +196,12 @@ function EvaluationCard({
                 marginBottom: "20px",
               }}
             >
-              <div style={{ width: "20%" }}>Evaluation for:</div>
+              <div style={{ width: "20%" }}>Evaluation Type:</div>
+              <div>
+                <p>Self Evaluation</p>
+              </div>
 
-              <FormControl sx={{ width: "25%", height: "35px" }} size="small">
+              {/* <FormControl sx={{ width: "25%", height: "35px" }} size="small">
                 <Select
                   sx={{
                     height: "35px",
@@ -214,18 +218,8 @@ function EvaluationCard({
                     <em>None</em>
                   </MenuItem>
                   <MenuItem value={"SELF"}>Self Evaluation</MenuItem>
-
-                  {/* <MenuItem
-                    disabled={
-                      loggedUser.employmentStatus !== "Regular" &&
-                      loggedUser.position !== "Secretary"
-                    }
-                    value={"PEER"}
-                  >
-                    Peer Evaluation
-                  </MenuItem> */}
                 </Select>
-              </FormControl>
+              </FormControl> */}
             </div>
           </div>
         </>
@@ -312,7 +306,7 @@ function EvaluationCard({
               sx={{
                 width: "14%",
                 height: "35px",
-                textTransform:"none",
+                textTransform: "none",
                 backgroundColor: "#8C383E",
                 "&:hover": {
                   backgroundColor: "#7C2828",
@@ -329,10 +323,11 @@ function EvaluationCard({
       )}
 
       {/** Evaluation tab */}
-      {activeCard === id && (
+      {takeEval && activeCard === id && (
         <EvaluationTypeTab
           period={period}
-          evalType={evalType}
+          //evalType={evalType}
+          evalType={"SELF"}
           handleOpenForm={handleOpenForm}
           handleOpenModal={handleOpenModal}
           //setShouldDisplay={setShouldDisplay}

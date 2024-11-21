@@ -533,7 +533,7 @@ function TakeEvaluationPage() {
   const [annualFirstSemStatus, setAnnualFirstSemStatus] = useState(null);
   const [annualSecondSemStatus, setAnnualSecondSemStatus] = useState(null);
 
-  const [shouldDisplayAnnual1st, setShouldDisplayAnnual1st] = useState(false);
+  const [shouldDisplayAnnual1st, setShouldDisplayAnnual1st] = useState(true);
   const [shouldDisplayAnnual2nd, setShouldDisplayAnnual2nd] = useState(false);
 
   useEffect(() => {
@@ -628,26 +628,105 @@ function TakeEvaluationPage() {
   //   fetchEvaluationStatus();
   // }, [firstSemEndDate, secondSemEndDate, loggedUser, currentAcadYear]);
 
+  // const [evalStatusData, setEvalStatusData] = useState(null);
+  // const [fetchComplete, setFetchComplete] = useState(false); // To track fetch completion
+
+  // useEffect(() => {
+  //   const fetchEvalStatus = async () => {
+  //     try {
+  //       const response = await axios.get(`${apiUrl}eval-status`, {
+  //         params: {
+  //           userId: loggedUser?.userID,
+  //           academicYearId: currentAcadYear?.id,
+  //         },
+  //       });
+
+  //       console.log("Fetched Evaluation Status:", response.data);
+  //       setEvalStatusData(response.data || []);
+  //       setFetchComplete(true); // Indicate that fetch is complete
+  //     } catch (error) {
+  //       console.error("Error fetching evaluation status:", error);
+  //       setFetchComplete(true); // Even if error occurs, indicate fetch is done
+  //     }
+  //   };
+
+  //   if (loggedUser && currentAcadYear?.id) {
+  //     fetchEvalStatus();
+  //   }
+  // }, [loggedUser, currentAcadYear?.id]);
+
+  // useEffect(() => {
+  //   const insertEvalStatus = async () => {
+  //     if (insertionExecuted.current || !fetchComplete) return;
+
+  //     try {
+  //       if (Array.isArray(evalStatusData) && evalStatusData.length === 0) {
+  //         console.log(
+  //           "No evaluation status found. Proceeding with insertion..."
+  //         );
+
+  //         await axios.post(`${apiUrl}eval-status/create-tracker`, null, {
+  //           params: {
+  //             academicYearId: currentAcadYear.id,
+  //             firstSemesterId: currentAcadYear.semesters[0].id,
+  //             secondSemesterId: currentAcadYear.semesters[1].id,
+  //             userId: loggedUser.userID,
+  //           },
+  //           headers: { "Content-Type": "application/json" },
+  //         });
+
+  //         console.log("Evaluation status tracker successfully created.");
+  //         insertionExecuted.current = true; // Mark insertion as executed
+  //       } else {
+  //         console.log("Evaluation status already exists, skipping insertion.");
+  //         insertionExecuted.current = true; // Prevent future executions
+  //       }
+  //     } catch (error) {
+  //       console.error("Error inserting evaluation status tracker:", error);
+  //     }
+  //   };
+
+  //   if (evalStatusData && fetchComplete) {
+  //     insertEvalStatus();
+  //   }
+  // }, [evalStatusData, fetchComplete, currentAcadYear, loggedUser]);
+
+  const [evalStatus, setEvalStatus] = useState([]);
+
+  useEffect(() => {
+    const fetchEvalStatus = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}eval-status`, {
+          params: {
+            userId: loggedUser?.userID,
+            academicYearId: currentAcadYear?.id,
+          },
+        });
+
+        setEvalStatus(response.data);
+      } catch (error) {
+        console.error(
+          "Error fetching and inserting eval status tracker:",
+          error
+        );
+      }
+    };
+
+    if (currentAcadYear) {
+      fetchEvalStatus();
+    }
+  }, [loggedUser, currentAcadYear]);
+
   useEffect(() => {
     const checkEvalStatusAndInsert = async () => {
-      // Prevent multiple insertions
       if (insertionExecutedEvalStatusTracker.current) {
-        console.log(
-          "Early return: insertion was already executed in eval status tracker."
-        );
+        console.log("Insertion already executed, skipping.");
         return;
       }
 
       try {
-        const response = await axios.get(`${apiUrl}eval-status`, {
-          params: {
-            userId: loggedUser.userID,
-            academicYearId: currentAcadYear.id,
-          },
-        });
-
         //check for existing eval status
-        if (Array.isArray(response.data) && response.data.length === 0) {
+        if (evalStatus.length === 0) {
           await axios.post(`${apiUrl}eval-status/create-tracker`, null, {
             params: {
               academicYearId: currentAcadYear.id,
@@ -657,11 +736,9 @@ function TakeEvaluationPage() {
             },
             headers: { "Content-Type": "application/json" },
           });
-
-          console.log("Evaluation status tracker created for the user.");
           insertionExecutedEvalStatusTracker.current = true;
         } else {
-          console.log("Evaluation status already exists.");
+          insertionExecutedEvalStatusTracker.current = true;
         }
       } catch (error) {
         console.error(
@@ -671,10 +748,34 @@ function TakeEvaluationPage() {
       }
     };
 
-    if (loggedUser && currentAcadYear && currentAcadYear.semesters) {
-      checkEvalStatusAndInsert();
-    }
-  }, [currentAcadYear, loggedUser]);
+    checkEvalStatusAndInsert();
+  }, [evalStatus]);
+
+  useEffect(() => {
+    const fetchDeleteDuplicates = async () => {
+      try {
+        const response = await axios.delete(
+          `${apiUrl}eval-status/remove-duplicates`
+        );
+
+        if (response.status === 200) {
+          console.log("Duplicates deleted successfully:", response.data);
+        } else {
+          console.error(
+            "Failed to delete duplicates, status code:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Error deleting duplicate evalstatustracker entries",
+          error
+        );
+      }
+    };
+
+    fetchDeleteDuplicates();
+  }, [loggedUser, evalStatus, currentAcadYear]);
 
   //for testing only
   useEffect(() => {
@@ -942,11 +1043,13 @@ function TakeEvaluationPage() {
   //check should display for annual first sem
   useEffect(() => {
     if (
-      isPartOneEvalComplete &&
-      isPartTwoEvalComplete &&
+      (isPartOneEvalComplete && isPartTwoEvalComplete) ||
       annualFirstSemStatus?.completed === true
     ) {
+      console.log("Hiding Annual-1st Card"); // Debug log
       setShouldDisplayAnnual1st(false);
+    } else {
+      console.log("Keeping Annual-1st Card Visible"); // Debug log
     }
   }, [
     renderFlag,
@@ -1285,6 +1388,11 @@ function TakeEvaluationPage() {
     fontSize: "15px",
     fontWeight: "500",
   };
+
+  console.log("RenderFlag:", renderFlag);
+  console.log("ShouldDisplayAnnual1st:", shouldDisplayAnnual1st);
+  console.log("PartOneEvalComplete:", isPartOneEvalComplete);
+  console.log("PartTwoEvalComplete:", isPartTwoEvalComplete);
 
   return (
     <div style={container}>
