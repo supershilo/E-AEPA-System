@@ -83,6 +83,9 @@ function TakeEvaluationPage() {
     fetchSchoolYearAndSem();
   }, []);
 
+  console.log("SY:", schoolYear);
+  console.log("SEM:", semester);
+
   //Fetch user details
   useEffect(() => {
     const fetchUser = async () => {
@@ -561,6 +564,7 @@ function TakeEvaluationPage() {
 
     fetchCurrentAcadYear();
   }, []);
+  console.log("ACAD YEAR ID:", currentAcadYear?.id);
 
   // console.log("Current Acad Year:", currentAcadYear);
   // console.log("Current 1st sem end date:", firstSemEndDate);

@@ -228,8 +228,8 @@ public class EvaluationService {
                     String lName = user.getlName();
                     Role role = user.getRole();
                     String dateHired = user.getDateHired();
-                    boolean is3rdEvalComplete = user.isIs3rdEvalComplete();
-                    boolean is5thEvalComplete = user.isIs5thEvalComplete();
+                    boolean is3rdEvalComplete = user.getIs3rdEvalComplete();
+                    boolean is5thEvalComplete = user.getIs5thEvalComplete();
 
                     List<EvaluationEntity> userEvaluations = entry.getValue();
 
