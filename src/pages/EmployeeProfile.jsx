@@ -37,7 +37,7 @@ import SendResultsModal from "../modals/SendResultsModal";
 import Send5thResultsModal from "../modals/Send5thResultsModal";
 import SendAnnual1st from "../modals/SendAnnual1stModal";
 import SendAnnual2nd from "../modals/SendAnnual2ndModal";
-import ThirdMonthEval from "../modals/3rdMonthEval";
+
 
 const theme = createTheme({
 	palette: {
@@ -104,7 +104,7 @@ function EmployeeProfile({ user, handleBack }) {
 	//FETCH DATA FOR HEAD EVAL
 	useEffect(() => {
 		axios
-			.get("http://localhost:8080/evaluation/getAllEvaluation")
+			.get(`${apiUrl}evaluation/getAllEvaluation`)
 			.then((response) => {
 				console.log("Fetched Evaluations:", response.data);
 
@@ -125,7 +125,7 @@ function EmployeeProfile({ user, handleBack }) {
 	//FETCH DATA FOR PEER EVAL
 	useEffect(() => {
 		axios
-			.get("http://localhost:8080/evaluation/evaluations")
+			.get(`${apiUrl}evaluation/evaluations`)
 			.then((response) => {
 				console.log("Fetched Evaluations:", response.data);
 
@@ -147,7 +147,7 @@ function EmployeeProfile({ user, handleBack }) {
 		const fetchEvaluations = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:8080/evaluation/getAllEvaluation"
+					`${apiUrl}evaluation/getAllEvaluation`
 				);
 				const data = response.data;
 
@@ -205,7 +205,7 @@ function EmployeeProfile({ user, handleBack }) {
 		const fetchUser = async () => {
 			try {
 				const response = await axios.get(
-					`http://localhost:8080/user/getUser/${user.userID}`
+					`${apiUrl}user/getUser/${user.userID}`
 				);
 				const data = response.data;
 
