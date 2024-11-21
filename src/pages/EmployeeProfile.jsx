@@ -350,7 +350,7 @@ function EmployeeProfile({ user, handleBack }) {
 		}
 
 		// Check for Filter evaluations per user
-		const filteredEvaluations = userData.filter(
+		const userEval = peerData.filter(
 			(evaluation) =>
 				evaluation.schoolYear === selectedYearEvaluation &&
 				evaluation.userId === user.userID &&
@@ -374,11 +374,12 @@ function EmployeeProfile({ user, handleBack }) {
 		);
 
 		// Check completion status for each evaluation stage
-		const hasCompletedValuesSelf = filteredEvaluations.some(
-			(evaluation) =>
-				evaluation.stage === "VALUES" &&
-				evaluation.evalType === "SELF" &&
-				evaluation.status === "COMPLETED"
+		const hasCompletedValuesSelf = userEval.some(
+			(evaluation) => evaluation.svbpaStatus === "COMPLETED"
+		);
+
+		const hasCompletedJobSelf = userEval.some(
+			(evaluation) => evaluation.sjbpStatus === "COMPLETED"
 		);
 
 		const hasCompletedValuesPeer = peerEval.some(
@@ -391,13 +392,6 @@ function EmployeeProfile({ user, handleBack }) {
 
 		const hasCompletedHeadJob = headEval.some(
 			(evaluation) => evaluation.hjbpStatus === "COMPLETED"
-		);
-
-		const hasCompletedJobSelf = filteredEvaluations.some(
-			(evaluation) =>
-				evaluation.stage === "JOB" &&
-				evaluation.evalType === "SELF" &&
-				evaluation.status === "COMPLETED"
 		);
 
 		const allValuesStagesCompleted =

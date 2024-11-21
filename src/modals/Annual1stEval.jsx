@@ -12,7 +12,7 @@ import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const AnnualFirstSemEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
+const Annual1stEval = ({ userId, filter, selectedYear,   }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -22,7 +22,7 @@ const AnnualFirstSemEval = ({ userId, filter, selectedYear, selectedSemester  })
   const [loading, setLoading] = useState(true);
 
   console.log("Selected Year ni:", selectedYear);
-  console.log("Selected Semester:", selectedSemester);
+
 
 
   useEffect(() => {
@@ -217,7 +217,7 @@ const calculatePeerAverage = (coreValue) => {
                 stage: "VALUES",
                 period: "Annual-1st",
                 schoolYear: selectedYear,
-                //semester: 'First Semester',
+                semester: 'First Semester',
               },
             }
           );
@@ -270,7 +270,7 @@ const calculatePeerAverage = (coreValue) => {
                 stage: "JOB",
                 period: "Annual-1st",
                 schoolYear: selectedYear,
-                //semester: selectedSemester,
+                semester: 'First Semester',
               },
             }
           );
@@ -336,7 +336,7 @@ const calculatePeerAverage = (coreValue) => {
                   period: "Annual-1st",
                   evalType: 'PEER-A',
                   schoolYear: selectedYear,
-                  // semester: 'First Semester',
+                  semester: 'First Semester',
                 },
                 
               }
@@ -1777,4 +1777,4 @@ const fetchHeadValuesAnnualFirst = async () => {
   );
 }
 
-export default AnnualFirstSemEval;
+export default Annual1stEval;
