@@ -18,7 +18,7 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?",
 };
 
-const AnnualSecondSemComments = ({ userId, filter }) => {
+const Annual1stComments = ({ userId, filter }) => {
   const role = sessionStorage.getItem("userRole");
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
@@ -48,14 +48,14 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
       const responses = responsesResponse.data;
   
       // Filter for only Annual 1st sem evaluations
-      const headResponsesForAnnualSecondSem = responses.filter((res) => {
+      const headResponsesForAnnualFirstSem = responses.filter((res) => {
         const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
         const isCorrectPeriod = res.evaluation?.period === "5th Month";
         return res.user.userID === userId && isHeadEvaluation && isCorrectPeriod;
       });
   
       // If no Annual 1st sem evaluation, leave comments blank
-      if (headResponsesForAnnualSecondSem.length === 0) {
+      if (headResponsesForAnnualFirstSem.length === 0) {
         console.log("No Annual 1st sem evaluation found, setting blank comments.");
         setCommentsData({
           27: "",
@@ -84,7 +84,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
       };
   
       const ids = {};
-      headResponsesForAnnualSecondSem.forEach((res) => {
+      headResponsesForAnnualFirstSem.forEach((res) => {
         ids[res.question.quesID] = res.responseID;
       });
   
@@ -533,4 +533,4 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
   );
 };
 
-export default AnnualSecondSemComments;
+export default Annual1stComments;

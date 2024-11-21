@@ -22,13 +22,46 @@ public class EvaluationDTO {
     private String hjbpStatus;
     private String hvbpaStatus;
     private String dateHired;
+
+    public String getSchoolYear() {
+        return schoolYear;
+    }
+
+    public void setSchoolYear(String schoolYear) {
+        this.schoolYear = schoolYear;
+    }
+
+    public LocalDate getSjbpDateTaken() {
+        return sjbpDateTaken;
+    }
+
+    private String schoolYear;
     private LocalDate sjbpDateTaken;
     private String period; // New field for period
+    private boolean is3rdEvalComplete= false;
+    private boolean is5thEvalComplete= false;
+
 
 
     
 
     // Getters and Setters
+
+    public boolean isIs3rdEvalComplete() {
+        return is3rdEvalComplete;
+    }
+
+    public void setIs3rdEvalComplete(boolean is3rdEvalComplete) {
+        this.is3rdEvalComplete = is3rdEvalComplete;
+    }
+
+    public boolean isIs5thEvalComplete() {
+        return is5thEvalComplete;
+    }
+
+    public void setIs5thEvalComplete(boolean is5thEvalComplete) {
+        this.is5thEvalComplete = is5thEvalComplete;
+    }
 
     public String getDateHired() {
         return dateHired;

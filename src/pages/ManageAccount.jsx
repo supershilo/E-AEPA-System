@@ -1071,7 +1071,7 @@ function ManageAccount() {
 
             <TableContainer
               sx={{
-                height: "29.55em",
+                height: "29.58em",
                 borderRadius: "5px 5px 0 0",
                 maxHeight: "100%",
                 maxWidth: "100%",
@@ -1081,7 +1081,7 @@ function ManageAccount() {
             >
               <Table stickyHeader aria-label="a dense table" size="small">
                 {/* Always render the TableHead */}
-                <TableHead sx={{ height: "2.3em" }}>
+                <TableHead sx={{ height: "2.67em" }}>
                   <TableRow>
                     {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
                       (column) => (
@@ -1178,8 +1178,7 @@ function ManageAccount() {
                             padding: "10px",
                           }}
                         >
-                          Oops! We couldn't find any results matching your
-                          search.
+                          Oops! We couldn't find anything.
                         </Typography>
                       </TableCell>
                     </TableRow>

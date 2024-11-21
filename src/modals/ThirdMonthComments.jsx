@@ -33,62 +33,49 @@ const ThirdMonthComments = ({ userId, filter }) => {
   const [editingCommentID, setEditingCommentID] = useState(null); // ID of the comment being edited
   const [responseIDs, setResponseIDs] = useState({});
 
-  // HEAD COMMENTS
-  const fetchCommentsAndResponseIDs = async () => {
-    try {
-      // Fetch comments
-      const commentsResponse = await axios.get(
-        `${apiUrl}response/getHeadComments/${userId}`
-      );
-      const comments = commentsResponse.data;
+ // Fetch comments and response IDs on component mount and when userId changes
+ const fetchCommentsAndResponseIDs = async () => {
+  try {
+    // Fetch comments
+    const commentsResponse = await axios.get(`${apiUrl}response/getHeadComments/${userId}`);
+    const comments = commentsResponse.data;
 
-      // Fetch response IDs
-      const responsesResponse = await axios.get(
-        `${apiUrl}response/getAllResponses`
-      );
-      const responses = responsesResponse.data;
+    // Fetch response IDs
+    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);
+    const responses = responsesResponse.data;
 
-      // Update comments and response IDs state
-      const initialData = {
-        27:
-          comments.find((comment) => comment.question.quesID === 27)
-            ?.comments || "",
-        28:
-          comments.find((comment) => comment.question.quesID === 28)
-            ?.comments || "",
-        29:
-          comments.find((comment) => comment.question.quesID === 29)
-            ?.comments || "",
-        30:
-          comments.find((comment) => comment.question.quesID === 30)
-            ?.comments || "",
-      };
+    // Update comments and response IDs state
+    const initialData = {
+      27: comments.find(comment => comment.question.quesID === 27)?.comments || '',
+      28: comments.find(comment => comment.question.quesID === 28)?.comments || '',
+      29: comments.find(comment => comment.question.quesID === 29)?.comments || '',
+      30: comments.find(comment => comment.question.quesID === 30)?.comments || ''
+    };
 
-      const ids = {};
-      responses.forEach((res) => {
-        const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
-        const isCorrectPeriod = res.evaluation?.period === "3rd Month";
-  
-        if (res.user.userID === userId && isHeadEvaluation && isCorrectPeriod) {
-          ids[res.question.quesID] = res.responseID;
-        }
-      });
-  
+    const ids = {};
+    responses.forEach(res => {
+      if (res.user.userID === userId) {
+        ids[res.question.quesID] = res.responseID;
+      }
+    });
 
-      setCommentsData(initialData);
-      setResponseIDs(ids);
-    } catch (error) {
-      console.error("Error fetching comments and responses:", error);
-    }
-  };
+    setCommentsData(initialData);
+    setResponseIDs(ids);
+  } catch (error) {
+    console.error('Error fetching comments and responses:', error);
+  }
+};
 
-  useEffect(() => {
-    fetchCommentsAndResponseIDs();
-  }, [userId]);
+useEffect(() => {
+  fetchCommentsAndResponseIDs();
+}, [userId]);
+
 
   const handleEditComment = (quesID) => {
+    console.log("Editing question ID:", quesID);
     setEditingCommentID(quesID);
   };
+  
 
   const handleCancelEdit = () => {
     setEditingCommentID(null);
@@ -96,33 +83,36 @@ const ThirdMonthComments = ({ userId, filter }) => {
 
   const handleSaveComment = async () => {
     const responseID = responseIDs[editingCommentID];
+    console.log("Editing Comment ID:", editingCommentID);
+    console.log("Retrieved Response ID:", responseID);
+  
     const dataToSend = {
       user: { userID: userId },
       question: { quesID: editingCommentID },
       comments: commentsData[editingCommentID],
     };
-
+  
     try {
       if (responseID) {
-        // Update existing comment
+        console.log("Updating comment:", dataToSend);
         await axios.put(
           `${apiUrl}response/updateHeadComment/${responseID}`,
           dataToSend
         );
-        console.log("Comment updated");
+        console.log("Comment updated successfully");
       } else {
-        // Create new comment
+        console.log("Creating new comment:", dataToSend);
         await axios.post(`${apiUrl}response/createHeadComment`, dataToSend);
-        console.log("Comment added");
+        console.log("Comment added successfully");
       }
-
-      // Clear editing state and refetch comments
+  
       setEditingCommentID(null);
-      await fetchCommentsAndResponseIDs(); // Refetch to get updated data
+      await fetchCommentsAndResponseIDs(); // Refetch updated comments
     } catch (error) {
-      console.error("Error saving comments:", error);
+      console.error("Error saving comment:", error.response?.data || error.message);
     }
   };
+  
 
   const handleCommentChange = (quesID, value) => {
     setCommentsData((prevData) => ({ ...prevData, [quesID]: value }));

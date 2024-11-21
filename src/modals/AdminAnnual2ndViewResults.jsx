@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, Menu, MenuItem, IconButton } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import Third from "../modals/3rdMonthEval";
+import Annual2ndEval from "./Annual2ndEval";
 import axios from "axios";
 import GeneratePDF from "../components/GeneratePDF"; // Import the GeneratePDF function
 import { apiUrl } from "../config/config";
@@ -175,7 +175,7 @@ const AdminViewResults = ({
 							Head
 						</MenuItem>
 					</Menu>
-					<Third
+					<Annual2ndEval
 						userId={employee.userID}
 						employee={employee}
 						filter={filter}

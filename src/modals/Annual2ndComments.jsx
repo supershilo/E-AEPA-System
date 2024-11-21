@@ -18,7 +18,7 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?",
 };
 
-const AnnualSecondSemComments = ({ userId, filter }) => {
+const Annual1stComments = ({ userId, filter }) => {
   const role = sessionStorage.getItem("userRole");
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
@@ -48,15 +48,15 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
       const responses = responsesResponse.data;
   
       // Filter for only Annual 1st sem evaluations
-      const headResponsesForAnnualSecondSem = responses.filter((res) => {
+      const headResponsesForAnnualFirstSem = responses.filter((res) => {
         const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
-        const isCorrectPeriod = res.evaluation?.period === "5th Month";
+        const isCorrectPeriod = res.evaluation?.period === "Annual-2nd";
         return res.user.userID === userId && isHeadEvaluation && isCorrectPeriod;
       });
   
       // If no Annual 1st sem evaluation, leave comments blank
-      if (headResponsesForAnnualSecondSem.length === 0) {
-        console.log("No Annual 1st sem evaluation found, setting blank comments.");
+      if (headResponsesForAnnualFirstSem.length === 0) {
+        console.log("No Annual 2nd sem evaluation found, setting blank comments.");
         setCommentsData({
           27: "",
           28: "",
@@ -84,7 +84,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
       };
   
       const ids = {};
-      headResponsesForAnnualSecondSem.forEach((res) => {
+      headResponsesForAnnualFirstSem.forEach((res) => {
         ids[res.question.quesID] = res.responseID;
       });
   
@@ -156,7 +156,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
             response.question?.quesID
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
-          const isCorrectPeriod = response.evaluation?.period === "Annual-1st";
+          const isCorrectPeriod = response.evaluation?.period === "Annual-2nd";
           return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod;
         });
 
@@ -244,7 +244,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
           `${apiUrl}assignedPeers/getAssignedPeersId`,
           {
             params: {
-              period: "Annual-1st",
+              period: "Annual-2nd",
               evaluateeId: userId,
             },
           }
@@ -280,7 +280,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
                   res.question?.quesID
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
-                const isCorrectPeriod = res.evaluation?.period === "Annual-1st";
+                const isCorrectPeriod = res.evaluation?.period === "Annual-2nd";
 
                 return (
                   isCorrectEvaluator &&
@@ -533,4 +533,4 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
   );
 };
 
-export default AnnualSecondSemComments;
+export default Annual1stComments;
