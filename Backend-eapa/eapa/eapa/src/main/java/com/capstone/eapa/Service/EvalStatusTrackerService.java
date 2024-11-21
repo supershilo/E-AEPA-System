@@ -46,13 +46,13 @@ public class EvalStatusTrackerService {
 
         // Create an entry for the first semester
         EvalStatusTrackerEntity firstSemEvalStatus = new EvalStatusTrackerEntity(
-                user, academicYear, firstSemester, false, null
+                user, academicYear, firstSemester, false, null, false
         );
         evalStatusRepo.save(firstSemEvalStatus);
 
         // Create an entry for the second semester
         EvalStatusTrackerEntity secondSemEvalStatus = new EvalStatusTrackerEntity(
-                user, academicYear, secondSemester, false, null
+                user, academicYear, secondSemester, false, null, false
         );
         evalStatusRepo.save(secondSemEvalStatus);
     }
@@ -80,6 +80,7 @@ public class EvalStatusTrackerService {
                     dto.setId(entity.getId());
                     dto.setCompleted(entity.isCompleted());
                     dto.setCompletedAt(entity.getCompletedAt() != null ? entity.getCompletedAt().toString() : null);
+                    dto.setSentResult(entity.isSentResult());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -107,6 +108,21 @@ public class EvalStatusTrackerService {
         dto.setId(updatedTracker.getId());
         dto.setCompleted(updatedTracker.isCompleted());
         dto.setCompletedAt(updatedTracker.getCompletedAt() != null ? updatedTracker.getCompletedAt().toString() : null);
+
+        return dto;
+    }
+
+    //update evaluation status isSentResult
+    public EvalStatusTrackerDTO updateEvalStatusSentResult(int trackerId, boolean isSentResult){
+        EvalStatusTrackerEntity tracker = evalStatusRepo.findById(trackerId).orElseThrow(() -> new RuntimeException("Evaluation status not found"));
+
+        tracker.setSentResult(isSentResult);
+        EvalStatusTrackerEntity updatedTracker = evalStatusRepo.save(tracker);
+
+        // Map to DTO
+        EvalStatusTrackerDTO dto = new EvalStatusTrackerDTO();
+        dto.setId(updatedTracker.getId());
+        dto.setSentResult(updatedTracker.isSentResult());
 
         return dto;
     }

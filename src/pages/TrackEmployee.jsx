@@ -213,7 +213,7 @@ function TrackEmployee() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 80,
+      minWidth: 70,
     },
     {
       id: "name",
@@ -589,7 +589,7 @@ function TrackEmployee() {
                     <TableBody>
                       <TableRow>
                         <TableCell
-                          sx={{ height: "29.8em", borderRadius: "5px 5px 0 0" }}
+                          sx={{ height: "29em", borderRadius: "5px 5px 0 0" }}
                           colSpan={columnsEmployees.length}
                           align="center"
                         >
