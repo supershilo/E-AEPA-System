@@ -110,7 +110,7 @@ function HeadEvalResult() {
           userID: item.userID,
           dateHired: item.dateHired,
         }))
-        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete || item.is5thEvalComplete) : (item.empStatus === 'Regular' /*& item.is1stAnnualComplete*/) ); // Filter based on selected tab
+        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete || item.is5thEvalComplete) : (item.empStatus === 'Regular' && item.sentResult ) ); // Filter based on selected tab
       
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
@@ -170,12 +170,12 @@ function HeadEvalResult() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 150,
+      minWidth: 50,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 120,
+      minWidth: 100,
       align: "center",
       format: (value) => formatName(value),
     },
@@ -196,7 +196,7 @@ function HeadEvalResult() {
     },
     {
       id: "is3rdEvalComplete",
-      label: "3rd Month Result Status",
+      label: "3rd Mon Result Status",
       align: "center",
       minWidth: 150,
       format: (value) => {
@@ -209,7 +209,7 @@ function HeadEvalResult() {
     },
     {
       id: "is5thEvalComplete",
-      label: "5th Month Result Status",
+      label: "5th Mon Result Status",
       align: "center",
       minWidth: 150,
       format: (value) => {
@@ -253,28 +253,28 @@ function HeadEvalResult() {
       }
     },
     {
-      id: "is1stAnnualEvalComplete",
-      label: "First Semester Result Status",
+      id: "period",
+      label: "1st Sem Result Status",
       align: "center",
       minWidth: 150,
       format: (value) => {
-        if (!value) {
-          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
+        if (value === "Annual-1st") {
+          return <span style={{ color: 'green', fontWeight: 'bold' }}>Available</span>;
         } else  {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
+          return <span style={{ color: 'orange', fontWeight: "bold" }}>Unavailable</span>;
         }
       },
     },
     {
       id: "is2ndAnnualEvalComplete",
-      label: "Second Semester Result Status",
+      label: "2nd Sem Result Status",
       align: "center",
       minWidth: 150,
       format: (value) => {
-        if (!value) {
-          return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
+        if (value === "Annual-2nd") {
+          return <span style={{ color: 'green', fontWeight: 'bold' }}>Available</span>;
         } else  {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
+          return <span style={{ color: 'orange', fontWeight: "bold" }}>Unavailable</span>;
         }
       },
     },
