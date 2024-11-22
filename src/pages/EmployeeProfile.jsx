@@ -37,7 +37,6 @@ import SendResultsModal from "../modals/SendResultsModal";
 import Send5thResultsModal from "../modals/Send5thResultsModal";
 import SendAnnual1st from "../modals/SendAnnual1stModal";
 import SendAnnual2nd from "../modals/SendAnnual2ndModal";
-import ThirdMonthEval from "../modals/3rdMonthEval";
 
 const theme = createTheme({
 	palette: {
@@ -89,6 +88,7 @@ function EmployeeProfile({ user, handleBack }) {
 	const [showAnnual1st, setShowAnnual1st] = useState(false);
 	const [showAnnual2nd, setShowAnnual2nd] = useState(false);
 	const [semester, setSemesters] = useState(" ");
+	const [currentAcadYear, setCurrentAcadYear] = useState(null);
 
 	//adi changes
 	const [openModal, setOpenModal] = useState(false);
@@ -100,11 +100,67 @@ function EmployeeProfile({ user, handleBack }) {
 	const handleClosPeerModal = () => {
 		setOpenModal(false);
 	};
+	//FETCH ACAD YEAR
+	useEffect(() => {
+		const fetchCurrentAcadYear = async () => {
+			try {
+				const response = await axios.get(
+					`${apiUrl}academicYear/current-year-full`
+				);
+				const currentYear = response.data;
+				setCurrentAcadYear(currentYear);
+			} catch (error) {
+				console.error("Failed to fetch academic year:", error);
+			}
+		};
+
+		fetchCurrentAcadYear();
+	}, []);
+	console.log("ACAD YEAR ID:", currentAcadYear?.id);
+
+	const [evalStatus, setEvalStatus] = useState([]);
+
+	useEffect(() => {
+		const fetchEvalStatus = async () => {
+			try {
+				const response = await axios.get(`${apiUrl}eval-status`, {
+					params: {
+						userId: userData?.userID,
+						academicYearId: currentAcadYear?.id,
+					},
+				});
+
+				setEvalStatus(response.data);
+			} catch (error) {
+				console.error(
+					"Error fetching and inserting eval status tracker:",
+					error
+				);
+			}
+		};
+
+		if (currentAcadYear) {
+			fetchEvalStatus();
+		}
+	}, [userData, currentAcadYear]);
+	console.log("USER AYD:", evalStatus);
+	console.log("USER ID FETCHED:", userData.userID);
+	console.log("STATUS:", isAnnual1stComplete);
+
+	useEffect(() => {
+		const assignStatus = () => {
+			setIsAnnual1stComplete(evalStatus[0]?.sentResult);
+		};
+
+		if (evalStatus) {
+			assignStatus();
+		}
+	}, [evalStatus]);
 
 	//FETCH DATA FOR HEAD EVAL
 	useEffect(() => {
 		axios
-			.get("http://localhost:8080/evaluation/getAllEvaluation")
+			.get(`${apiUrl}evaluation/getAllEvaluation`)
 			.then((response) => {
 				console.log("Fetched Evaluations:", response.data);
 
@@ -125,7 +181,7 @@ function EmployeeProfile({ user, handleBack }) {
 	//FETCH DATA FOR PEER EVAL
 	useEffect(() => {
 		axios
-			.get("http://localhost:8080/evaluation/evaluations")
+			.get(`${apiUrl}evaluation/evaluations`)
 			.then((response) => {
 				console.log("Fetched Evaluations:", response.data);
 
@@ -147,7 +203,7 @@ function EmployeeProfile({ user, handleBack }) {
 		const fetchEvaluations = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:8080/evaluation/getAllEvaluation"
+					`${apiUrl}evaluation/getAllEvaluation`
 				);
 				const data = response.data;
 
@@ -205,7 +261,7 @@ function EmployeeProfile({ user, handleBack }) {
 		const fetchUser = async () => {
 			try {
 				const response = await axios.get(
-					`http://localhost:8080/user/getUser/${user.userID}`
+					`${apiUrl}user/getUser/${user.userID}`
 				);
 				const data = response.data;
 
@@ -222,6 +278,33 @@ function EmployeeProfile({ user, handleBack }) {
 
 	console.log("ANG 3rd", is3rdEvalComplete);
 	console.log("ANG 5th", is5thEvalComplete);
+
+	useEffect(() => {
+		const fetchEvalStatus = async () => {
+			try {
+				const response = await axios.get(`${apiUrl}eval-status`, {
+					params: {
+						userId: user.userID,
+						academicYearId: currentAcadYear?.id,
+					},
+				});
+
+				setEvalStatus(response.data);
+			} catch (error) {
+				console.error(
+					"Error fetching and inserting eval status tracker:",
+					error
+				);
+			}
+		};
+
+		if (currentAcadYear) {
+			fetchEvalStatus();
+		}
+	}, [userData, currentAcadYear]);
+	console.log("USER AYD:", evalStatus);
+	console.log("USER ID FETCHED:", user.userID);
+	console.log("MAO NI ANG ID:", evalStatus[0]?.id);
 
 	const handleYearEvaluationChange = (event) => {
 		setSelectedYearEvaluation(event.target.value);
@@ -309,6 +392,11 @@ function EmployeeProfile({ user, handleBack }) {
 		setIs5thModal(false);
 	};
 
+	const handleConfirmAnnual1st = () => {
+		setIsAnnual1stComplete(true);
+		setAnnual1stModal(false);
+	};
+
 	const handleConfirmOpen = () => {
 		setIs3rdModal(true);
 	};
@@ -350,7 +438,7 @@ function EmployeeProfile({ user, handleBack }) {
 		}
 
 		// Check for Filter evaluations per user
-		const filteredEvaluations = userData.filter(
+		const userEval = peerData.filter(
 			(evaluation) =>
 				evaluation.schoolYear === selectedYearEvaluation &&
 				evaluation.userId === user.userID &&
@@ -374,11 +462,12 @@ function EmployeeProfile({ user, handleBack }) {
 		);
 
 		// Check completion status for each evaluation stage
-		const hasCompletedValuesSelf = filteredEvaluations.some(
-			(evaluation) =>
-				evaluation.stage === "VALUES" &&
-				evaluation.evalType === "SELF" &&
-				evaluation.status === "COMPLETED"
+		const hasCompletedValuesSelf = userEval.some(
+			(evaluation) => evaluation.svbpaStatus === "COMPLETED"
+		);
+
+		const hasCompletedJobSelf = userEval.some(
+			(evaluation) => evaluation.sjbpStatus === "COMPLETED"
 		);
 
 		const hasCompletedValuesPeer = peerEval.some(
@@ -393,17 +482,9 @@ function EmployeeProfile({ user, handleBack }) {
 			(evaluation) => evaluation.hjbpStatus === "COMPLETED"
 		);
 
-		const hasCompletedJobSelf = filteredEvaluations.some(
-			(evaluation) =>
-				evaluation.stage === "JOB" &&
-				evaluation.evalType === "SELF" &&
-				evaluation.status === "COMPLETED"
-		);
-
-		const allValuesStagesCompleted =
-			hasCompletedValuesSelf &&
-			// hasCompletedValuesPeer &&
-			hasCompletedJobSelf;
+		const allValuesStagesCompleted = hasCompletedValuesSelf;
+		// hasCompletedValuesPeer &&
+		//hasCompletedJobSelf;
 		// hasCompletedHeadValues &&
 		// hasCompletedHeadJob;
 
@@ -1022,8 +1103,9 @@ function EmployeeProfile({ user, handleBack }) {
 							)}
 							<SendAnnual1st
 								isOpen={annual1stModal}
+								evalId={evalStatus[0]?.id}
 								onCancel={handleAnnualModalClose}
-								onConfirm={handleConfirm5th}
+								onConfirm={handleConfirmAnnual1st}
 								empUserId={user.userID}
 							/>
 							{selectedEvaluationPeriod === "Annual-2nd" && (

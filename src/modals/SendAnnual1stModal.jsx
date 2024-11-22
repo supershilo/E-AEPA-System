@@ -6,8 +6,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { apiUrl } from "../config/config";
 
-function SendAnnual1st({ isOpen, onCancel, onConfirm, empUserId }) {
+function SendAnnual1st({ isOpen, onCancel, onConfirm, evalId }) {
 	const modalStyle = {
 		position: "absolute",
 		top: "50%",
@@ -25,13 +26,13 @@ function SendAnnual1st({ isOpen, onCancel, onConfirm, empUserId }) {
 
 	const handleConfirm = async () => {
 		try {
-			// First, send the PATCH request to update 3rd evaluation status
+			// First, send the PATCH request to update Annual evaluation status
 			const evalResponse = await axios.patch(
-				`http://localhost:8080/user/${empUserId}/5thEval`,
+				`${apiUrl}eval-status/update-sentResult/${evalId}`,
 				null,
 				{
 					params: {
-						status: true,
+						isSentResult: true,
 					},
 					headers: {
 						"Content-Type": "application/json",
@@ -41,7 +42,7 @@ function SendAnnual1st({ isOpen, onCancel, onConfirm, empUserId }) {
 			if (evalResponse.status === 200) {
 				onConfirm();
 			} else {
-				console.error("Failed to update the probeStatus.");
+				console.error("Failed to update the AnnualStatus.");
 			}
 		} catch (error) {
 			console.error("Error during the update process:", error);
