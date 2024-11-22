@@ -38,7 +38,6 @@ import Send5thResultsModal from "../modals/Send5thResultsModal";
 import SendAnnual1st from "../modals/SendAnnual1stModal";
 import SendAnnual2nd from "../modals/SendAnnual2ndModal";
 
-
 const theme = createTheme({
 	palette: {
 		secondary: {
@@ -89,6 +88,7 @@ function EmployeeProfile({ user, handleBack }) {
 	const [showAnnual1st, setShowAnnual1st] = useState(false);
 	const [showAnnual2nd, setShowAnnual2nd] = useState(false);
 	const [semester, setSemesters] = useState(" ");
+	const [currentAcadYear, setCurrentAcadYear] = useState(null);
 
 	//adi changes
 	const [openModal, setOpenModal] = useState(false);
@@ -100,6 +100,62 @@ function EmployeeProfile({ user, handleBack }) {
 	const handleClosPeerModal = () => {
 		setOpenModal(false);
 	};
+	//FETCH ACAD YEAR
+	useEffect(() => {
+		const fetchCurrentAcadYear = async () => {
+			try {
+				const response = await axios.get(
+					`${apiUrl}academicYear/current-year-full`
+				);
+				const currentYear = response.data;
+				setCurrentAcadYear(currentYear);
+			} catch (error) {
+				console.error("Failed to fetch academic year:", error);
+			}
+		};
+
+		fetchCurrentAcadYear();
+	}, []);
+	console.log("ACAD YEAR ID:", currentAcadYear?.id);
+
+	const [evalStatus, setEvalStatus] = useState([]);
+
+	useEffect(() => {
+		const fetchEvalStatus = async () => {
+			try {
+				const response = await axios.get(`${apiUrl}eval-status`, {
+					params: {
+						userId: userData?.userID,
+						academicYearId: currentAcadYear?.id,
+					},
+				});
+
+				setEvalStatus(response.data);
+			} catch (error) {
+				console.error(
+					"Error fetching and inserting eval status tracker:",
+					error
+				);
+			}
+		};
+
+		if (currentAcadYear) {
+			fetchEvalStatus();
+		}
+	}, [userData, currentAcadYear]);
+	console.log("USER AYD:", evalStatus);
+	console.log("USER ID FETCHED:", userData.userID);
+	console.log("STATUS:", isAnnual1stComplete);
+
+	useEffect(() => {
+		const assignStatus = () => {
+			setIsAnnual1stComplete(evalStatus[0]?.sentResult);
+		};
+
+		if (evalStatus) {
+			assignStatus();
+		}
+	}, [evalStatus]);
 
 	//FETCH DATA FOR HEAD EVAL
 	useEffect(() => {
@@ -223,6 +279,33 @@ function EmployeeProfile({ user, handleBack }) {
 	console.log("ANG 3rd", is3rdEvalComplete);
 	console.log("ANG 5th", is5thEvalComplete);
 
+	useEffect(() => {
+		const fetchEvalStatus = async () => {
+			try {
+				const response = await axios.get(`${apiUrl}eval-status`, {
+					params: {
+						userId: user.userID,
+						academicYearId: currentAcadYear?.id,
+					},
+				});
+
+				setEvalStatus(response.data);
+			} catch (error) {
+				console.error(
+					"Error fetching and inserting eval status tracker:",
+					error
+				);
+			}
+		};
+
+		if (currentAcadYear) {
+			fetchEvalStatus();
+		}
+	}, [userData, currentAcadYear]);
+	console.log("USER AYD:", evalStatus);
+	console.log("USER ID FETCHED:", user.userID);
+	console.log("MAO NI ANG ID:", evalStatus[0]?.id);
+
 	const handleYearEvaluationChange = (event) => {
 		setSelectedYearEvaluation(event.target.value);
 	};
@@ -307,6 +390,11 @@ function EmployeeProfile({ user, handleBack }) {
 	const handleConfirm5th = () => {
 		setIs5thEvalComplete(true);
 		setIs5thModal(false);
+	};
+
+	const handleConfirmAnnual1st = () => {
+		setIsAnnual1stComplete(true);
+		setAnnual1stModal(false);
 	};
 
 	const handleConfirmOpen = () => {
@@ -394,10 +482,9 @@ function EmployeeProfile({ user, handleBack }) {
 			(evaluation) => evaluation.hjbpStatus === "COMPLETED"
 		);
 
-		const allValuesStagesCompleted =
-			hasCompletedValuesSelf &&
-			// hasCompletedValuesPeer &&
-			hasCompletedJobSelf;
+		const allValuesStagesCompleted = hasCompletedValuesSelf;
+		// hasCompletedValuesPeer &&
+		//hasCompletedJobSelf;
 		// hasCompletedHeadValues &&
 		// hasCompletedHeadJob;
 
@@ -1016,8 +1103,9 @@ function EmployeeProfile({ user, handleBack }) {
 							)}
 							<SendAnnual1st
 								isOpen={annual1stModal}
+								evalId={evalStatus[0]?.id}
 								onCancel={handleAnnualModalClose}
-								onConfirm={handleConfirm5th}
+								onConfirm={handleConfirmAnnual1st}
 								empUserId={user.userID}
 							/>
 							{selectedEvaluationPeriod === "Annual-2nd" && (
