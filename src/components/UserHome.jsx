@@ -521,6 +521,7 @@ function UserHome() {
                           width: "50px",
                           borderRadius: "50%",
                           //border: "1px solid black",
+                          border: "2px solid #c6c6c6",
                         }}
                       >
                         <img
@@ -531,7 +532,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : null
+                              : defaultProfie
                           }
                           alt=""
                         />

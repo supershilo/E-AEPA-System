@@ -1,5 +1,5 @@
 // NOTIFICATION KUWANG IF MADA
-//makita ang staff sa table if ting eval na like if after 3 months sa date hired, makita dri dayon 
+//makita ang staff sa table if ting eval na like if after 3 months sa date hired, makita dri dayon
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
 import {
@@ -520,10 +520,11 @@ function TrackEmployee() {
             ) : (
               <TableContainer
                 sx={{
-                  height: "29.8em",
+                  height: "30em",
                   borderRadius: "5px 5px 0 0 ",
                   border: "1px solid lightgray",
                   width: "100%",
+                  //backgroundColor: "lightgreen",
                 }}
               >
                 <Table stickyHeader aria-label="sticky table" size="small">

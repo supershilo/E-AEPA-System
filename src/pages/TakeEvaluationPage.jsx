@@ -533,7 +533,7 @@ function TakeEvaluationPage() {
   const [annualFirstSemStatus, setAnnualFirstSemStatus] = useState(null);
   const [annualSecondSemStatus, setAnnualSecondSemStatus] = useState(null);
 
-  const [shouldDisplayAnnual1st, setShouldDisplayAnnual1st] = useState(true);
+  const [shouldDisplayAnnual1st, setShouldDisplayAnnual1st] = useState(false);
   const [shouldDisplayAnnual2nd, setShouldDisplayAnnual2nd] = useState(false);
 
   useEffect(() => {
