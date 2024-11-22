@@ -147,14 +147,11 @@ function EvaluationForm({
     if (evaluationID) {
       const fetchPeerID = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:8080/evaluation/getPeerID`,
-            {
-              params: {
-                evalID: evaluationID,
-              },
-            }
-          );
+          const response = await axios.get(`${apiUrl}evaluation/getPeerID`, {
+            params: {
+              evalID: evaluationID,
+            },
+          });
           console.log("Fetched Peer ID:", response.data);
           setrandomPID(response.data);
         } catch (error) {
@@ -268,17 +265,14 @@ function EvaluationForm({
       let response = null;
       try {
         if (evalType === "PEER") {
-          response = await axios.get(
-            "http://localhost:8080/evaluation/getEvalID",
-            {
-              params: {
-                userID: userId,
-                period: evalPeriod,
-                stage: stageType,
-                evalType: formType,
-              },
-            }
-          );
+          response = await axios.get(`${apiUrl}evaluation/getEvalID`, {
+            params: {
+              userID: userId,
+              period: evalPeriod,
+              stage: stageType,
+              evalType: formType,
+            },
+          });
         } else if (evalType === "PEER-A") {
           response = await axios.get(
             `${apiUrl}evaluation/getEvalIDAssignedPeer`,
@@ -313,7 +307,7 @@ function EvaluationForm({
           });
         }
 
-        console.log("check: ",response.data);
+        console.log("check: ", response.data);
         setEvaluationID(response.data);
       } catch (error) {
         if (error.response) {
