@@ -216,7 +216,8 @@ function NavBar() {
     setPassword("");
     setOpenPasswordModal(true);
   };
-  const handleSwitchConfirm = async () => {
+  const handleSwitchConfirm = async (e) => {
+    e.preventDefault();
     setMessage("");
     try {
       const response = await axios.post(`${apiUrl}swapAccount`, {
