@@ -33,15 +33,35 @@ public class EvalStatusTrackerEntity {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    private boolean isSentResult = false;
+
     public EvalStatusTrackerEntity() {
     }
 
-    public EvalStatusTrackerEntity(UserEntity user, AcademicYearEntity academicYear, SemesterEntity semester, boolean isCompleted, LocalDateTime completedAt) {
+//    public EvalStatusTrackerEntity(UserEntity user, AcademicYearEntity academicYear, SemesterEntity semester, boolean isCompleted, LocalDateTime completedAt) {
+//        this.user = user;
+//        this.academicYear = academicYear;
+//        this.semester = semester;
+//        this.isCompleted = isCompleted;
+//        this.completedAt = completedAt;
+//    }
+
+
+    public EvalStatusTrackerEntity(UserEntity user, AcademicYearEntity academicYear, SemesterEntity semester, boolean isCompleted, LocalDateTime completedAt, boolean isSentResult) {
         this.user = user;
         this.academicYear = academicYear;
         this.semester = semester;
         this.isCompleted = isCompleted;
         this.completedAt = completedAt;
+        this.isSentResult = isSentResult;
+    }
+
+    public boolean isSentResult() {
+        return isSentResult;
+    }
+
+    public void setSentResult(boolean sentResult) {
+        isSentResult = sentResult;
     }
 
     public int getId() {

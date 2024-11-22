@@ -1,4 +1,4 @@
-//SAYOP PA ANG PAG DISPLAY ANI, DAPAT ANG MO DISPLAY DRI KAY KTO NG MGA COMPLETED 
+//SAYOP PA ANG PAG DISPLAY ANI, DAPAT ANG MO DISPLAY DRI KAY KTO NG MGA COMPLETED
 //OR ANG MGA EMPLOYEES NA GSEND NA ANG RESULT GIKAN SA ADMIN
 // SI DATEHIRED D MO DISPLAY
 import React, { useState, useEffect, useMemo } from "react";
@@ -9,7 +9,7 @@ import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 
 function HeadEvalResult() {
   const userID = sessionStorage.getItem("userID");
@@ -22,13 +22,14 @@ function HeadEvalResult() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
-  const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  const startPageGroup =
+    Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
   const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
 
   const handlePageChange = (newPage) => {
@@ -100,7 +101,9 @@ function HeadEvalResult() {
       
       // Filter processed data based on selected tab
       const processedData = allUsersData
-        .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
+        .filter(
+          (item) => item.role === "EMPLOYEE" && item.dept === userData.dept
+        )
         .map((item) => ({
           ...item,
           name: `${item.fName} ${item.lName}`,
@@ -145,13 +148,13 @@ function HeadEvalResult() {
       const userData = await response.json();
       setViewRatingsModal(true);
       setEmployee(userData);
+      console.log("Emp id:", employee?.userID);
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
       setLoading(false); // Stop the loader
     }
   };
-
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -167,16 +170,15 @@ function HeadEvalResult() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 90,
+      minWidth: 150,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 100,
+      minWidth: 120,
       align: "center",
       format: (value) => formatName(value),
     },
-
 
     {
       id: "dateHired",
@@ -185,12 +187,12 @@ function HeadEvalResult() {
       align: "center",
       format: (value) => {
         const date = new Date(value);
-        return date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
-      }
+      },
     },
     {
       id: "is3rdEvalComplete",
@@ -292,16 +294,30 @@ function HeadEvalResult() {
       />
       <Animated>
         {showPasswordModal ? (
-          <Skeleton variant="text" sx={{ fontSize: '3em', width: '8em', ml: '1em', mt: '.3em' }}></Skeleton>
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "3em", width: "8em", ml: "1em", mt: ".3em" }}
+          ></Skeleton>
         ) : (
-          <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>
+          <Typography
+            ml={4}
+            mt={3}
+            sx={{
+              fontFamily: "Poppins",
+              fontWeight: "bold",
+              fontSize: "1.5em",
+            }}
+          >
             Employee Evaluation Results
           </Typography>
         )}
         {showPasswordModal ? (
-          <Skeleton variant="text" sx={{ fontSize: '3em', width: '6em', ml: '1em', }}></Skeleton>
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "3em", width: "6em", ml: "1em" }}
+          ></Skeleton>
         ) : (
-          <div className="ml-8 mt-2">
+          <div className="ml-4 mt-2">
             <div className="mr-10  flex items-center justify-between">
               <div className="ml-4 flex items-center justify-start">
                 <TextField
@@ -309,18 +325,18 @@ function HeadEvalResult() {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   sx={{
-
                     "& .MuiOutlinedInput-root": {
                       backgroundColor: "#ffffff", // Set the background color for the entire input area
                     },
-                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                      borderWidth: "1px",
-                      borderColor: "#e0e0e0",
-                    },
+                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderWidth: "1px",
+                        borderColor: "#e0e0e0",
+                      },
                     "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                    {
-                      borderColor: "#e0e0e0",
-                    },
+                      {
+                        borderColor: "#e0e0e0",
+                      },
                     "&:focus-within": {
                       "& fieldset": {
                         borderColor: "#8C383E !important",
@@ -354,7 +370,7 @@ function HeadEvalResult() {
                 <Skeleton variant="rectangular" width='80em' height={500} sx={{marginLeft: 6, marginTop:3}}  />
             ) : (
               <>
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml:0.4,mt: 4, width: "93.5%" } }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml:0.4,mt: 4, width: "100%", } }}>
           <Grid container
             spacing={1.5}
             sx={{
@@ -368,7 +384,7 @@ function HeadEvalResult() {
                 <Grid
                   item
                   xs={12}
-                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em",ml:5 }}
+                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em",ml:3 }}
                 >
                   <Tabs
                     value={selectedTab}
@@ -379,19 +395,19 @@ function HeadEvalResult() {
                     <Tab label={`Regular Employees`} sx={tabStyle} />
                   </Tabs>
                 </Grid>
-                <TableContainer sx={{ height: '29.5em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' ,ml:6}}>
+                <TableContainer sx={{ height: '28em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' , width: "95%", margin: "auto"}}>
                   <Table stickyHeader aria-label="sticky table" size="small">
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
                         {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
-                          <TableCell
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                          >
-                            {column.label}
-                          </TableCell>
+                       <TableCell
+                       sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                       key={column.id}
+                       align={column.align}
+                       style={{ minWidth: column.minWidth }}
+                     >
+                       {column.label}
+                     </TableCell>
                         ))}
                       </TableRow>
                     </TableHead>
@@ -449,8 +465,8 @@ function HeadEvalResult() {
         {showPasswordModal ? (
           <Skeleton variant="rectangular" width="100%" height="100%" />
         ) : (
-          < div
-            className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
+          <div
+            className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-4"
             style={{
               position: "relative", // Change to relative to keep it in place
               // bottom: 200,
@@ -458,7 +474,7 @@ function HeadEvalResult() {
               // transform: "translateX(-50%)",
               display: "flex",
               alignItems: "center",
-              ml: '4em'
+              ml: "4em",
             }}
           >
             <ol className="flex justify-end gap-1 text-xs font-medium">
@@ -484,20 +500,24 @@ function HeadEvalResult() {
                 </a>
               </li>
 
-              {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
-                <li key={startPageGroup + index}>
-                  <a
-                    href="#"
-                    className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
-                      ? "border-pink-900 bg-pink-900 text-white"
-                      : "border-gray-100 bg-white text-gray-900"
+              {Array.from(
+                { length: endPageGroup - startPageGroup + 1 },
+                (_, index) => (
+                  <li key={startPageGroup + index}>
+                    <a
+                      href="#"
+                      className={`block h-8 w-8 rounded border ${
+                        currentPage === startPageGroup + index
+                          ? "border-pink-900 bg-pink-900 text-white"
+                          : "border-gray-100 bg-white text-gray-900"
                       } text-center leading-8`}
-                    onClick={() => handlePageChange(startPageGroup + index)}
-                  >
-                    {startPageGroup + index}
-                  </a>
-                </li>
-              ))}
+                      onClick={() => handlePageChange(startPageGroup + index)}
+                    >
+                      {startPageGroup + index}
+                    </a>
+                  </li>
+                )
+              )}
 
               <li>
                 <a
@@ -523,9 +543,8 @@ function HeadEvalResult() {
             </ol>
           </div>
         )}
-
-      </Animated >
-    </div >
+      </Animated>
+    </div>
   );
 }
 

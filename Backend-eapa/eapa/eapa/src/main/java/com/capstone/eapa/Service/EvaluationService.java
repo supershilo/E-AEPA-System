@@ -228,8 +228,8 @@ public class EvaluationService {
                     String lName = user.getlName();
                     Role role = user.getRole();
                     String dateHired = user.getDateHired();
-                    boolean is3rdEvalComplete = user.isIs3rdEvalComplete();
-                    boolean is5thEvalComplete = user.isIs5thEvalComplete();
+                    boolean is3rdEvalComplete = user.getIs3rdEvalComplete();
+                    boolean is5thEvalComplete = user.getIs5thEvalComplete();
 
                     List<EvaluationEntity> userEvaluations = entry.getValue();
 
@@ -260,12 +260,15 @@ public class EvaluationService {
                             });
 
                     List<LocalDate> evaluationDates = new ArrayList<>();
+                    String schoolYear = null; // Initialize schoolYear variable
                     for (EvaluationEntity eval : userEvaluations) {
                         LocalDate dateTaken = eval.getDateTaken();
                         evaluationDates.add(dateTaken);
-
+                        if (schoolYear == null) {
+                            schoolYear = eval.getSchoolYear();
+                        }
                         dto.setPeriod(eval.getPeriod());
-
+                        dto.setSchoolYear(schoolYear != null ? schoolYear : "N/A");
                         switch (eval.getEvalType() + "-" + eval.getStage()) {
                             case "SELF-JOB":
                                 dto.setSjbpStatus(eval.getStatus());

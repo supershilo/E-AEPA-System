@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, Menu, MenuItem, IconButton } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import Fifth from "../modals/5thMonthEval";
+import Annual2ndEval from "./Annual2ndEval";
 import axios from "axios";
 import GeneratePDF from "../components/GeneratePDF"; // Import the GeneratePDF function
 import { apiUrl } from "../config/config";
@@ -27,7 +27,15 @@ const selectedMenuItemStyles = {
 	},
 };
 
-const AdminViewResults = ({ userId, open, onClose, employee, role, selectedSemester, selectedYear }) => {
+const AdminViewResults = ({
+	userId,
+	open,
+	onClose,
+	employee,
+	role,
+	selectedYear,
+	selectedSemester,
+}) => {
 	const [filter, setFilter] = useState("overall");
 	const [selectedStaff, setSelectedStaff] = useState(employee);
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -167,7 +175,7 @@ const AdminViewResults = ({ userId, open, onClose, employee, role, selectedSemes
 							Head
 						</MenuItem>
 					</Menu>
-					<Fifth
+					<Annual2ndEval
 						userId={employee.userID}
 						employee={employee}
 						filter={filter}

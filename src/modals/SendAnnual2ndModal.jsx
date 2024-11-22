@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { apiUrl } from "../config/config";
 
-function SendResultsModal({ isOpen, onCancel, onConfirm, empUserId }) {
+function SendAnnual1st({ isOpen, onCancel, onConfirm, empUserId }) {
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -28,7 +28,7 @@ function SendResultsModal({ isOpen, onCancel, onConfirm, empUserId }) {
     try {
       // First, send the PATCH request to update 3rd evaluation status
       const evalResponse = await axios.patch(
-        `${apiUrl}user/${empUserId}/5thEval`,
+        `${apiUrl}eval-status/update-sentResult/${evalId}`,
         null,
         {
           params: {
@@ -138,4 +138,4 @@ function SendResultsModal({ isOpen, onCancel, onConfirm, empUserId }) {
   );
 }
 
-export default SendResultsModal;
+export default SendAnnual1st;

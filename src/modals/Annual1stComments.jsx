@@ -18,9 +18,8 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?",
 };
 
-const ThirdMonthComments = ({ userId, filter }) => {
+const Annual1stComments = ({ userId, filter }) => {
   const role = sessionStorage.getItem("userRole");
-  console.log("Si role:", role);
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
   const [commentsData, setCommentsData] = useState({
@@ -33,49 +32,77 @@ const ThirdMonthComments = ({ userId, filter }) => {
   const [editingCommentID, setEditingCommentID] = useState(null); // ID of the comment being edited
   const [responseIDs, setResponseIDs] = useState({});
 
- // Fetch comments and response IDs on component mount and when userId changes
- const fetchCommentsAndResponseIDs = async () => {
-  try {
-    // Fetch comments
-    const commentsResponse = await axios.get(`${apiUrl}response/getHeadComments/${userId}`);
-    const comments = commentsResponse.data;
-
-    // Fetch response IDs
-    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);
-    const responses = responsesResponse.data;
-
-    // Update comments and response IDs state
-    const initialData = {
-      27: comments.find(comment => comment.question.quesID === 27)?.comments || '',
-      28: comments.find(comment => comment.question.quesID === 28)?.comments || '',
-      29: comments.find(comment => comment.question.quesID === 29)?.comments || '',
-      30: comments.find(comment => comment.question.quesID === 30)?.comments || ''
-    };
-
-    const ids = {};
-    responses.forEach(res => {
-      if (res.user.userID === userId) {
-        ids[res.question.quesID] = res.responseID;
+  // Fetch comments and response IDs on component mount and when userId changes
+  const fetchCommentsAndResponseIDs = async () => {
+    try {
+      // Fetch comments
+      const commentsResponse = await axios.get(
+        `${apiUrl}response/getHeadComments/${userId}`
+      );
+      const comments = commentsResponse.data;
+  
+      // Fetch response IDs
+      const responsesResponse = await axios.get(
+        `${apiUrl}response/getAllResponses`
+      );
+      const responses = responsesResponse.data;
+  
+      // Filter for only Annual 1st sem evaluations
+      const headResponsesForAnnualFirstSem = responses.filter((res) => {
+        const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
+        const isCorrectPeriod = res.evaluation?.period === "5th Month";
+        return res.user.userID === userId && isHeadEvaluation && isCorrectPeriod;
+      });
+  
+      // If no Annual 1st sem evaluation, leave comments blank
+      if (headResponsesForAnnualFirstSem.length === 0) {
+        console.log("No Annual 1st sem evaluation found, setting blank comments.");
+        setCommentsData({
+          27: "",
+          28: "",
+          29: "",
+          30: ""
+        });
+        setResponseIDs({});
+        return;
       }
-    });
-
-    setCommentsData(initialData);
-    setResponseIDs(ids);
-  } catch (error) {
-    console.error('Error fetching comments and responses:', error);
-  }
-};
-
-useEffect(() => {
-  fetchCommentsAndResponseIDs();
-}, [userId]);
-
-
-  const handleEditComment = (quesID) => {
-    console.log("Editing question ID:", quesID);
-    setEditingCommentID(quesID);
+  
+      // Proceed to populate comments and response IDs
+      const initialData = {
+        27:
+          comments.find((comment) => comment.question.quesID === 27)
+            ?.comments || "",
+        28:
+          comments.find((comment) => comment.question.quesID === 28)
+            ?.comments || "",
+        29:
+          comments.find((comment) => comment.question.quesID === 29)
+            ?.comments || "",
+        30:
+          comments.find((comment) => comment.question.quesID === 30)
+            ?.comments || "",
+      };
+  
+      const ids = {};
+      headResponsesForAnnualFirstSem.forEach((res) => {
+        ids[res.question.quesID] = res.responseID;
+      });
+  
+      setCommentsData(initialData);
+      setResponseIDs(ids);
+    } catch (error) {
+      console.error("Error fetching comments and responses:", error);
+    }
   };
   
+
+  useEffect(() => {
+    fetchCommentsAndResponseIDs();
+  }, [userId]);
+
+  const handleEditComment = (quesID) => {
+    setEditingCommentID(quesID);
+  };
 
   const handleCancelEdit = () => {
     setEditingCommentID(null);
@@ -83,36 +110,33 @@ useEffect(() => {
 
   const handleSaveComment = async () => {
     const responseID = responseIDs[editingCommentID];
-    console.log("Editing Comment ID:", editingCommentID);
-    console.log("Retrieved Response ID:", responseID);
-  
     const dataToSend = {
       user: { userID: userId },
       question: { quesID: editingCommentID },
       comments: commentsData[editingCommentID],
     };
-  
+
     try {
       if (responseID) {
-        console.log("Updating comment:", dataToSend);
+        // Update existing comment
         await axios.put(
           `${apiUrl}response/updateHeadComment/${responseID}`,
           dataToSend
         );
-        console.log("Comment updated successfully");
+        console.log("Comment updated");
       } else {
-        console.log("Creating new comment:", dataToSend);
+        // Create new comment
         await axios.post(`${apiUrl}response/createHeadComment`, dataToSend);
-        console.log("Comment added successfully");
+        console.log("Comment added");
       }
-  
+
+      // Clear editing state and refetch comments
       setEditingCommentID(null);
-      await fetchCommentsAndResponseIDs(); // Refetch updated comments
+      await fetchCommentsAndResponseIDs(); // Refetch to get updated data
     } catch (error) {
-      console.error("Error saving comment:", error.response?.data || error.message);
+      console.error("Error saving comments:", error);
     }
   };
-  
 
   const handleCommentChange = (quesID, value) => {
     setCommentsData((prevData) => ({ ...prevData, [quesID]: value }));
@@ -132,7 +156,7 @@ useEffect(() => {
             response.question?.quesID
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
-          const isCorrectPeriod = response.evaluation?.period === "3rd Month";
+          const isCorrectPeriod = response.evaluation?.period === "Annual-1st";
           return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod;
         });
 
@@ -220,7 +244,7 @@ useEffect(() => {
           `${apiUrl}assignedPeers/getAssignedPeersId`,
           {
             params: {
-              period: "3rd Month",
+              period: "Annual-1st",
               evaluateeId: userId,
             },
           }
@@ -256,7 +280,7 @@ useEffect(() => {
                   res.question?.quesID
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
-                const isCorrectPeriod = res.evaluation?.period === "3rd Month";
+                const isCorrectPeriod = res.evaluation?.period === "Annual-1st";
 
                 return (
                   isCorrectEvaluator &&
@@ -509,4 +533,4 @@ useEffect(() => {
   );
 };
 
-export default ThirdMonthComments;
+export default Annual1stComments;

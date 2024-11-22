@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import imageSources from "../data/imageSource";
 import evaluate from "../assets/evaluate.png";
+import defaultProfie from "../assets/default-profile.png";
 import select from "../assets/select.png";
 import done from "../assets/done.png";
 import ManageAccoount from "../assets/ManageAccount.png";
@@ -11,6 +12,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { apiUrl } from "../config/config";
+import { Link } from "react-router-dom";
 
 function UserHome() {
   const [loggedUserData, setLoggedUserData] = useState({});
@@ -148,7 +150,6 @@ function UserHome() {
             //backgroundColor: "lavender",
             width: "100%",
             height: "100%",
-            
           }}
         >
           <div
@@ -521,6 +522,7 @@ function UserHome() {
                           width: "50px",
                           borderRadius: "50%",
                           //border: "1px solid black",
+                          border: "2px solid #c6c6c6",
                         }}
                       >
                         <img
@@ -531,7 +533,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : null
+                              : defaultProfie
                           }
                           alt=""
                         />
@@ -548,7 +550,7 @@ function UserHome() {
                         }}
                       >
                         <h1>
-                          {staff.fName} {staff.lName}
+                        {staff.fName} {staff.lName}
                         </h1>
                         <p>{staff.position}</p>
                       </div>
@@ -578,7 +580,7 @@ function UserHome() {
                           height: "50px",
                           width: "50px",
                           borderRadius: "50%",
-                          //border: "1px solid black",
+                          border: "2px solid #c6c6c6",
                         }}
                       >
                         <img
@@ -589,7 +591,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : null
+                              : defaultProfie
                           }
                           alt=""
                         />
@@ -606,7 +608,15 @@ function UserHome() {
                         }}
                       >
                         <h1>
+                        <Link to={`/viewProfile/${staff.userID}`}
+                          style={{
+                            textDecoration: 'none',
+                          }}
+                          onMouseEnter={(e) => { e.target.style.textDecoration = "underline"; }}
+                          onMouseLeave={(e) => { e.target.style.textDecoration = "none"; }}
+                        >
                           {staff.fName} {staff.lName}
+                          </Link>
                         </h1>
                         <p>{staff.position}</p>
                       </div>

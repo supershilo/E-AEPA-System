@@ -1,5 +1,3 @@
- 
-
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
 import {
@@ -54,9 +52,8 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; //p
 import axios from "axios";
 import Animated from "../components/motion";
 import { BorderBottom } from "@mui/icons-material";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 import Loader from "../components/Loader";
-
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -238,9 +235,22 @@ function ManageAccount() {
     setProbeStatus(event.target.value);
   };
 
+  const [selectedDeptId, setSelectedDeptId] = useState(0);
+
   const handledept = (event) => {
-    setdept(event.target.value);
+    const selectedDeptName = event.target.value;
+
+    // Find the selected department object
+    const selectedDept = availableDepartments.find(
+      (dept) => dept.deptName === selectedDeptName
+    );
+
+    setdept(selectedDeptName);
+    setSelectedDeptId(selectedDept ? selectedDept.deptID : 0);
   };
+
+  console.log("Selected Dept:", dept);
+  console.log("Selected Dept Id:", selectedDeptId);
 
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
@@ -482,7 +492,7 @@ function ManageAccount() {
         });
 
         setDepartments(departmentsWithHeads);
-        console.log(departmentsWithHeads);
+        console.log("Department with heads", departmentsWithHeads);
       } catch (error) {
         if (error.response) {
           console.log(error.response.data);
@@ -600,6 +610,8 @@ function ManageAccount() {
         role: role,
       };
 
+      const newOfficeHead = `${firstname} ${lastname}`;
+
       if (role !== "ADMIN") {
         userData.workEmail = emailChange;
       }
@@ -611,6 +623,24 @@ function ManageAccount() {
         },
         body: JSON.stringify(userData),
       });
+
+      console.log("Selected Department ID:", selectedDeptId);
+      //console.log("Full Name:", fullName);
+
+      if (role === "HEAD") {
+        const deptHeadResp = await axios.patch(
+          `${apiUrl}department/${selectedDeptId}/office-head`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            params: { newOfficeHead },
+          }
+        );
+
+        console.log("Department Head assigned:", deptHeadResp.data);
+      }
 
       if (response.ok) {
         showSuccessAlert("User registered successfully");
@@ -644,6 +674,8 @@ function ManageAccount() {
     role === "HEAD"
       ? departments.filter((dept) => !dept.deptOfficeHead)
       : departments;
+
+  console.log("Available Department:", availableDepartments);
 
   const handleClickEditBtn = async (userID) => {
     try {
@@ -977,7 +1009,7 @@ function ManageAccount() {
                   display: "flex-end",
                   height: "2.5em",
                   width: "9em",
-                  marginRight:"1.5em",
+                  marginRight: "1.5em",
                   fontFamily: "Poppins",
                   backgroundColor: "#8c383e",
                   padding: "1px 1px 0 0 ",
@@ -1039,35 +1071,37 @@ function ManageAccount() {
 
             <TableContainer
               sx={{
-                height: '29.58em',
+                height: "29.58em",
                 borderRadius: "5px 5px 0 0",
                 maxHeight: "100%",
-                maxWidth: '100%',
-                position: 'relative',
-                border: '1px solid lightgray',
+                maxWidth: "100%",
+                position: "relative",
+                border: "1px solid lightgray",
               }}
             >
               <Table stickyHeader aria-label="a dense table" size="small">
                 {/* Always render the TableHead */}
-                <TableHead sx={{ height: '2.67em' }}>
+                <TableHead sx={{ height: "2.67em" }}>
                   <TableRow>
-                    {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{
-                          fontFamily: "Poppins",
-                          bgcolor: "#8c383e",
-                          color: "white",
-                          fontWeight: 500,
-                        }}
-                        key={column.id}
-                        align={column.align}
-                        style={{ minWidth: column.minWidth }}
-                      >
-                        {column.label}
-                      </TableCell>
-                    ))}
+                    {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
+                      (column) => (
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{
+                            fontFamily: "Poppins",
+                            bgcolor: "#8c383e",
+                            color: "white",
+                            fontWeight: 500,
+                          }}
+                          key={column.id}
+                          align={column.align}
+                          style={{ minWidth: column.minWidth }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      )
+                    )}
                   </TableRow>
                 </TableHead>
 
@@ -1076,8 +1110,13 @@ function ManageAccount() {
                   {loggedUserRole === "SUPERUSER" && loading ? (
                     // Display loading message in the TableBody
                     <TableRow>
-                      <TableCell colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
-                          <Loader />
+                      <TableCell
+                        colSpan={
+                          columnsEmployees.length || columnsAdmins.length
+                        }
+                        align="center"
+                      >
+                        <Loader />
                       </TableCell>
                     </TableRow>
                   ) : hasData ? (
@@ -1092,23 +1131,30 @@ function ManageAccount() {
                         }}
                         key={row.id}
                       >
-                        {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
+                        {(selectedTab === 0
+                          ? columnsEmployees
+                          : columnsAdmins
+                        ).map((column) => (
                           <TableCell
                             component="th"
                             scope="row"
-                            sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: '.8em' }}
+                            sx={{
+                              fontFamily: "Poppins",
+                              fontWeight: 500,
+                              fontSize: ".8em",
+                            }}
                             key={`${row.id}-${column.id}`}
                             align={column.align}
                           >
                             {column.id === "name"
                               ? row.name
                               : column.id === "actions"
-                                ? column.format
-                                  ? column.format(row[column.id], row)
-                                  : null
-                                : column.format
-                                  ? column.format(row[column.id])
-                                  : row[column.id]}
+                              ? column.format
+                                ? column.format(row[column.id], row)
+                                : null
+                              : column.format
+                              ? column.format(row[column.id])
+                              : row[column.id]}
                           </TableCell>
                         ))}
                       </TableRow>
@@ -1116,7 +1162,12 @@ function ManageAccount() {
                   ) : (
                     // No data case
                     <TableRow>
-                      <TableCell colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                      <TableCell
+                        colSpan={
+                          columnsEmployees.length || columnsAdmins.length
+                        }
+                        align="center"
+                      >
                         <Typography
                           sx={{
                             textAlign: "center",
