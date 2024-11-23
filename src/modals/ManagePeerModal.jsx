@@ -70,6 +70,7 @@ function ManagePeerModal({
   const [openEditPeer, setOpenEditPeer] = useState(false);
   const [viewedUser, setViewedUser] = useState();
   const [selectedEvaluators, setSelectedEvaluators] = useState([]);
+  const [assignEvalautorsStats, setAssignedEvaluatorsStats] = useState([]);
 
   //fetch user
   useEffect(() => {
