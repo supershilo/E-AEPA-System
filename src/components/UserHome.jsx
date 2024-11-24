@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import imageSources from "../data/imageSource";
 import evaluate from "../assets/evaluate.png";
-import defaultProfie from "../assets/default-profile.png";
+import defaultProfile from "../assets/default-profile.png";
 import select from "../assets/select.png";
 import done from "../assets/done.png";
 import ManageAccoount from "../assets/ManageAccount.png";
@@ -533,7 +533,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : defaultProfie
+                              : defaultProfile
                           }
                           alt=""
                         />
@@ -591,7 +591,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : defaultProfie
+                              : defaultProfile
                           }
                           alt=""
                         />
