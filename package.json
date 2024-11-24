@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@date-io/date-fns": "^3.0.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
@@ -26,7 +25,6 @@
     "apexcharts": "^3.49.1",
     "axios": "^1.7.0",
     "bootstrap": "^5.3.3",
-    "date-fns": "^2.29.2",
     "dayjs": "^1.11.12",
     "dom-to-image": "^2.6.0",
     "e-aepa-app": "file:",

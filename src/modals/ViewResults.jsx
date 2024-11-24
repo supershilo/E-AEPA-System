@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { apiUrl } from "../config/config";
 import { motion } from "framer-motion";
 import { faChevronDown, faGears } from "@fortawesome/free-solid-svg-icons";
+import '../index.css';
 
 
 const TabPanel = ({ children, value, index, ...props }) => {
@@ -396,7 +397,6 @@ const ViewResults = ({ open, onClose, employee }) => {
 
           {isProbationary && (
           <>
-            {/* Check if 3rd Month Evaluation is completed */}
             {employee.is3rdEvalComplete ? (
               <TabPanel value={tabIndex} index={0}>
                 <ThirdMonthEval 
@@ -413,7 +413,6 @@ const ViewResults = ({ open, onClose, employee }) => {
               </TabPanel>
             )}
 
-            {/* Check if 5th Month Evaluation is completed */}
             {employee.is5thEvalComplete ? (
               <TabPanel value={tabIndex} index={1}>
                 <FifthMonthEval 

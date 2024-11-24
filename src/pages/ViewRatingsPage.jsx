@@ -389,14 +389,26 @@ const ViewRatingsPage = () => {
         <Tab key="3rd-month" label="3rd Month" sx={tabStyle} />
         <Tab key="5th-month" label="5th Month" sx={tabStyle} />
       </Tabs>
-
+      {loggedUser.is3rdEvalComplete ? (
       <TabPanel value={tabIndex} index={0}>
           <ThirdMonthEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester} />
       </TabPanel>
+    ) : (
+      <TabPanel value={tabIndex} index={0}>
+      <NoResults message="There are no results for the third-month evaluation at this time." />
+    </TabPanel>
+  )}
 
+  {loggedUser.is5thEvalComplete ? (
       <TabPanel value={tabIndex} index={1}>
         <FifthMonthEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester}/>
       </TabPanel>
+       ) : (
+        <TabPanel value={tabIndex} index={1}>
+        <NoResults message="There are no results for the Fifth month evaluation at this time." />
+      </TabPanel>
+    )}
+  
     </>
   ) : (
     // Non-hire year: Render the selected semester evaluation

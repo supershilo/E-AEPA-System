@@ -477,7 +477,6 @@ const handleSaveComment = async () => {
                 variant="outlined"
                 fullWidth
                 minRows={5}
-                placeholder="Add your comment here"
                 value={commentsData[quesID]}
                 onChange={(e) => handleCommentChange(quesID, e.target.value)}
                 style={{

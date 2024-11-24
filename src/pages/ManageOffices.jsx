@@ -63,6 +63,8 @@ const ManageOffices = () => {
     staff: [],
   });
 
+  console.log("Selected Department Details:", selectedDepartmentDetails);
+
   const [renderflag, setRenderFlag] = useState(false);
 
   const handleRenderFlag = () => {
@@ -115,32 +117,32 @@ const ManageOffices = () => {
   }, [renderflag]);
 
   //fetch all users with "office head" position
-  //   useEffect(() => {
-  //     const fetchUsers = async () => {
-  //       try {
-  //         const response = await axios.get(`${apiUrl}user/getAllUser`);
-  //         setAllUsers(response.data);
-  //         const officeHeads = response.data
-  //           .filter(
-  //             (user) =>
-  //               user.position === "Office Head" ||
-  //               user.position === "Department Head" ||
-  //               user.position === "Head"
-  //           )
-  //           .map((user) => ({
-  //             id: user.id,
-  //             name: `${user.fName} ${
-  //               user.mName ? user.mName.charAt(0) + "." : ""
-  //             } ${user.lName}`,
-  //           }));
-  //         setDepartmentOfficeHead(officeHeads);
-  //       } catch (error) {
-  //         console.error("Error fetching users:", error);
-  //       }
-  //     };
+    useEffect(() => {
+      const fetchUsers = async () => {
+        try {
+          const response = await axios.get(`${apiUrl}user/getAllUser`);
+          setAllUsers(response.data);
+          const officeHeads = response.data
+            .filter(
+              (user) =>
+                user.position === "Office Head" ||
+                user.position === "Department Head" ||
+                user.position === "Head"
+            )
+            .map((user) => ({
+              id: user.id,
+              name: `${user.fName} ${
+                user.mName ? user.mName.charAt(0) + "." : ""
+              } ${user.lName}`,
+            }));
+          setDepartmentOfficeHead(officeHeads);
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        }
+      };
 
-  //     fetchUsers();
-  //   }, []);
+      fetchUsers();
+    }, []);
 
   //fetch all departments
   //   useEffect(() => {
@@ -201,14 +203,17 @@ const ManageOffices = () => {
     const usersInDepartment = allUsers.filter(
       (user) => user.dept === department.deptName
     );
-    const deptFullName = [department.deptName];
+  
     const secretary = usersInDepartment.find(
-      (user) => user.position === "Secretary" || user.position === "secretary"
+      (user) => user.position?.toLowerCase() === "secretary"
     );
+  
     const staffMembers = usersInDepartment.filter(
-      (user) => user.role === "EMPLOYEE" && user.userID !== secretary?.userID
+      (user) =>
+        user.role === "EMPLOYEE" &&
+        user.userID !== secretary?.userID // Exclude the secretary if found
     );
-
+  
     setSelectedDepartmentDetails({
       deptName: department.deptName || "N/A",
       officeHead: department.deptOfficeHead || "N/A",
@@ -225,9 +230,13 @@ const ManageOffices = () => {
         status: staff.empStatus,
       })),
     });
-
+    console.log("usersInDepartment:", usersInDepartment);
+    console.log("secretary:", secretary);
+    console.log("staffMembers:", staffMembers);
+    
     setShowDetailsDialog(true);
   };
+  
 
   //Add Department
   const handleDepartmentFormSubmit = async (e) => {

@@ -10,7 +10,7 @@ import ThirdMonthComments from "../modals/ThirdMonthComments";
 import axios from "axios";
 import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
-
+import '../index.css';
 
 const ThirdMonthEval = ({ headId, userId, filter, selectedYear, selectedSemester }) => {
   const [employee, setEmployee] = useState({});
