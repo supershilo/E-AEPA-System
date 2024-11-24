@@ -533,7 +533,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : defaultProfile
+                              : "/assets/default-profile.png"
                           }
                           alt=""
                         />
@@ -591,7 +591,7 @@ function UserHome() {
                           src={
                             staff?.profilePic
                               ? base64ToDataURL(staff.profilePic)
-                              : defaultProfile
+                              : "/assets/default-profile.png"
                           }
                           alt=""
                         />
