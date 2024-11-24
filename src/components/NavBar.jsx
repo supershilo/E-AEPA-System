@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/e-AEPA-logo.png";
-import defaultProfie from "../assets/default-profile.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -332,7 +331,7 @@ function NavBar() {
             src={
               loggedUserData?.profilePic
                 ? base64ToDataURL(loggedUserData.profilePic)
-                : defaultProfie
+                : "/assets/default-profile.png"
             }
             alt="nav-profile-picture"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
