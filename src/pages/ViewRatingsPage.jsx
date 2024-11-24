@@ -391,11 +391,7 @@ const ViewRatingsPage = () => {
       </Tabs>
 
       <TabPanel value={tabIndex} index={0}>
-        {today >= evaluationStartDate ? (
           <ThirdMonthEval userId={userId} filter={filter} selectedYear={selectedYear} selectedSemester={selectedSemester} />
-        ) : (
-          <NoResults message="There are no results for the third-month evaluation at this time." />
-        )}
       </TabPanel>
 
       <TabPanel value={tabIndex} index={1}>

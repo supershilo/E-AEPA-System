@@ -12,7 +12,7 @@ import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const ThirdMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
+const ThirdMonthEval = ({ headId, userId, filter, selectedYear, selectedSemester }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -1658,7 +1658,7 @@ const fetchHeadValuesThirdMonth = async () => {
             </>
           )}
         </div>
-        <ThirdMonthComments userId={userId} filter={filter} />
+        <ThirdMonthComments schoolYear={selectedYear} headId={headId} userId={userId} filter={filter} />
         <div
           style={{
             display: "flex",

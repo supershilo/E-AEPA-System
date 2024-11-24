@@ -12,7 +12,7 @@ import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const AnnualFirstSemEval = ({ userId, filter, selectedYear, selectedSemester  }) => {
+const AnnualFirstSemEval = ({ headId, userId, filter, selectedYear, selectedSemester  }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -1664,7 +1664,7 @@ const fetchHeadValuesAnnualFirst = async () => {
             </>
           )}
         </div>
-        <AnnualFirstSemComments userId={userId} filter={filter} />
+        <AnnualFirstSemComments headId={headId} schoolYear={selectedYear} userId={userId} filter={filter} />
         <div
           style={{
             display: "flex",

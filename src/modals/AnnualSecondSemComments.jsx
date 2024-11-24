@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  IconButton,
-  Typography,
-  TextareaAutosize,
-} from "@mui/material";
+import React, { useEffect, useState, useRef} from "react";
+import {Box,Button, Snackbar, Alert,IconButton,Typography,TextareaAutosize,} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { apiUrl } from "../config/config";
@@ -18,8 +12,9 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?",
 };
 
-const AnnualSecondSemComments = ({ userId, filter }) => {
+const AnnualSecondSemComments = ({ headId, userId, filter, schoolYear }) => {
   const role = sessionStorage.getItem("userRole");
+  console.log("Si role:", role);
   const [selfComments, setSelfComments] = useState([]);
   const [peerComments, setPeerComments] = useState([]);
   const [commentsData, setCommentsData] = useState({
@@ -29,117 +24,127 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
     30: "", // SUPPLEMENTARY comment
   });
 
-  const [editingCommentID, setEditingCommentID] = useState(null); // ID of the comment being edited
+  const [editingCommentID, setEditingCommentID] = useState(null); 
+  const [initialCommentText, setInitialCommentText] = useState(''); 
   const [responseIDs, setResponseIDs] = useState({});
-
-  // Fetch comments and response IDs on component mount and when userId changes
-  const fetchCommentsAndResponseIDs = async () => {
-    try {
-      // Fetch comments
-      const commentsResponse = await axios.get(
-        `${apiUrl}response/getHeadComments/${userId}`
-      );
-      const comments = commentsResponse.data;
-  
-      // Fetch response IDs
-      const responsesResponse = await axios.get(
-        `${apiUrl}response/getAllResponses`
-      );
-      const responses = responsesResponse.data;
-  
-      // Filter for only Annual 1st sem evaluations
-      const headResponsesForAnnualSecondSem = responses.filter((res) => {
-        const isHeadEvaluation = res.evaluation?.evalType === "HEAD";
-        const isCorrectPeriod = res.evaluation?.period === "5th Month";
-        return res.user.userID === userId && isHeadEvaluation && isCorrectPeriod;
-      });
-  
-      // If no Annual 1st sem evaluation, leave comments blank
-      if (headResponsesForAnnualSecondSem.length === 0) {
-        console.log("No Annual 1st sem evaluation found, setting blank comments.");
-        setCommentsData({
-          27: "",
-          28: "",
-          29: "",
-          30: ""
-        });
-        setResponseIDs({});
-        return;
-      }
-  
-      // Proceed to populate comments and response IDs
-      const initialData = {
-        27:
-          comments.find((comment) => comment.question.quesID === 27)
-            ?.comments || "",
-        28:
-          comments.find((comment) => comment.question.quesID === 28)
-            ?.comments || "",
-        29:
-          comments.find((comment) => comment.question.quesID === 29)
-            ?.comments || "",
-        30:
-          comments.find((comment) => comment.question.quesID === 30)
-            ?.comments || "",
-      };
-  
-      const ids = {};
-      headResponsesForAnnualSecondSem.forEach((res) => {
-        ids[res.question.quesID] = res.responseID;
-      });
-  
-      setCommentsData(initialData);
-      setResponseIDs(ids);
-    } catch (error) {
-      console.error("Error fetching comments and responses:", error);
-    }
-  };
-  
+  const textareaRef = useRef(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    fetchCommentsAndResponseIDs();
-  }, [userId]);
-
-  const handleEditComment = (quesID) => {
-    setEditingCommentID(quesID);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCommentID(null);
-  };
-
-  const handleSaveComment = async () => {
-    const responseID = responseIDs[editingCommentID];
-    const dataToSend = {
-      user: { userID: userId },
-      question: { quesID: editingCommentID },
-      comments: commentsData[editingCommentID],
-    };
-
+  const fetchComments = async () => {
     try {
-      if (responseID) {
-        // Update existing comment
-        await axios.put(
-          `${apiUrl}response/updateHeadComment/${responseID}`,
-          dataToSend
-        );
-        console.log("Comment updated");
-      } else {
-        // Create new comment
-        await axios.post(`${apiUrl}response/createHeadComment`, dataToSend);
-        console.log("Comment added");
-      }
+      const response = await axios.get(`${apiUrl}headcomments/filteredcomments`, {
+        params: {
+          userID: userId,       
+          period: "Annual-2nd",  
+          schoolYear: schoolYear, 
+          semester: "First Semester"     
+        },
+      });
+      const fetchedComments = response.data;
 
-      // Clear editing state and refetch comments
-      setEditingCommentID(null);
-      await fetchCommentsAndResponseIDs(); // Refetch to get updated data
+      const updatedCommentsData = {};
+      const updatedResponseIDs = {};
+
+      fetchedComments.forEach((comment) => {
+        const quesID = comment.question.quesID;
+        updatedCommentsData[quesID] = comment.comment;
+        updatedResponseIDs[quesID] = comment.id;
+      });
+
+      setCommentsData(updatedCommentsData);
+      setResponseIDs(updatedResponseIDs);
+      console.log("Fetched comments:", fetchedComments);
+      console.log("Updated commentsData:", updatedCommentsData);
+      console.log("Updated responseIDs:", updatedResponseIDs);
     } catch (error) {
-      console.error("Error saving comments:", error);
+      console.error("Error fetching comments:", error.response?.data || error.message);
     }
   };
 
+  fetchComments();
+
+  if (editingCommentID !== null && textareaRef.current) {
+    textareaRef.current.focus();
+  }
+}, [userId, editingCommentID]);  
+
+
+// Handle the Edit Comment action
+const handleEditComment = (quesID) => {
+  console.log("Editing question ID:", quesID);
+  setEditingCommentID(quesID);
+  setInitialCommentText(commentsData[quesID]); // Store the initial comment text
+};
+
+
+// Handle Cancel action
+const handleCancelEdit = () => {
+  setEditingCommentID(null); 
+  setCommentsData((prevData) => ({
+    ...prevData,
+    [editingCommentID]: initialCommentText,  
+  }));
+};
+
+
+// Handle Save action (either create new or update existing)
+const handleSaveComment = async () => {
+  const responseID = responseIDs[editingCommentID]; 
+
+  const dataToSend = responseID
+    ? { comment: commentsData[editingCommentID], quesID:editingCommentID } 
+    : {
+        question: { quesID: editingCommentID },
+        userID: { userID: userId }, 
+        headID: { userID: headId }, 
+        comment: commentsData[editingCommentID], 
+        period: "Annual-2nd",
+        schoolYear: schoolYear, 
+        semester: "First Semester",
+      };
+
+  try {
+    if (responseID) {
+      // Update an existing comment
+      await axios.put(`${apiUrl}headcomments/updateHeadComment/${responseID}`, dataToSend);
+      setSnackbarMessage("Comment updated successfully!");
+      console.log("Comment updated successfully");
+    } else {
+      // Add a new comment
+      const response = await axios.post(`${apiUrl}headcomments/createHeadComment`, dataToSend);
+      console.log("Comment added successfully");
+
+      setResponseIDs((prevResponseIDs) => ({
+        ...prevResponseIDs,
+        [editingCommentID]: response.data.id, 
+      }));
+      setSnackbarMessage("Comment added successfully!");
+    }
+    setOpenSnackbar(true);
+    setEditingCommentID(null); 
+    await fetchComments(); 
+  } catch (error) {
+    console.error("Error saving comment:", error.response?.data || error.message);
+  }
+
+  // Debug logs for troubleshooting
+  console.log("Editing comment ID:", editingCommentID);
+  console.log("Response ID for current quesID:", responseID);
+  console.log("Data to send:", dataToSend);
+};
+
+  // Update comment data while editing
   const handleCommentChange = (quesID, value) => {
-    setCommentsData((prevData) => ({ ...prevData, [quesID]: value }));
+    setCommentsData((prevData) => ({
+      ...prevData,
+      [quesID]: value,  
+    }));
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   //FETCH SELF COMMENTS
@@ -156,8 +161,9 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
             response.question?.quesID
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
-          const isCorrectPeriod = response.evaluation?.period === "Annual-1st";
-          return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod;
+          const isCorrectPeriod = response.evaluation?.period === "Annual-2nd";
+          const isCorrectSchoolYear = response.evaluation?.schoolYear === schoolYear;
+          return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod && isCorrectSchoolYear;
         });
 
         setSelfComments(filteredComments);
@@ -244,7 +250,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
           `${apiUrl}assignedPeers/getAssignedPeersId`,
           {
             params: {
-              period: "Annual-1st",
+              period: "Annual-2nd",
               evaluateeId: userId,
             },
           }
@@ -280,14 +286,16 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
                   res.question?.quesID
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
-                const isCorrectPeriod = res.evaluation?.period === "Annual-1st";
+                const isCorrectPeriod = res.evaluation?.period === "Annual-2nd";
+                const isCorrectSchoolYear = res.evaluation?.schoolYear === schoolYear;
 
                 return (
                   isCorrectEvaluator &&
                   isCorrectEvaluatee &&
                   isCorrectQuestion &&
                   isPeerEvaluation &&
-                  isCorrectPeriod
+                  isCorrectPeriod &&
+                  isCorrectSchoolYear
                 );
               });
 
@@ -444,7 +452,7 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
   }}
 >
   {label}
-  {role !== "EMPLOYEE" && (
+  {role !== "EMPLOYEE" && role!=="ADMIN" &&(
     <div className="ml-auto">
       <IconButton
         onClick={() => handleEditComment(quesID)}
@@ -465,9 +473,11 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
 
               <TextareaAutosize
                 disabled={role === "EMPLOYEE" || editingCommentID !== quesID}
+                ref={textareaRef} 
                 variant="outlined"
                 fullWidth
                 minRows={5}
+                placeholder="Add your comment here"
                 value={commentsData[quesID]}
                 onChange={(e) => handleCommentChange(quesID, e.target.value)}
                 style={{
@@ -529,6 +539,17 @@ const AnnualSecondSemComments = ({ userId, filter }) => {
           ))}
         </>
       )}
+      {/* The Snackbar */}
+            <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000} // Auto close after 3 seconds
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success" variant="filled" elevation={6}sx={{ width: "100%" }} style={{ fontFamily: "Poppins" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

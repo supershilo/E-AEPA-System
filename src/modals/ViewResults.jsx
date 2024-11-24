@@ -43,6 +43,31 @@ const selectedMenuItemStyles = {
   },
 };
 
+const NoResults = ({ message }) => (
+  <div
+    style={{
+      height: "200px",
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "end",
+    }}
+  >
+    <div
+      style={{
+        height: "75px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        color: "#a8a7a9",
+      }}
+    >
+      <FontAwesomeIcon icon={faGears} style={{ fontSize: "30px", color: "#a8a7a9" }} />
+      <p>{message}</p>
+    </div>
+  </div>
+);
+
 
 const ViewResults = ({ open, onClose, employee }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -54,6 +79,7 @@ const ViewResults = ({ open, onClose, employee }) => {
   const isProbationary = employee?.empStatus === "Probationary";
   const isRegular = employee?.empStatus === "Regular";
   const [dateHired, setDateHired] = useState("");
+  const userID = sessionStorage.getItem("userID");
   console.log("Employee userID:", employee?.userID);
   console.log("mao ni ang year ay: ", selectedYear);
 
@@ -359,20 +385,49 @@ const ViewResults = ({ open, onClose, employee }) => {
           </Menu>
 
           {isProbationary && (
-            <>
+          <>
+            {/* Check if 3rd Month Evaluation is completed */}
+            {employee.is3rdEvalComplete ? (
               <TabPanel value={tabIndex} index={0}>
-                <ThirdMonthEval userId={employee.userID} filter={filter} selectedYear={selectedYear} selectedSemester='First Semester'/>
+                <ThirdMonthEval 
+                  headId={userID} 
+                  userId={employee.userID} 
+                  filter={filter} 
+                  selectedYear={selectedYear} 
+                  selectedSemester='First Semester' 
+                />
               </TabPanel>
+            ) : (
+              <TabPanel value={tabIndex} index={0}>
+                <NoResults message="There are no results for the third-month evaluation at this time." />
+              </TabPanel>
+            )}
+
+            {/* Check if 5th Month Evaluation is completed */}
+            {employee.is5thEvalComplete ? (
               <TabPanel value={tabIndex} index={1}>
-                <FifthMonthEval userId={employee.userID} filter={filter} selectedYear={selectedYear} selectedSemester='First Semester'/>
+                <FifthMonthEval 
+                  headId={userID} 
+                  userId={employee.userID} 
+                  filter={filter} 
+                  selectedYear={selectedYear} 
+                  selectedSemester='First Semester' 
+                />
               </TabPanel>
-            </>
-          )}
+            ) : (
+              <TabPanel value={tabIndex} index={1}>
+                <NoResults message="There are no results for the 5th month evaluation at this time." />
+              </TabPanel>
+            )}
+          </>
+        )}
+
           {isRegular && (
             <>
               <TabPanel value={tabIndex} index={0}>
               <AnnualFirstSemEval 
                     userId={employee.userID} 
+                    headId={userID} 
                     filter={filter} 
                     selectedYear={selectedYear} 
                     selectedSemester='First Semester' 
@@ -380,6 +435,7 @@ const ViewResults = ({ open, onClose, employee }) => {
                 </TabPanel>
                 <TabPanel value={tabIndex} index={1}>
                   <AnnualSecondSemEval 
+                    headId={userID} 
                     userId={employee.userID} 
                     filter={filter} 
                     selectedYear={selectedYear} 

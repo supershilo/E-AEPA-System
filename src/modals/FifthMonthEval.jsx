@@ -12,7 +12,7 @@ import { apiUrl } from '../config/config';
 import Loader from "../components/Loader";
 
 
-const FifthMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
+const FifthMonthEval = ({ headId, userId, filter, selectedYear, selectedSemester }) => {
   const [employee, setEmployee] = useState({});
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
@@ -1675,7 +1675,7 @@ const FifthMonthEval = ({ userId, filter, selectedYear, selectedSemester }) => {
             </>
           )}
         </div>
-        <FifthMonthComments userId={userId} filter={filter} />
+        <FifthMonthComments headId={headId} schoolYear={selectedYear} userId={userId} filter={filter} />
         <div
           style={{
             display: "flex",

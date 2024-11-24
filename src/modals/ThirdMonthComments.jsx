@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  IconButton,
-  Typography,
-  TextareaAutosize,
-} from "@mui/material";
+import React, { useEffect, useState, useRef} from "react";
+import {Box,Button, Snackbar, Alert,IconButton,Typography,TextareaAutosize,} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { apiUrl } from "../config/config";
@@ -18,7 +12,7 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?",
 };
 
-const ThirdMonthComments = ({ userId, filter }) => {
+const ThirdMonthComments = ({ headId, userId, filter, schoolYear }) => {
   const role = sessionStorage.getItem("userRole");
   console.log("Si role:", role);
   const [selfComments, setSelfComments] = useState([]);
@@ -30,92 +24,127 @@ const ThirdMonthComments = ({ userId, filter }) => {
     30: "", // SUPPLEMENTARY comment
   });
 
-  const [editingCommentID, setEditingCommentID] = useState(null); // ID of the comment being edited
+  const [editingCommentID, setEditingCommentID] = useState(null); 
+  const [initialCommentText, setInitialCommentText] = useState(''); 
   const [responseIDs, setResponseIDs] = useState({});
+  const textareaRef = useRef(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
- // Fetch comments and response IDs on component mount and when userId changes
- const fetchCommentsAndResponseIDs = async () => {
-  try {
-    // Fetch comments
-    const commentsResponse = await axios.get(`${apiUrl}response/getHeadComments/${userId}`);
-    const comments = commentsResponse.data;
-
-    // Fetch response IDs
-    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);
-    const responses = responsesResponse.data;
-
-    // Update comments and response IDs state
-    const initialData = {
-      27: comments.find(comment => comment.question.quesID === 27)?.comments || '',
-      28: comments.find(comment => comment.question.quesID === 28)?.comments || '',
-      29: comments.find(comment => comment.question.quesID === 29)?.comments || '',
-      30: comments.find(comment => comment.question.quesID === 30)?.comments || ''
-    };
-
-    const ids = {};
-    responses.forEach(res => {
-      if (res.user.userID === userId) {
-        ids[res.question.quesID] = res.responseID;
-      }
-    });
-
-    setCommentsData(initialData);
-    setResponseIDs(ids);
-  } catch (error) {
-    console.error('Error fetching comments and responses:', error);
-  }
-};
-
-useEffect(() => {
-  fetchCommentsAndResponseIDs();
-}, [userId]);
-
-
-  const handleEditComment = (quesID) => {
-    console.log("Editing question ID:", quesID);
-    setEditingCommentID(quesID);
-  };
-  
-
-  const handleCancelEdit = () => {
-    setEditingCommentID(null);
-  };
-
-  const handleSaveComment = async () => {
-    const responseID = responseIDs[editingCommentID];
-    console.log("Editing Comment ID:", editingCommentID);
-    console.log("Retrieved Response ID:", responseID);
-  
-    const dataToSend = {
-      user: { userID: userId },
-      question: { quesID: editingCommentID },
-      comments: commentsData[editingCommentID],
-    };
-  
+  useEffect(() => {
+  const fetchComments = async () => {
     try {
-      if (responseID) {
-        console.log("Updating comment:", dataToSend);
-        await axios.put(
-          `${apiUrl}response/updateHeadComment/${responseID}`,
-          dataToSend
-        );
-        console.log("Comment updated successfully");
-      } else {
-        console.log("Creating new comment:", dataToSend);
-        await axios.post(`${apiUrl}response/createHeadComment`, dataToSend);
-        console.log("Comment added successfully");
-      }
-  
-      setEditingCommentID(null);
-      await fetchCommentsAndResponseIDs(); // Refetch updated comments
+      const response = await axios.get(`${apiUrl}headcomments/filteredcomments`, {
+        params: {
+          userID: userId,       
+          period: "3rd Month",  
+          schoolYear: schoolYear, 
+          semester: "First Semester"     
+        },
+      });
+      const fetchedComments = response.data;
+
+      const updatedCommentsData = {};
+      const updatedResponseIDs = {};
+
+      fetchedComments.forEach((comment) => {
+        const quesID = comment.question.quesID;
+        updatedCommentsData[quesID] = comment.comment;
+        updatedResponseIDs[quesID] = comment.id;
+      });
+
+      setCommentsData(updatedCommentsData);
+      setResponseIDs(updatedResponseIDs);
+      console.log("Fetched comments:", fetchedComments);
+      console.log("Updated commentsData:", updatedCommentsData);
+      console.log("Updated responseIDs:", updatedResponseIDs);
     } catch (error) {
-      console.error("Error saving comment:", error.response?.data || error.message);
+      console.error("Error fetching comments:", error.response?.data || error.message);
     }
   };
-  
 
+  fetchComments();
+
+  if (editingCommentID !== null && textareaRef.current) {
+    textareaRef.current.focus();
+  }
+}, [userId, editingCommentID]);  
+
+
+// Handle the Edit Comment action
+const handleEditComment = (quesID) => {
+  console.log("Editing question ID:", quesID);
+  setEditingCommentID(quesID);
+  setInitialCommentText(commentsData[quesID]); // Store the initial comment text
+};
+
+
+// Handle Cancel action
+const handleCancelEdit = () => {
+  setEditingCommentID(null); 
+  setCommentsData((prevData) => ({
+    ...prevData,
+    [editingCommentID]: initialCommentText,  
+  }));
+};
+
+
+// Handle Save action (either create new or update existing)
+const handleSaveComment = async () => {
+  const responseID = responseIDs[editingCommentID]; 
+
+  const dataToSend = responseID
+    ? { comment: commentsData[editingCommentID], quesID:editingCommentID } 
+    : {
+        question: { quesID: editingCommentID },
+        userID: { userID: userId }, 
+        headID: { userID: headId }, 
+        comment: commentsData[editingCommentID], 
+        period: "3rd Month",
+        schoolYear: schoolYear, 
+        semester: "First Semester",
+      };
+
+  try {
+    if (responseID) {
+      // Update an existing comment
+      await axios.put(`${apiUrl}headcomments/updateHeadComment/${responseID}`, dataToSend);
+      setSnackbarMessage("Comment updated successfully!");
+      console.log("Comment updated successfully");
+    } else {
+      // Add a new comment
+      const response = await axios.post(`${apiUrl}headcomments/createHeadComment`, dataToSend);
+      console.log("Comment added successfully");
+
+      setResponseIDs((prevResponseIDs) => ({
+        ...prevResponseIDs,
+        [editingCommentID]: response.data.id, 
+      }));
+      setSnackbarMessage("Comment added successfully!");
+    }
+    setOpenSnackbar(true);
+    setEditingCommentID(null); 
+    await fetchComments(); 
+  } catch (error) {
+    console.error("Error saving comment:", error.response?.data || error.message);
+  }
+
+  // Debug logs for troubleshooting
+  console.log("Editing comment ID:", editingCommentID);
+  console.log("Response ID for current quesID:", responseID);
+  console.log("Data to send:", dataToSend);
+};
+
+  // Update comment data while editing
   const handleCommentChange = (quesID, value) => {
-    setCommentsData((prevData) => ({ ...prevData, [quesID]: value }));
+    setCommentsData((prevData) => ({
+      ...prevData,
+      [quesID]: value,  
+    }));
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   //FETCH SELF COMMENTS
@@ -133,7 +162,8 @@ useEffect(() => {
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
           const isCorrectPeriod = response.evaluation?.period === "3rd Month";
-          return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod;
+          const isCorrectSchoolYear = response.evaluation?.schoolYear === schoolYear;
+          return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod && isCorrectSchoolYear;
         });
 
         setSelfComments(filteredComments);
@@ -257,13 +287,15 @@ useEffect(() => {
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
                 const isCorrectPeriod = res.evaluation?.period === "3rd Month";
+                const isCorrectSchoolYear = res.evaluation?.schoolYear === schoolYear;
 
                 return (
                   isCorrectEvaluator &&
                   isCorrectEvaluatee &&
                   isCorrectQuestion &&
                   isPeerEvaluation &&
-                  isCorrectPeriod
+                  isCorrectPeriod &&
+                  isCorrectSchoolYear
                 );
               });
 
@@ -420,7 +452,7 @@ useEffect(() => {
   }}
 >
   {label}
-  {role !== "EMPLOYEE" && (
+  {role !== "EMPLOYEE" && role!=="ADMIN" &&(
     <div className="ml-auto">
       <IconButton
         onClick={() => handleEditComment(quesID)}
@@ -441,9 +473,11 @@ useEffect(() => {
 
               <TextareaAutosize
                 disabled={role === "EMPLOYEE" || editingCommentID !== quesID}
+                ref={textareaRef} 
                 variant="outlined"
                 fullWidth
                 minRows={5}
+                placeholder="Add your comment here"
                 value={commentsData[quesID]}
                 onChange={(e) => handleCommentChange(quesID, e.target.value)}
                 style={{
@@ -505,6 +539,17 @@ useEffect(() => {
           ))}
         </>
       )}
+      {/* The Snackbar */}
+            <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000} // Auto close after 3 seconds
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success" variant="filled" elevation={6}sx={{ width: "100%" }} style={{ fontFamily: "Poppins" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
