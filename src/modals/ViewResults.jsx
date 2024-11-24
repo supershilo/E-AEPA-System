@@ -15,13 +15,19 @@ import { motion } from "framer-motion";
 import { faChevronDown, faGears } from "@fortawesome/free-solid-svg-icons";
 
 
-const TabPanel = ({ children, value, index }) => {
+const TabPanel = ({ children, value, index, ...props }) => {
   return (
-    <div role="tabpanel" hidden={value !== index}>
+    <div
+      id={`tabPanel-${index}`} // Ensure the id matches the expected format
+      role="tabpanel"
+      hidden={value !== index}
+      {...props}
+    >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 };
+
 
 const menuItemStyles = {
   fontFamily: "Poppins",
@@ -80,8 +86,11 @@ const ViewResults = ({ open, onClose, employee }) => {
   const isRegular = employee?.empStatus === "Regular";
   const [dateHired, setDateHired] = useState("");
   const userID = sessionStorage.getItem("userID");
-  console.log("Employee userID:", employee?.userID);
-  console.log("mao ni ang year ay: ", selectedYear);
+  const fName = employee?.fName;
+  const lName = employee?.lName;
+  const userFullName = `${fName} ${lName}`;
+  const formattedName = userFullName.replace(/\s+/g, '_'); 
+  const fileName = `${formattedName}_e-eapa.pdf`;
 
   useEffect(() => {
     if (employee?.dateHired) {
@@ -172,13 +181,14 @@ const ViewResults = ({ open, onClose, employee }) => {
 
   const handlePrint = () => {
     const printAreaId = `tabPanel-${tabIndex}`;
+    console.log("Searching for print area with ID:", printAreaId);
     const input = document.getElementById(printAreaId);
+    console.log("Found element:", input);
   
     if (!input) {
       console.error("Print area not found");
       return;
     }
-  
     // Ensure the image is fully loaded
     const images = input.getElementsByTagName('img');
     const promises = Array.from(images).map(img => {
@@ -206,7 +216,7 @@ const ViewResults = ({ open, onClose, employee }) => {
             format: [canvas.width, canvas.height]
           });
           pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-          pdf.save('download.pdf');
+          pdf.save(fileName);
         }).catch(error => {
           console.error('Error capturing the PDF:', error);
         });

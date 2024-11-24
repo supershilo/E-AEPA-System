@@ -9,9 +9,14 @@
   box-sizing: border-box;
 }
 
+.no-print {
+  display: none;
+}
+
+
 @media print {
   .no-print {
-    display: none !important;
+    display: none;
   }
 }
 
