@@ -386,10 +386,10 @@ function TrackEmployee() {
       minWidth: 150,
       align: "center",
       format: (value) => {
-        if (value === "OPEN") {
+        if (value === "PENDING") {
           return (
-            <span style={{ color: "orange", fontWeight: "bold" }}>
-              IN PROGRESS
+            <span style={{ color: "red", fontWeight: "bold" }}>
+              PENDING
             </span>
           );
         } else if (value === "COMPLETED") {
@@ -400,7 +400,7 @@ function TrackEmployee() {
           );
         } else {
           return (
-            <span style={{ color: "red", fontWeight: "bold" }}>PENDING</span>
+            <span style={{ color: "#444444", fontWeight: "bold" }}>N/A</span>
           ); //SA WA PA NAOPEN ANG EVAL, PENDING RA AKO GBUTANG
         }
       },

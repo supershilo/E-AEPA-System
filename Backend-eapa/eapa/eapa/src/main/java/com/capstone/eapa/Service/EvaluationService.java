@@ -256,7 +256,7 @@ public class EvaluationService {
 
                     // Set overall status from AssignedPeerEvaluators
                     String overallStatus = overallStatuses.get(userId); 
-                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "PENDING");
+                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "N/A");
 
                     headEvalStatuses.stream()
                             .filter(headDto -> headDto.getUserId() == userId)
