@@ -67,6 +67,8 @@ public class EvaluationController {
         return evalServ.isEvaluationCompleted(userID, period, stage, evalType);
     }
 
+
+
     @GetMapping("/getEvaluationsByUser/{userID}")
     public ResponseEntity<List<EvaluationEntity>> getEvaluationsByUser(@PathVariable int userID) {
         List<EvaluationEntity> evaluations = evalServ.getEvaluationsByUser(userID);

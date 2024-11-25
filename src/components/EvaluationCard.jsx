@@ -24,10 +24,14 @@ function EvaluationCard({
   handleCloseModal,
   handleConfirm,
   setEvalType,
+  handleTakeEvalChange,
+  takeEval,
+  setTakeEval,
   activeCard = { activeCard },
   setActiveCard = { setActiveCard },
 }) {
-  const [takeEval, setTakeEval] = useState(false);
+  //const [takeEval, setTakeEval] = useState(false);
+
   //const [shouldDisplay, setShouldDisplay] = useState(true);
 
   // //eval start date
@@ -44,14 +48,14 @@ function EvaluationCard({
 
   const handleReturn = () => {
     setTakeEval(!takeEval);
-    setEvalType("");
+    //setEvalType("");
   };
 
-  const handleTakeEvalChange = () => {
-    setTakeEval(!takeEval);
-    setActiveCard(id);
-    setEvalType("SELF");
-  };
+  // const handleTakeEvalChange = () => {
+  //   setTakeEval(!takeEval);
+  //   setActiveCard(id);
+  //   setEvalType("SELF");
+  // };
 
   const modalStyle = {
     position: "absolute",
@@ -110,7 +114,7 @@ function EvaluationCard({
           )}
         </h3>
         {/*  */}
-        {takeEval ? (
+        {takeEval && activeCard === id ? (
           <>
             <div
               style={{
@@ -165,7 +169,7 @@ function EvaluationCard({
         )}
       </div>
 
-      {takeEval ? (
+      {takeEval && activeCard === id ? (
         <>
           <div style={{ height: "18vh" }}>
             <div
@@ -314,7 +318,7 @@ function EvaluationCard({
                 fontFamily: "poppins",
               }}
               variant="contained"
-              onClick={handleTakeEvalChange}
+              onClick={() => handleTakeEvalChange(id)}
             >
               Take Evaluation
             </Button>
@@ -323,6 +327,7 @@ function EvaluationCard({
       )}
 
       {/** Evaluation tab */}
+      {/** takeEval && activeCard === id && */}
       {takeEval && activeCard === id && (
         <EvaluationTypeTab
           period={period}

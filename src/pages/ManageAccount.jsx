@@ -1071,12 +1071,14 @@ function ManageAccount() {
 
             <TableContainer
               sx={{
-                height: "29.58em",
+                height: "29.80em",
                 borderRadius: "5px 5px 0 0",
                 maxHeight: "100%",
                 maxWidth: "100%",
                 position: "relative",
                 border: "1px solid lightgray",
+                overflow: "hidden",
+                //backgroundColor: "yellow",
               }}
             >
               <Table stickyHeader aria-label="a dense table" size="small">
@@ -1116,7 +1118,9 @@ function ManageAccount() {
                         }
                         align="center"
                       >
-                        <Loader />
+                        <div>
+                          <Loader />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : hasData ? (
@@ -1192,7 +1196,7 @@ function ManageAccount() {
         </Box>
         {/* Pagination */}
         <div
-          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-5"
+          className="rounded-b-lg mt-1 border-gray-200 px-4 py-2 ml-5"
           style={{
             position: "relative", // Change to relative to keep it in place
             // bottom: 30,

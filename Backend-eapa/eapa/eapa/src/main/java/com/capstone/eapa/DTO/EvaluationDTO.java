@@ -22,6 +22,24 @@ public class EvaluationDTO {
     private String hjbpStatus;
     private String hvbpaStatus;
     private String dateHired;
+    private Boolean isSentResult;
+    private int semester;
+
+    public Boolean getSentResult() {
+        return isSentResult;
+    }
+
+    public void setSentResult(Boolean isSentResult) {
+        this.isSentResult = isSentResult;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
 
     public String getSchoolYear() {
         return schoolYear;

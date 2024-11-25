@@ -185,6 +185,9 @@ function AdminDashboard() {
         const filtered5thMonthEmp =
           filterFifthMonthEmployees(fifthMonthEmployees);
         setFifthMonthEmp(filtered5thMonthEmp);
+
+        console.log("filter 3rd month emps: ", filtered3rdMonthEmp);
+        console.log("filter 5th month emps: ", filtered5thMonthEmp);
       } catch (error) {
         console.error(
           "Error fetching third month probationary employees:",
@@ -596,737 +599,746 @@ function AdminDashboard() {
 
   return (
     <Animated>
-    <div style={{ minHeight: "91vh" }}>
-      <div
-        style={{
-          height: "9vh",
-          width: "100%",
-          padding: "0px 30px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 2,
-          //backgroundColor: "lightyellow",
-        }}
-      >
-        <Typography variant="h5" fontWeight="bolder" fontFamily="Poppins">
-          Dashboard
-        </Typography>
-        <Button
-          onClick={handleOpenSYModal}
-          sx={{
-            width: "12%",
-            backgroundColor: "#8C383E",
-            "&:hover": {
-              backgroundColor: "#8c383e",
-            },
-            fontFamily: "poppins",
-          }}
-          variant="contained"
-        >
-          Manage S.Y.
-        </Button>
-      </div>
-
-      {loading ? (
-        <Loader />
-      ) : (
+      <div style={{ minHeight: "91vh" }}>
         <div
           style={{
-            height: "82vh",
-            width: "95%",
-            //backgroundColor: "tomato",
-            margin: "auto",
-            overflowX: "scroll",
+            height: "9vh",
+            width: "100%",
+            padding: "0px 30px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 2,
+            //backgroundColor: "lightyellow",
           }}
         >
-          {/** 1st part */}
+          <Typography variant="h5" fontWeight="bolder" fontFamily="Poppins">
+            Dashboard
+          </Typography>
+          <Button
+            onClick={handleOpenSYModal}
+            sx={{
+              width: "12%",
+              backgroundColor: "#8C383E",
+              "&:hover": {
+                backgroundColor: "#8c383e",
+              },
+              fontFamily: "poppins",
+            }}
+            variant="contained"
+          >
+            Manage S.Y.
+          </Button>
+        </div>
+
+        {loading ? (
+          <Loader />
+        ) : (
           <div
             style={{
-              height: "45vh",
-              width: "99%",
-              //backgroundColor: "lightgreen",
-              display: "flex",
-              justifyContent: "space-between",
+              height: "82vh",
+              width: "95%",
+              //backgroundColor: "tomato",
+              margin: "auto",
+              overflowX: "scroll",
             }}
           >
-            {/** Employee Counts */}
+            {/** 1st part */}
             <div
               style={{
-                height: "100%",
-                width: "19%",
-                //backgroundColor: "white",
+                height: "45vh",
+                width: "99%",
+                //backgroundColor: "lightgreen",
                 display: "flex",
-                flexDirection: "column",
                 justifyContent: "space-between",
               }}
             >
+              {/** Employee Counts */}
               <div
                 style={{
-                  height: "31%",
-                  width: "100%",
-                  backgroundColor: "#8c383e",
-                  borderRadius: "8px",
-                  padding: "12px",
-                  boxShadow:
-                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                  height: "100%",
+                  width: "19%",
+                  //backgroundColor: "white",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                 }}
               >
                 <div
                   style={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
+                    height: "31%",
+                    width: "100%",
+                    backgroundColor: "#8c383e",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    boxShadow:
+                      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
                   }}
                 >
                   <div
                     style={{
-                      height: "30%",
-                      fontWeight: "500",
-                      color: "white",
-                      fontSize: "15px",
-                    }}
-                  >
-                    <h3>3rd Month Probationaries</h3>
-                  </div>
-
-                  <div
-                    style={{
-                      height: "60%",
-                      //backgroundColor: "lightsteelblue",
+                      height: "100%",
                       display: "flex",
+                      flexDirection: "column",
                       justifyContent: "space-between",
-                      alignItems: "center",
                     }}
                   >
-                    <p
+                    <div
                       style={{
-                        fontSize: "40px",
-                        fontWeight: "bolder",
+                        height: "30%",
+                        fontWeight: "500",
                         color: "white",
+                        fontSize: "15px",
                       }}
                     >
-                      {thirdMonthEmpCount}
-                    </p>
-                    <FontAwesomeIcon
-                      icon={faSeedling}
-                      style={{ fontSize: "25px", color: "white" }}
+                      <h3>3rd Month Probationaries</h3>
+                    </div>
+
+                    <div
+                      style={{
+                        height: "60%",
+                        //backgroundColor: "lightsteelblue",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: "40px",
+                          fontWeight: "bolder",
+                          color: "white",
+                        }}
+                      >
+                        {thirdMonthEmpCount}
+                      </p>
+                      <FontAwesomeIcon
+                        icon={faSeedling}
+                        style={{ fontSize: "25px", color: "white" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    height: "31%",
+                    width: "100%",
+                    backgroundColor: "#808080",
+                    //backgroundColor: "#FFEEAD",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    boxShadow:
+                      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "30%",
+                        fontWeight: "500",
+                        color: "white",
+                        fontSize: "15px",
+                      }}
+                    >
+                      <h3>5th Month Probationaries</h3>
+                    </div>
+
+                    <div
+                      style={{
+                        height: "60%",
+                        //backgroundColor: "lightsteelblue",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: "40px",
+                          fontWeight: "bolder",
+                          color: "white",
+                        }}
+                      >
+                        {fifthMonthEmpCount}
+                      </p>
+                      <FontAwesomeIcon
+                        icon={faHandshake}
+                        style={{ fontSize: "25px", color: "white" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    height: "31%",
+                    width: "100%",
+                    backgroundColor: "#F8C702",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    boxShadow:
+                      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      color: "#333333",
+                    }}
+                  >
+                    <div style={{ height: "30%", fontWeight: "500" }}>
+                      <h3>Regular Employees</h3>
+                    </div>
+
+                    <div
+                      style={{
+                        height: "60%",
+                        //backgroundColor: "lightsteelblue",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <p style={{ fontSize: "40px", fontWeight: "bolder" }}>
+                        {regEmpCount}
+                      </p>
+                      <FontAwesomeIcon
+                        icon={faUsers}
+                        style={{ fontSize: "25px" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/** Total Employee Graph */}
+              <div
+                style={{
+                  height: "100%",
+                  width: "44%",
+                  //backgroundColor: "lightgray",
+                }}
+              >
+                <div
+                  id="line-chart"
+                  style={{
+                    backgroundColor: "white",
+                    width: "100%",
+
+                    borderRadius: "10px",
+                    boxShadow:
+                      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  <h1
+                    style={{
+                      backgroundColor: "#F8C702",
+                      borderRadius: "10px 10px 0px 0px",
+                      padding: "5px 15px",
+                      fontWeight: "500",
+                      fontSize: "16px",
+                    }}
+                  >
+                    Total Regular Employees
+                  </h1>
+                  <div style={{ padding: "0px 10px 0pc 0pc" }}>
+                    <ReactApexChart
+                      options={lineChartData.options}
+                      series={lineChartData.series}
+                      type="line"
+                      height={280}
                     />
                   </div>
                 </div>
               </div>
+              {/** Employee Evaluation Pie Chart */}
               <div
                 style={{
-                  height: "31%",
-                  width: "100%",
-                  backgroundColor: "#808080",
-                  //backgroundColor: "#FFEEAD",
-                  borderRadius: "8px",
-                  padding: "12px",
+                  height: "100%",
+                  width: "34%",
+                  //backgroundColor: "lightcyan",
+                  //marginRight: "10px",
                   boxShadow:
                     "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
                 }}
               >
                 <div
+                  id="pie-chart"
                   style={{
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
+                    justifyContent: "space-evenly",
+                    borderRadius: "10px",
+                    backgroundColor: "white",
+                    padding: "15px",
                   }}
                 >
                   <div
                     style={{
-                      height: "30%",
-                      fontWeight: "500",
-                      color: "white",
-                      fontSize: "15px",
-                    }}
-                  >
-                    <h3>5th Month Probationaries</h3>
-                  </div>
-
-                  <div
-                    style={{
-                      height: "60%",
-                      //backgroundColor: "lightsteelblue",
+                      //backgroundColor: "yellow",
                       display: "flex",
+                      width: "99%",
+                      margin: "auto",
                       justifyContent: "space-between",
                       alignItems: "center",
+                      //padding: "5px",
                     }}
                   >
-                    <p
+                    <p style={{ fontSize: "13px" }}>
+                      Employee count: {empPieCount}
+                    </p>
+                    <select
+                      value={pieMonth}
+                      onChange={handlePieMonthChange}
                       style={{
-                        fontSize: "40px",
-                        fontWeight: "bolder",
-                        color: "white",
+                        border: "2px solid #636E72",
+                        borderRadius: "5px",
                       }}
                     >
-                      {fifthMonthEmpCount}
-                    </p>
-                    <FontAwesomeIcon
-                      icon={faHandshake}
-                      style={{ fontSize: "25px", color: "white" }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  height: "31%",
-                  width: "100%",
-                  backgroundColor: "#F8C702",
-                  borderRadius: "8px",
-                  padding: "12px",
-                  boxShadow:
-                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
-                }}
-              >
-                <div
-                  style={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    color: "#333333",
-                  }}
-                >
-                  <div style={{ height: "30%", fontWeight: "500" }}>
-                    <h3>Regular Employees</h3>
+                      <option value="3rd Month">3rd Month</option>
+                      <option value="5th Month">5th Month</option>
+                      {/* Add more months as needed */}
+                    </select>
                   </div>
 
-                  <div
-                    style={{
-                      height: "60%",
-                      //backgroundColor: "lightsteelblue",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <p style={{ fontSize: "40px", fontWeight: "bolder" }}>
-                      {regEmpCount}
-                    </p>
-                    <FontAwesomeIcon
-                      icon={faUsers}
-                      style={{ fontSize: "25px" }}
-                    />
-                  </div>
+                  {empPieCount === 0 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faUsersSlash}
+                        style={{ fontSize: "25px", color: "#808080" }}
+                      />
+                      <p
+                        style={{
+                          color: "#808080",
+                          fontSize: "14px",
+                          paddingTop: "15px",
+                        }}
+                      >
+                        No employees found
+                      </p>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                      }}
+                    >
+                      <ReactApexChart
+                        options={pieChartData.options}
+                        series={pieChartData.series}
+                        type="donut"
+                        height={300}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-            {/** Total Employee Graph */}
+
+            {/** 2nd part */}
             <div
               style={{
-                height: "100%",
-                width: "44%",
-                //backgroundColor: "lightgray",
+                //backgroundColor: "#7E60BF",
+                height: "55vh",
+                width: "99%",
+                display: "flex",
+                alignItems: "end",
               }}
             >
               <div
-                id="line-chart"
                 style={{
-                  backgroundColor: "white",
+                  height: "93%",
                   width: "100%",
-
+                  backgroundColor: "white",
                   borderRadius: "10px",
+                  paddingTop: "15px",
                   boxShadow:
                     "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
                 }}
               >
-                <h1
-                  style={{
-                    backgroundColor: "#F8C702",
-                    borderRadius: "10px 10px 0px 0px",
-                    padding: "5px 15px",
-                    fontWeight: "500",
-                    fontSize: "16px",
-                  }}
-                >
-                  Total Regular Employees
-                </h1>
-                <div style={{ padding: "0px 10px 0pc 0pc" }}>
+                <div id="chart">
                   <ReactApexChart
-                    options={lineChartData.options}
-                    series={lineChartData.series}
-                    type="line"
-                    height={280}
+                    options={columnChartData.options}
+                    series={columnChartData.series}
+                    type="bar"
+                    height={330}
                   />
                 </div>
               </div>
             </div>
-            {/** Employee Evaluation Pie Chart */}
+
+            {/** Third part */}
             <div
               style={{
-                height: "100%",
-                width: "34%",
-                //backgroundColor: "lightcyan",
-                //marginRight: "10px",
-                boxShadow:
-                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                //backgroundColor: "#E4B1F0",
+                height: "45vh",
+                width: "99%",
+                display: "flex",
+                alignItems: "end",
               }}
             >
               <div
-                id="pie-chart"
                 style={{
-                  height: "100%",
+                  height: "93%",
+                  width: "100%",
+                  //backgroundColor: "white",
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  padding: "15px",
+                  justifyContent: "space-between",
                 }}
               >
                 <div
                   style={{
-                    //backgroundColor: "yellow",
-                    display: "flex",
-                    width: "99%",
-                    margin: "auto",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    //padding: "5px",
+                    height: "100%",
+                    width: "49%",
+                    backgroundColor: "white",
+                    borderRadius: "10px",
+                    boxShadow:
+                      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
                   }}
                 >
-                  <p style={{ fontSize: "13px" }}>
-                    Employee count: {empPieCount}
-                  </p>
-                  <select
-                    value={pieMonth}
-                    onChange={handlePieMonthChange}
-                    style={{ border: "2px solid #636E72", borderRadius: "5px" }}
-                  >
-                    <option value="3rd Month">3rd Month</option>
-                    <option value="5th Month">5th Month</option>
-                    {/* Add more months as needed */}
-                  </select>
-                </div>
-
-                {empPieCount === 0 ? (
-                  <div
+                  <h2
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
+                      backgroundColor: "#8c383e",
+                      borderRadius: "10px 10px 0px 0px",
+                      padding: "5px 15px",
+                      fontWeight: "500",
+                      fontSize: "16px",
+                      height: "4.5vh",
+                      color: "white",
                     }}
                   >
-                    <FontAwesomeIcon
-                      icon={faUsersSlash}
-                      style={{ fontSize: "25px", color: "#808080" }}
-                    />
-                    <p
+                    3rd Month Probationary Employee for This Month
+                  </h2>
+                  <div
+                    style={{
+                      //backgroundColor: "lavender",
+                      height: "89.5%",
+                      width: "99%",
+                      borderRadius: "0px 0px 10px 10px",
+                      overflowX: "scroll",
+                    }}
+                  >
+                    {/** labels */}
+                    <div
                       style={{
-                        color: "#808080",
-                        fontSize: "14px",
-                        paddingTop: "15px",
+                        backgroundColor: "white",
+                        //padding: "5px 15px",
+                        height: "5vh",
+                        width: "95%",
+                        margin: "auto",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        color: "#636E72",
+                        //borderBottom: "1px solid #A9A9A9",
+                        fontSize: "13px",
+                        fontWeight: "500",
+                        marginTop: "5px",
+                        position: "sticky",
+                        top: 0,
                       }}
                     >
-                      No employees found
-                    </p>
+                      <p
+                        style={{
+                          //backgroundColor: "tomato",
+                          flex: 2,
+                          paddingLeft: "15px",
+                        }}
+                      >
+                        Employee Name
+                      </p>
+                      <p
+                        style={{
+                          //backgroundColor: "lightgreen",
+                          flex: 2,
+                          paddingLeft: "15px",
+                        }}
+                      >
+                        Department
+                      </p>
+                      <p
+                        style={{
+                          //backgroundColor: "lightcoral",
+                          flex: 2,
+                          paddingLeft: "15px",
+                        }}
+                      >
+                        Position
+                      </p>
+                    </div>
+                    {/** users data */}
+                    {thirdMonthEmp.length > 0 ? (
+                      thirdMonthEmp.map((user) => {
+                        return (
+                          <div
+                            style={{
+                              //backgroundColor: "#FFAD60",
+                              //padding: "5px 15px",
+                              fontWeight: "500",
+
+                              height: "5vh",
+                              width: "95%",
+                              margin: "auto",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              color: "#636E72",
+                              borderBottom: "1px solid #A9A9A9",
+                              fontSize: "12px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                //backgroundColor: "tomato",
+                                flex: 2,
+                                paddingLeft: "15px",
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                icon={faUser}
+                                style={{
+                                  fontSize: "13px",
+                                  marginRight: "10px",
+                                }}
+                              />
+                              {user.fName} {user.lName}
+                            </p>
+                            <p
+                              style={{
+                                //backgroundColor: "lightgreen",
+                                flex: 2,
+                                paddingLeft: "15px",
+                              }}
+                            >
+                              {abbreviateDept(user.dept)}
+                            </p>
+                            <p
+                              style={{
+                                //backgroundColor: "lightcoral",
+                                flex: 2,
+                                paddingLeft: "15px",
+                              }}
+                            >
+                              {user.position}
+                            </p>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div
+                        style={{
+                          //backgroundColor: "lightpink",
+                          height: "45%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "end",
+                        }}
+                      >
+                        <p style={{ fontSize: "13px", color: "#636E72" }}>
+                          There are no 3rd month probationary employees for this
+                          month.
+                        </p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div
+                </div>
+                <div
+                  style={{
+                    height: "100%",
+                    width: "49%",
+                    backgroundColor: "white",
+                    borderRadius: "10px",
+                    boxShadow:
+                      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  <h2
                     style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
+                      backgroundColor: "#808080",
+                      borderRadius: "10px 10px 0px 0px",
+                      padding: "5px 15px",
+                      fontWeight: "500",
+                      fontSize: "16px",
+                      height: "4.5vh",
+                      color: "white",
                     }}
                   >
-                    <ReactApexChart
-                      options={pieChartData.options}
-                      series={pieChartData.series}
-                      type="donut"
-                      height={300}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+                    5th Month Probationary Employee for This Month
+                  </h2>
+                  <div
+                    style={{
+                      //backgroundColor: "lavender",
+                      height: "89.5%",
+                      width: "99%",
+                      borderRadius: "0px 0px 10px 10px",
+                      overflowX: "scroll",
+                    }}
+                  >
+                    {/** labels */}
+                    <div
+                      style={{
+                        backgroundColor: "white",
+                        //padding: "5px 15px",
 
-          {/** 2nd part */}
-          <div
-            style={{
-              //backgroundColor: "#7E60BF",
-              height: "55vh",
-              width: "99%",
-              display: "flex",
-              alignItems: "end",
-            }}
-          >
-            <div
-              style={{
-                height: "93%",
-                width: "100%",
-                backgroundColor: "white",
-                borderRadius: "10px",
-                paddingTop: "15px",
-                boxShadow:
-                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
-              }}
-            >
-              <div id="chart">
-                <ReactApexChart
-                  options={columnChartData.options}
-                  series={columnChartData.series}
-                  type="bar"
-                  height={330}
+                        height: "5vh",
+                        width: "95%",
+                        margin: "auto",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        color: "#636E72",
+                        //borderBottom: "1px solid #A9A9A9",
+                        fontSize: "13px",
+                        fontWeight: "500",
+                        marginTop: "5px",
+                        position: "sticky",
+                        top: 0,
+                      }}
+                    >
+                      <p
+                        style={{
+                          //backgroundColor: "tomato",
+                          flex: 2,
+                          paddingLeft: "15px",
+                        }}
+                      >
+                        Employee Name
+                      </p>
+                      <p
+                        style={{
+                          //backgroundColor: "lightgreen",
+                          flex: 2,
+                          paddingLeft: "15px",
+                        }}
+                      >
+                        Department
+                      </p>
+                      <p
+                        style={{
+                          //backgroundColor: "lightcoral",
+                          flex: 2,
+                          paddingLeft: "15px",
+                        }}
+                      >
+                        Position
+                      </p>
+                    </div>
+                    {/** users data */}
+                    {fifthMonthEmp.length > 0 ? (
+                      fifthMonthEmp.map((user) => {
+                        return (
+                          <div
+                            style={{
+                              //backgroundColor: "#FFAD60",
+                              //padding: "5px 15px",
+                              fontWeight: "500",
+
+                              height: "5vh",
+                              width: "95%",
+                              margin: "auto",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              color: "#636E72",
+                              borderBottom: "1px solid #A9A9A9",
+                              fontSize: "12px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                //backgroundColor: "tomato",
+                                flex: 2,
+                                paddingLeft: "15px",
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                icon={faUser}
+                                style={{
+                                  fontSize: "13px",
+                                  marginRight: "10px",
+                                }}
+                              />
+                              {user.fName} {user.lName}
+                            </p>
+                            <p
+                              style={{
+                                //backgroundColor: "lightgreen",
+                                flex: 2,
+                                paddingLeft: "15px",
+                              }}
+                            >
+                              {abbreviateDept(user.dept)}
+                            </p>
+                            <p
+                              style={{
+                                //backgroundColor: "lightcoral",
+                                flex: 2,
+                                paddingLeft: "15px",
+                              }}
+                            >
+                              {user.position}
+                            </p>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div
+                        style={{
+                          //backgroundColor: "lightpink",
+                          height: "45%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "end",
+                        }}
+                      >
+                        <p style={{ fontSize: "13px", color: "#636E72" }}>
+                          There are no 5th month probationary employees for this
+                          month.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <SchoolYearModal
+                  openModal={openSYModal}
+                  handleCloseModal={handleCloseSYModal}
+                  isOpenView={isOpenView}
+                  handleOpenView={handleOpenView}
+                  handleCloseView={handleCloseView}
+                  openAddSY={openAddSY}
+                  setOpenAddSY={setOpenAddSY}
+                  handleOpenAddSY={handleOpenAddSY}
+                  handleCloseAddSY={handleCloseAddSY}
+                  openEditView={openEditView}
+                  handleOpenEditView={handleOpenEditView}
+                  handleCloseEditView={handleCloseEditView}
                 />
               </div>
             </div>
           </div>
-
-          {/** Third part */}
-          <div
-            style={{
-              //backgroundColor: "#E4B1F0",
-              height: "45vh",
-              width: "99%",
-              display: "flex",
-              alignItems: "end",
-            }}
-          >
-            <div
-              style={{
-                height: "93%",
-                width: "100%",
-                //backgroundColor: "white",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: "49%",
-                  backgroundColor: "white",
-                  borderRadius: "10px",
-                  boxShadow:
-                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
-                }}
-              >
-                <h2
-                  style={{
-                    backgroundColor: "#8c383e",
-                    borderRadius: "10px 10px 0px 0px",
-                    padding: "5px 15px",
-                    fontWeight: "500",
-                    fontSize: "16px",
-                    height: "4.5vh",
-                    color: "white",
-                  }}
-                >
-                  3rd Month Probationary Employee for This Month
-                </h2>
-                <div
-                  style={{
-                    //backgroundColor: "lavender",
-                    height: "89.5%",
-                    width: "99%",
-                    borderRadius: "0px 0px 10px 10px",
-                    overflowX: "scroll",
-                  }}
-                >
-                  {/** labels */}
-                  <div
-                    style={{
-                      backgroundColor: "white",
-                      //padding: "5px 15px",
-                      height: "5vh",
-                      width: "95%",
-                      margin: "auto",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      color: "#636E72",
-                      //borderBottom: "1px solid #A9A9A9",
-                      fontSize: "13px",
-                      fontWeight: "500",
-                      marginTop: "5px",
-                      position: "sticky",
-                      top: 0,
-                    }}
-                  >
-                    <p
-                      style={{
-                        //backgroundColor: "tomato",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Employee Name
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightgreen",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Department
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightcoral",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Position
-                    </p>
-                  </div>
-                  {/** users data */}
-                  {thirdMonthEmp.length > 0 ? (
-                    thirdMonthEmp.map((user) => {
-                      return (
-                        <div
-                          style={{
-                            //backgroundColor: "#FFAD60",
-                            //padding: "5px 15px",
-                            fontWeight: "500",
-
-                            height: "5vh",
-                            width: "95%",
-                            margin: "auto",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            color: "#636E72",
-                            borderBottom: "1px solid #A9A9A9",
-                            fontSize: "12px",
-                          }}
-                        >
-                          <p
-                            style={{
-                              //backgroundColor: "tomato",
-                              flex: 2,
-                              paddingLeft: "15px",
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              icon={faUser}
-                              style={{ fontSize: "13px", marginRight: "10px" }}
-                            />
-                            {user.fName} {user.lName}
-                          </p>
-                          <p
-                            style={{
-                              //backgroundColor: "lightgreen",
-                              flex: 2,
-                              paddingLeft: "15px",
-                            }}
-                          >
-                            {abbreviateDept(user.dept)}
-                          </p>
-                          <p
-                            style={{
-                              //backgroundColor: "lightcoral",
-                              flex: 2,
-                              paddingLeft: "15px",
-                            }}
-                          >
-                            {user.position}
-                          </p>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div
-                      style={{
-                        //backgroundColor: "lightpink",
-                        height: "45%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "end",
-                      }}
-                    >
-                      <p style={{ fontSize: "13px", color: "#636E72" }}>
-                        There are no 3rd month probationary employees for this
-                        month.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div
-                style={{
-                  height: "100%",
-                  width: "49%",
-                  backgroundColor: "white",
-                  borderRadius: "10px",
-                  boxShadow:
-                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
-                }}
-              >
-                <h2
-                  style={{
-                    backgroundColor: "#808080",
-                    borderRadius: "10px 10px 0px 0px",
-                    padding: "5px 15px",
-                    fontWeight: "500",
-                    fontSize: "16px",
-                    height: "4.5vh",
-                    color: "white",
-                  }}
-                >
-                  5th Month Probationary Employee for This Month
-                </h2>
-                <div
-                  style={{
-                    //backgroundColor: "lavender",
-                    height: "89.5%",
-                    width: "99%",
-                    borderRadius: "0px 0px 10px 10px",
-                    overflowX: "scroll",
-                  }}
-                >
-                  {/** labels */}
-                  <div
-                    style={{
-                      backgroundColor: "white",
-                      //padding: "5px 15px",
-
-                      height: "5vh",
-                      width: "95%",
-                      margin: "auto",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      color: "#636E72",
-                      //borderBottom: "1px solid #A9A9A9",
-                      fontSize: "13px",
-                      fontWeight: "500",
-                      marginTop: "5px",
-                      position: "sticky",
-                      top: 0,
-                    }}
-                  >
-                    <p
-                      style={{
-                        //backgroundColor: "tomato",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Employee Name
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightgreen",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Department
-                    </p>
-                    <p
-                      style={{
-                        //backgroundColor: "lightcoral",
-                        flex: 2,
-                        paddingLeft: "15px",
-                      }}
-                    >
-                      Position
-                    </p>
-                  </div>
-                  {/** users data */}
-                  {fifthMonthEmp.length > 0 ? (
-                    fifthMonthEmp.map((user) => {
-                      return (
-                        <div
-                          style={{
-                            //backgroundColor: "#FFAD60",
-                            //padding: "5px 15px",
-                            fontWeight: "500",
-
-                            height: "5vh",
-                            width: "95%",
-                            margin: "auto",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            color: "#636E72",
-                            borderBottom: "1px solid #A9A9A9",
-                            fontSize: "12px",
-                          }}
-                        >
-                          <p
-                            style={{
-                              //backgroundColor: "tomato",
-                              flex: 2,
-                              paddingLeft: "15px",
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              icon={faUser}
-                              style={{ fontSize: "13px", marginRight: "10px" }}
-                            />
-                            {user.fName} {user.lName}
-                          </p>
-                          <p
-                            style={{
-                              //backgroundColor: "lightgreen",
-                              flex: 2,
-                              paddingLeft: "15px",
-                            }}
-                          >
-                            {abbreviateDept(user.dept)}
-                          </p>
-                          <p
-                            style={{
-                              //backgroundColor: "lightcoral",
-                              flex: 2,
-                              paddingLeft: "15px",
-                            }}
-                          >
-                            {user.position}
-                          </p>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div
-                      style={{
-                        //backgroundColor: "lightpink",
-                        height: "45%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "end",
-                      }}
-                    >
-                      <p style={{ fontSize: "13px", color: "#636E72" }}>
-                        There are no 5th month probationary employees for this
-                        month.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <SchoolYearModal
-                openModal={openSYModal}
-                handleCloseModal={handleCloseSYModal}
-                isOpenView={isOpenView}
-                handleOpenView={handleOpenView}
-                handleCloseView={handleCloseView}
-                openAddSY={openAddSY}
-                setOpenAddSY={setOpenAddSY}
-                handleOpenAddSY={handleOpenAddSY}
-                handleCloseAddSY={handleCloseAddSY}
-                openEditView={openEditView}
-                handleOpenEditView={handleOpenEditView}
-                handleCloseEditView={handleCloseEditView}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </Animated>
   );
 }

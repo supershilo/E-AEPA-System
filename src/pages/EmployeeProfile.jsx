@@ -37,6 +37,7 @@ import SendResultsModal from "../modals/SendResultsModal";
 import Send5thResultsModal from "../modals/Send5thResultsModal";
 import SendAnnual1st from "../modals/SendAnnual1stModal";
 import SendAnnual2nd from "../modals/SendAnnual2ndModal";
+import Loader from "../components/Loader";
 
 const theme = createTheme({
   palette: {
@@ -65,6 +66,8 @@ function EmployeeProfile({ user, handleBack }) {
     padding: 0,
   };
 
+  const [loading, setLoading] = useState(true);
+
   const [selectedYearEvaluation, setSelectedYearEvaluation] = useState(" ");
   const [selectedTab, setSelectedTab] = useState(0);
   const [userData, setUserData] = useState([]);
@@ -92,6 +95,11 @@ function EmployeeProfile({ user, handleBack }) {
 
   //adi changes
   const [openModal, setOpenModal] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleOpenPeerModal = () => {
     setOpenModal(true);
@@ -747,414 +755,436 @@ function EmployeeProfile({ user, handleBack }) {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          ...containerStyle,
-          display: "flex",
-          justifyContent: "center",
-          minWidth: "95%",
-        }}
-      >
-        <Box
-          sx={{
-            p: 1,
-            borderRadius: "5px",
-            mb: 2,
-            backgroundColor: "white",
-            width: "98%",
+    <div>
+      {loading ? (
+        <div
+          style={{
+            height: "91vh",
+            //backgroundColor: "tomato",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <button
-            onClick={handleBack}
+          <Loader />
+        </div>
+      ) : (
+        <ThemeProvider theme={theme}>
+          <Container
             style={{
-              color: "#8C383E",
-              fontSize: "15px",
-              border: "none",
-              background: "none",
-              cursor: "pointer",
+              ...containerStyle,
               display: "flex",
-              alignItems: "center",
-              margin: "10px 0 5px 20px",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.textDecoration = "underline";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.textDecoration = "none";
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faArrowLeft}
-              style={{ marginRight: "5px" }}
-            />
-            Back
-          </button>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              margin: "10px 10px 10px 14px",
-              width: "97%",
-              backgroundColor: "white",
-              borderBottom: "2px solid #e0e0e0",
+              justifyContent: "center",
+              minWidth: "95%",
             }}
           >
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                margin: "10px 10px 10px 14px",
-                width: "97%",
+                p: 1,
+                borderRadius: "5px",
+                mb: 2,
                 backgroundColor: "white",
+                width: "98%",
               }}
             >
-              <Box sx={{ ml: 8, mb: 2 }}>
-                <Avatar
-                  alt="Employee"
-                  src={
-                    user.profilePic
-                      ? base64ToDataURL(user.profilePic)
-                      : "/user.png"
-                  }
-                  sx={{ width: "120px", height: "120px" }}
-                />
-              </Box>
-              <Box sx={{ ml: 8 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      fontSize="14px"
-                      color="#9D9D9D"
-                      mb={1}
-                    >
-                      Employee ID:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      mb={2}
-                      fontWeight={500}
-                      fontSize="16px"
-                    >
-                      {user.workID}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      fontSize="14px"
-                      color="#9D9D9D"
-                      mb={1}
-                    >
-                      Name:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      mb={2}
-                      fontWeight={500}
-                      fontSize="16px"
-                    >
-                      {user.fName} {user.lName}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      mb={1}
-                      fontSize="14px"
-                      color="#9D9D9D"
-                    >
-                      Position:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      mb={2}
-                      fontWeight={500}
-                      fontSize="16px"
-                    >
-                      {user.position}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      fontSize="14px"
-                      mb={1}
-                      color="#9D9D9D"
-                    >
-                      Department:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontFamily="Poppins"
-                      mb={2}
-                      fontWeight={500}
-                      fontSize="16px"
-                    >
-                      {user.dept}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              ml: 1.8,
-              mr: 2.5,
-              mt: 2,
-              justifyContent: "space-between",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                variant="body2"
-                fontFamily="Poppins"
-                color="#9D9D9D"
-                mr={1}
+              <button
+                onClick={handleBack}
+                style={{
+                  color: "#8C383E",
+                  fontSize: "15px",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "10px 0 5px 20px",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.textDecoration = "underline";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.textDecoration = "none";
+                }}
               >
-                Set Year Evaluation:
-              </Typography>
-              <FormControl sx={{ minWidth: 90 }} size="small">
-                <Select
-                  id="year-evaluation"
-                  value={selectedYearEvaluation}
-                  onChange={handleYearEvaluationChange}
-                  style={{
-                    fontSize: 13,
-                    fontFamily: "Poppins",
-                    color: "#1a1a1a",
+                <FontAwesomeIcon
+                  icon={faArrowLeft}
+                  style={{ marginRight: "5px" }}
+                />
+                Back
+              </button>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "10px 10px 10px 14px",
+                  width: "97%",
+                  backgroundColor: "white",
+                  borderBottom: "2px solid #e0e0e0",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "10px 10px 10px 14px",
+                    width: "97%",
+                    backgroundColor: "white",
                   }}
                 >
-                  <MenuItem value=" ">Select Year</MenuItem>
-                  {years.map((year) => (
-                    <MenuItem value={year} key={year}>
-                      {year}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-
-            {selectedYearEvaluation !== " " && (
-              <Button
-                variant="contained"
+                  <Box sx={{ ml: 8, mb: 2 }}>
+                    <Avatar
+                      alt="Employee"
+                      src={
+                        user.profilePic
+                          ? base64ToDataURL(user.profilePic)
+                          : "/user.png"
+                      }
+                      sx={{ width: "120px", height: "120px" }}
+                    />
+                  </Box>
+                  <Box sx={{ ml: 8 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          fontSize="14px"
+                          color="#9D9D9D"
+                          mb={1}
+                        >
+                          Employee ID:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          mb={2}
+                          fontWeight={500}
+                          fontSize="16px"
+                        >
+                          {user.workID}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          fontSize="14px"
+                          color="#9D9D9D"
+                          mb={1}
+                        >
+                          Name:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          mb={2}
+                          fontWeight={500}
+                          fontSize="16px"
+                        >
+                          {user.fName} {user.lName}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          mb={1}
+                          fontSize="14px"
+                          color="#9D9D9D"
+                        >
+                          Position:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          mb={2}
+                          fontWeight={500}
+                          fontSize="16px"
+                        >
+                          {user.position}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          fontSize="14px"
+                          mb={1}
+                          color="#9D9D9D"
+                        >
+                          Department:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontFamily="Poppins"
+                          mb={2}
+                          fontWeight={500}
+                          fontSize="16px"
+                        >
+                          {user.dept}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Box>
+              </Box>
+              <Box
                 sx={{
-                  height: "2.5em",
-                  width: "11em",
-                  fontFamily: "Poppins",
-                  backgroundColor: "#8c383e",
-                  padding: "1px 1px 0 0 ",
-                  "&:hover": { backgroundColor: "#762F34", color: "white" },
+                  display: "flex",
+                  alignItems: "center",
+                  ml: 1.8,
+                  mr: 2.5,
+                  mt: 2,
+                  justifyContent: "space-between",
                 }}
-                style={{ textTransform: "none" }}
-                startIcon={
-                  <FontAwesomeIcon
-                    icon={faUsers}
-                    style={{ fontSize: "15px" }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    variant="body2"
+                    fontFamily="Poppins"
+                    color="#9D9D9D"
+                    mr={1}
+                  >
+                    Set Year Evaluation:
+                  </Typography>
+                  <FormControl sx={{ minWidth: 90 }} size="small">
+                    <Select
+                      id="year-evaluation"
+                      value={selectedYearEvaluation}
+                      onChange={handleYearEvaluationChange}
+                      style={{
+                        fontSize: 13,
+                        fontFamily: "Poppins",
+                        color: "#1a1a1a",
+                      }}
+                    >
+                      <MenuItem value=" ">Select Year</MenuItem>
+                      {years.map((year) => (
+                        <MenuItem value={year} key={year}>
+                          {year}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                {selectedYearEvaluation !== " " && (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      height: "2.5em",
+                      width: "11em",
+                      fontFamily: "Poppins",
+                      backgroundColor: "#8c383e",
+                      padding: "1px 1px 0 0 ",
+                      "&:hover": { backgroundColor: "#762F34", color: "white" },
+                    }}
+                    style={{ textTransform: "none" }}
+                    startIcon={
+                      <FontAwesomeIcon
+                        icon={faUsers}
+                        style={{ fontSize: "15px" }}
+                      />
+                    }
+                    onClick={handleOpenPeerModal}
+                  >
+                    Manage Peer
+                  </Button>
+                )}
+              </Box>
+
+              {console.log("si selected", selectedYearEvaluation)}
+
+              {/* Display tabs and kung unsa year selected */}
+              {selectedYearEvaluation != " " && (
+                <Box sx={{ mt: 2, ml: 1.8, width: "97.1%" }}>
+                  <Tabs
+                    value={selectedTab}
+                    onChange={handleTabChange}
+                    indicatorColor="secondary"
+                    textColor="secondary"
+                  >
+                    {hasAnnualPeriod && (
+                      <Tab label="Annual-1st Sem" style={tabStyle} />
+                    )}
+
+                    {hasAnnualPeriod && (
+                      <Tab label="Annual-2nd Sem" style={tabStyle} />
+                    )}
+
+                    {!hasAnnualPeriod && (
+                      <Tab label="3rd Month" style={tabStyle} />
+                    )}
+                    {!hasAnnualPeriod && (
+                      <Tab label="5th Month" style={tabStyle} />
+                    )}
+                  </Tabs>
+                  {selectedEvaluationPeriod === "3rd Month" &&
+                    !hasAnnualPeriod && (
+                      <Animated>
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontSize: "20px",
+                              display: "flex",
+                              justifyContent: "center",
+                              padding: 1,
+                              color: "#1a1a1a",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            3RD MONTH EVALUATION
+                          </Typography>
+                          {renderEvaluationTable()}
+                          {show3rd && (
+                            <AdminViewResult
+                              userId={user.userID}
+                              open={show3rd}
+                              onClose={handleClose3rdResults}
+                              selectedYear={selectedYearEvaluation}
+                              selectedSemester={semester}
+                              employee={user}
+                              role={role}
+                            />
+                          )}
+                        </Box>
+                      </Animated>
+                    )}
+                  <SendResultsModal
+                    isOpen={is3rdModal}
+                    onCancel={handleCloseConfirm}
+                    onConfirm={handleConfirmSent}
+                    empUserId={user.userID}
                   />
-                }
-                onClick={handleOpenPeerModal}
-              >
-                Manage Peer
-              </Button>
-            )}
-          </Box>
-
-          {console.log("si selected", selectedYearEvaluation)}
-
-          {/* Display tabs and kung unsa year selected */}
-          {selectedYearEvaluation != " " && (
-            <Box sx={{ mt: 2, ml: 1.8, width: "97.1%" }}>
-              <Tabs
-                value={selectedTab}
-                onChange={handleTabChange}
-                indicatorColor="secondary"
-                textColor="secondary"
-              >
-                {hasAnnualPeriod && (
-                  <Tab label="Annual-1st Sem" style={tabStyle} />
-                )}
-
-                {hasAnnualPeriod && (
-                  <Tab label="Annual-2nd Sem" style={tabStyle} />
-                )}
-
-                {!hasAnnualPeriod && <Tab label="3rd Month" style={tabStyle} />}
-                {!hasAnnualPeriod && <Tab label="5th Month" style={tabStyle} />}
-              </Tabs>
-              {selectedEvaluationPeriod === "3rd Month" && !hasAnnualPeriod && (
-                <Animated>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "20px",
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: 1,
-                        color: "#1a1a1a",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      3RD MONTH EVALUATION
-                    </Typography>
-                    {renderEvaluationTable()}
-                    {show3rd && (
-                      <AdminViewResult
-                        userId={user.userID}
-                        open={show3rd}
-                        onClose={handleClose3rdResults}
-                        selectedYear={selectedYearEvaluation}
-                        selectedSemester={semester}
-                        employee={user}
-                        role={role}
-                      />
+                  {selectedEvaluationPeriod === "5th Month" &&
+                    !hasAnnualPeriod && (
+                      <Animated>
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontSize: "20px",
+                              display: "flex",
+                              justifyContent: "center",
+                              padding: 1,
+                              color: "#1a1a1a",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            5TH MONTH EVALUATION
+                          </Typography>
+                          {renderEvaluationTable()}
+                          {show5th && (
+                            <Admin5thViewResults
+                              userId={user.userID}
+                              open={show5th}
+                              onClose={handleClose5thViewResult}
+                              selectedYear={selectedYearEvaluation}
+                              selectedSemester={semester}
+                              employee={user}
+                              role={role}
+                            />
+                          )}
+                        </Box>
+                      </Animated>
                     )}
-                  </Box>
-                </Animated>
+                  <Send5thResultsModal
+                    isOpen={is5thModalOpen}
+                    onCancel={handle5thModalClose}
+                    onConfirm={handleConfirm5th}
+                    empUserId={user.userID}
+                  />
+                  {selectedEvaluationPeriod === "Annual-1st" && (
+                    <Animated>
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontSize: "20px",
+                            display: "flex",
+                            justifyContent: "center",
+                            padding: 1,
+                            color: "#1a1a1a",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          FIRST SEMESTER EVALUATION
+                        </Typography>
+                        {renderEvaluationTable()}
+                        {showAnnual1st && (
+                          <AdminAnnual1stResults
+                            userId={user.userID}
+                            open={showAnnual1st}
+                            onClose={handleCloseAnnual1st}
+                            employee={user}
+                            role={role}
+                            selectedYear={selectedYearEvaluation}
+                            selectedSemester={semester}
+                          />
+                        )}
+                      </Box>
+                    </Animated>
+                  )}
+                  <SendAnnual1st
+                    isOpen={annual1stModal}
+                    evalId={evalStatus[0]?.id}
+                    onCancel={handleAnnualModalClose}
+                    onConfirm={handleConfirmAnnual1st}
+                    empUserId={user.userID}
+                  />
+                  {selectedEvaluationPeriod === "Annual-2nd" && (
+                    <Animated>
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontSize: "20px",
+                            display: "flex",
+                            justifyContent: "center",
+                            padding: 1,
+                            color: "#1a1a1a",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          SECOND SEMESTER EVALUATION
+                        </Typography>
+                        {renderEvaluationTable()}
+                        {showAnnual2nd && (
+                          <AdminAnnual2ndResults
+                            userId={user.userID}
+                            open={showAnnual2nd}
+                            onClose={handleCloseAnnual2nd}
+                            selectedYear={selectedYearEvaluation}
+                            selectedSemester={semester}
+                            employee={user}
+                            role={role}
+                          />
+                        )}
+                      </Box>
+                    </Animated>
+                  )}
+                  <SendAnnual2nd
+                    isOpen={annual2ndModal}
+                    onCancel={handleAnnual2ndModalClose}
+                    onConfirm={handleConfirm5th}
+                    empUserId={user.userID}
+                  />
+                </Box>
               )}
-              <SendResultsModal
-                isOpen={is3rdModal}
-                onCancel={handleCloseConfirm}
-                onConfirm={handleConfirmSent}
-                empUserId={user.userID}
-              />
-              {selectedEvaluationPeriod === "5th Month" && !hasAnnualPeriod && (
-                <Animated>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "20px",
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: 1,
-                        color: "#1a1a1a",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      5TH MONTH EVALUATION
-                    </Typography>
-                    {renderEvaluationTable()}
-                    {show5th && (
-                      <Admin5thViewResults
-                        userId={user.userID}
-                        open={show5th}
-                        onClose={handleClose5thViewResult}
-                        selectedYear={selectedYearEvaluation}
-                        selectedSemester={semester}
-                        employee={user}
-                        role={role}
-                      />
-                    )}
-                  </Box>
-                </Animated>
-              )}
-              <Send5thResultsModal
-                isOpen={is5thModalOpen}
-                onCancel={handle5thModalClose}
-                onConfirm={handleConfirm5th}
-                empUserId={user.userID}
-              />
-              {selectedEvaluationPeriod === "Annual-1st" && (
-                <Animated>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "20px",
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: 1,
-                        color: "#1a1a1a",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      FIRST SEMESTER EVALUATION
-                    </Typography>
-                    {renderEvaluationTable()}
-                    {showAnnual1st && (
-                      <AdminAnnual1stResults
-                        userId={user.userID}
-                        open={showAnnual1st}
-                        onClose={handleCloseAnnual1st}
-                        employee={user}
-                        role={role}
-                        selectedYear={selectedYearEvaluation}
-                        selectedSemester={semester}
-                      />
-                    )}
-                  </Box>
-                </Animated>
-              )}
-              <SendAnnual1st
-                isOpen={annual1stModal}
-                evalId={evalStatus[0]?.id}
-                onCancel={handleAnnualModalClose}
-                onConfirm={handleConfirmAnnual1st}
-                empUserId={user.userID}
-              />
-              {selectedEvaluationPeriod === "Annual-2nd" && (
-                <Animated>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "20px",
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: 1,
-                        color: "#1a1a1a",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      SECOND SEMESTER EVALUATION
-                    </Typography>
-                    {renderEvaluationTable()}
-                    {showAnnual2nd && (
-                      <AdminAnnual2ndResults
-                        userId={user.userID}
-                        open={showAnnual2nd}
-                        onClose={handleCloseAnnual2nd}
-                        selectedYear={selectedYearEvaluation}
-                        selectedSemester={semester}
-                        employee={user}
-                        role={role}
-                      />
-                    )}
-                  </Box>
-                </Animated>
-              )}
-              <SendAnnual2nd
-                isOpen={annual2ndModal}
-                onCancel={handleAnnual2ndModalClose}
-                onConfirm={handleConfirm5th}
-                empUserId={user.userID}
-              />
             </Box>
-          )}
-        </Box>
-      </Container>
-      <ManagePeerModal
-        openModal={openModal}
-        userId={user.userID}
-        selectedEvaluationPeriod={selectedEvaluationPeriod}
-        year={years}
-        handleCloseModal={handleClosPeerModal}
-      />
-    </ThemeProvider>
+          </Container>
+          <ManagePeerModal
+            openModal={openModal}
+            userId={user.userID}
+            selectedEvaluationPeriod={selectedEvaluationPeriod}
+            year={years}
+            handleCloseModal={handleClosPeerModal}
+          />
+        </ThemeProvider>
+      )}
+    </div>
   );
 }
 
