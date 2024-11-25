@@ -1501,6 +1501,10 @@ function TakeEvaluationPage() {
               handleConfirm={handleConfirm}
               activeCard={activeCard}
               setActiveCard={setActiveCard}
+              handleTakeEvalChange={handleTakeEvalChange}
+              takeEval={takeEval}
+              setTakeEval={setTakeEval}
+                
               style={{ zIndex: 1 }}
             />
           )}
