@@ -27,7 +27,6 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import Animated from "../components/motion";
 import { apiUrl } from "../config/config";
 import { useParams } from "react-router-dom";
-import defaultProfile from "../assets/default-profile.png";
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
     <Snackbar
@@ -333,7 +332,7 @@ function ViewProfilePage() {
                     ) : (
                       <Avatar
                         alt="User"
-                        src={defaultProfile}
+                        src="/assets/default-profile.png"
                         sx={{
                           width: 110,
                           height: 110,
@@ -1452,7 +1451,7 @@ function ViewProfilePage() {
                 ) : (
                   <Avatar
                     alt="User"
-                    src={defaultProfile}
+                    src="/assets/default-profile.png"
                     sx={{
                       width: "15em",
                       height: "15em",
