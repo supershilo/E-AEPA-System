@@ -259,24 +259,30 @@ public class UserController {
 
     @GetMapping("/get3rdMonthProbeEmp")
     public ResponseEntity<List<ThirdAndFifthProbeDTO>> get3rdMonthProbeEmp(){
+        System.out.println("Fetching 3rd-month probationary employees...");
         List<ThirdAndFifthProbeDTO> userList = userServ.getAll3rdMonthProbeEmp("3rd Probationary");
-
-        if (userList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(userList);
-        }
+        System.out.println("User list size: " + userList.size());
+//
+//        if (userList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(userList);
+//        }
+        return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/get5thMonthProbeEmp")
     public ResponseEntity<List<ThirdAndFifthProbeDTO>> get5thMonthProbeEmp(){
-        List<ThirdAndFifthProbeDTO> userList = userServ.getAll3rdMonthProbeEmp("5th Probationary");
+        System.out.println("Fetching 5th-month probationary employees...");
+        List<ThirdAndFifthProbeDTO> userList = userServ.getAll5thMonthProbeEmp("5th Probationary");
+        System.out.println("User list size: " + userList.size());
 
-        if (userList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(userList);
-        }
+//        if (userList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(userList);
+//        }
+        return ResponseEntity.ok(userList);
     }
 
     //return user counts by dept

@@ -549,7 +549,7 @@ function UserHome() {
                         }}
                       >
                         <h1>
-                        {staff.fName} {staff.lName}
+                          {staff.fName} {staff.lName}
                         </h1>
                         <p>{staff.position}</p>
                       </div>
@@ -607,14 +607,19 @@ function UserHome() {
                         }}
                       >
                         <h1>
-                        <Link to={`/viewProfile/${staff.userID}`}
-                          style={{
-                            textDecoration: 'none',
-                          }}
-                          onMouseEnter={(e) => { e.target.style.textDecoration = "underline"; }}
-                          onMouseLeave={(e) => { e.target.style.textDecoration = "none"; }}
-                        >
-                          {staff.fName} {staff.lName}
+                          <Link
+                            to={`/viewProfile/${staff.userID}`}
+                            style={{
+                              textDecoration: "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.textDecoration = "underline";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.textDecoration = "none";
+                            }}
+                          >
+                            {staff.fName} {staff.lName}
                           </Link>
                         </h1>
                         <p>{staff.position}</p>

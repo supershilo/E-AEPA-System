@@ -13,7 +13,7 @@ function TakeEvaluationPage() {
   const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(false);
-  const [evalType, setEvalType] = useState("");
+  const [evalType, setEvalType] = useState("SELF");
   const [stage, setStage] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedStage, setSelectedStage] = useState("");
@@ -38,6 +38,14 @@ function TakeEvaluationPage() {
 
   const handleRenderFlag = () => {
     setRenderFlag((prevFlag) => !prevFlag);
+  };
+
+  const [takeEval, setTakeEval] = useState(false);
+
+  //tale eval change
+  const handleTakeEvalChange = (id) => {
+    setTakeEval(!takeEval);
+    setActiveCard(id);
   };
 
   //evaluation completed checker for 3rd month
@@ -147,24 +155,12 @@ function TakeEvaluationPage() {
           }
         );
 
-        const response3 = await axios.get(
-          `${apiUrl}evaluation/isEvaluationCompleted`,
-          {
-            params: {
-              userID: userID,
-              period: "3rd Month",
-              stage: "VALUES",
-              evalType: "PEER",
-            },
-          }
-        );
-
         console.log("user id to be submitted:" + userID);
         console.log("period to be submitted:" + period);
 
         setResponse1(response1.data);
         setResponse2(response2.data);
-        setResponse3(response3.data);
+        //setResponse3(response3.data);
       } catch (error) {
         console.error("Error submitting responses:", error);
       }
@@ -174,10 +170,10 @@ function TakeEvaluationPage() {
   }, [renderFlag, shouldDisplay]);
 
   useEffect(() => {
-    if (response1 && response2 && response3) {
+    if (response1 && response2) {
       setShouldDisplay(false);
     }
-  }, [renderFlag, response1, response2, response3, shouldDisplay]);
+  }, [renderFlag, response1, response2, shouldDisplay]);
 
   //fetch is evaluation completed for 5th Month
   useEffect(() => {
@@ -207,24 +203,12 @@ function TakeEvaluationPage() {
           }
         );
 
-        const response3For5th = await axios.get(
-          `${apiUrl}evaluation/isEvaluationCompleted`,
-          {
-            params: {
-              userID: userID,
-              period: "5th Month",
-              stage: "VALUES",
-              evalType: "PEER",
-            },
-          }
-        );
-
         console.log("user id to be submitted:" + userID);
         console.log("period to be submitted:" + period);
 
         setResponse1For5th(response1For5th.data);
         setResponse2For5th(response2For5th.data);
-        setResponse3For5th(response3For5th.data);
+        //setResponse3For5th(response3For5th.data);
       } catch (error) {
         console.error("Error submitting responses:", error);
       }
@@ -234,16 +218,10 @@ function TakeEvaluationPage() {
   }, [renderFlag, shouldDisplay5th]);
 
   useEffect(() => {
-    if (response1For5th && response2For5th && response3For5th) {
+    if (response1For5th && response2For5th) {
       setShouldDisplay5th(false);
     }
-  }, [
-    renderFlag,
-    response1For5th,
-    response2For5th,
-    response3For5th,
-    shouldDisplay5th,
-  ]);
+  }, [renderFlag, response1For5th, response2For5th, shouldDisplay5th]);
 
   //3rd
   const evaluationStartDate = new Date(dateHired);
@@ -1195,7 +1173,7 @@ function TakeEvaluationPage() {
       },
       stage: selectedStage,
       period: period,
-      evalType: evalType,
+      evalType: "SELF",
       status: "OPEN",
       dateTaken: currentDate,
       schoolYear: schoolYear,
@@ -1236,7 +1214,7 @@ function TakeEvaluationPage() {
       },
       stage: selectedStage,
       period: period,
-      evalType: evalType,
+      evalType: "PEER-A",
       status: "OPEN",
       schoolYear: schoolYear,
       semester: semester,
@@ -1428,6 +1406,7 @@ function TakeEvaluationPage() {
             annualFirstSemId={annualFirstSemStatus?.id}
             annualSecondSemId={annualSecondSemStatus?.id}
             handleRenderFlag={handleRenderFlag}
+            setTakeEval={setTakeEval}
           />
         )
       ) : (
@@ -1451,14 +1430,19 @@ function TakeEvaluationPage() {
                 handleCloseModal={handleCloseModal}
                 handleConfirm={handleConfirm}
                 activeCard={activeCard}
+                shouldDisplay5th
                 setActiveCard={setActiveCard}
+                handleTakeEvalChange={handleTakeEvalChange}
+                takeEval={takeEval}
+                setTakeEval={setTakeEval}
                 style={{ zIndex: 1 }}
               />
             )}
 
           {today >= evaluationStartDate5th &&
             loggedUser.empStatus !== "Regular" &&
-            loggedUser.probeStatus !== "3rd Probationary" && (
+            loggedUser.probeStatus !== "3rd Probationary" &&
+            shouldDisplay5th && (
               <EvaluationCard
                 id={"5thMonth"}
                 period={"5th Month"}
@@ -1475,6 +1459,9 @@ function TakeEvaluationPage() {
                 handleConfirm={handleConfirm}
                 activeCard={activeCard}
                 setActiveCard={setActiveCard}
+                handleTakeEvalChange={handleTakeEvalChange}
+                takeEval={takeEval}
+                setTakeEval={setTakeEval}
                 style={{ zIndex: 1 }}
               />
             )}
@@ -1514,6 +1501,10 @@ function TakeEvaluationPage() {
               handleConfirm={handleConfirm}
               activeCard={activeCard}
               setActiveCard={setActiveCard}
+              handleTakeEvalChange={handleTakeEvalChange}
+              takeEval={takeEval}
+              setTakeEval={setTakeEval}
+                
               style={{ zIndex: 1 }}
             />
           )}

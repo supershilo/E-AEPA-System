@@ -7,11 +7,13 @@ import com.capstone.eapa.DTO.EvaluationStatusDTO;
 import com.capstone.eapa.DTO.PeerEvaluationDTO;
 import com.capstone.eapa.Entity.AssignedPeerEvaluators;
 import com.capstone.eapa.Entity.AssignedPeersEntity;
+import com.capstone.eapa.Entity.EvalStatusTrackerEntity;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Entity.ResponseEntity;
 import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Repository.AssignedPeerEvaluatorsRepository;
+import com.capstone.eapa.Repository.EvalStatusTrackerRepository;
 import com.capstone.eapa.Repository.EvaluationRepository;
 import com.capstone.eapa.Repository.ResponseRepository;
 import com.capstone.eapa.Repository.UserRepository;
@@ -51,6 +53,9 @@ public class EvaluationService {
 
     @Autowired
     AssignedPeersService apeServ;
+
+    @Autowired
+    EvalStatusTrackerRepository evalStatusRepo;
 
     // create evaluation
     public EvaluationEntity createEvaluation(EvaluationEntity evaluation) {
@@ -177,6 +182,8 @@ public class EvaluationService {
         return "COMPLETED".equals(status);
     }
 
+
+
     // returns true if evaluation is done (HEAD)
     public boolean isEvaluationCompletedHead(int userID, int empID, String period, String stage, String evalType) {
         String status = evalRepo.findStatusByUserIDEmpIDPeriodStageAndEvalType(userID, empID, period, stage, evalType);
@@ -249,7 +256,7 @@ public class EvaluationService {
 
                     // Set overall status from AssignedPeerEvaluators
                     String overallStatus = overallStatuses.get(userId); 
-                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "PENDING");
+                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "N/A");
 
                     headEvalStatuses.stream()
                             .filter(headDto -> headDto.getUserId() == userId)
@@ -279,7 +286,15 @@ public class EvaluationService {
                                 break;
                         }
                     }
-                    return dto;
+                    // Query EvalStatusTrackerEntity for the acadYearId, semester, and isSentResult
+                List<EvalStatusTrackerEntity> evalTrackers = evalStatusRepo.findByUser_UserID(userId);
+                if (!evalTrackers.isEmpty()) {
+                    EvalStatusTrackerEntity latestTracker = evalTrackers.get(0); // Assuming you want the latest tracker
+                    // dto.setSchoolYear(latestTracker.getAcademicYear().getId());
+                    dto.setSemester(latestTracker.getSemester().getId());
+                    dto.setSentResult(latestTracker.isSentResult());
+                }
+                return dto;
                 })
                 .collect(Collectors.toList());
     }

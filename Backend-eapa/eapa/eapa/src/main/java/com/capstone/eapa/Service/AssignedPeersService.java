@@ -1,5 +1,6 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.DTO.AsssignedEvaluatorStatusDTO;
 import com.capstone.eapa.DTO.EvaluatorAssignmentDTO;
 import com.capstone.eapa.Entity.AssignedPeerEvaluators;
 import com.capstone.eapa.Entity.AssignedPeersEntity;
@@ -178,6 +179,37 @@ public class AssignedPeersService {
         Integer id = apRepo.findIdByPeriodAndEvaluateeIdAndSchoolYearAndSemester(period, evaluateeId, schoolYear, semester);
         return id != null;
     }
+
+    //get statuses for evaluators
+//    public List<EvaluatorAssignmentDTO> getEvaluateeAssignmentsByEvaluators(List<Integer> evaluatorIds) {
+//        List<AssignedPeersEntity> assignedPeersList = apRepo.findAll();
+//        List<EvaluatorAssignmentDTO> evaluatorAssignments = new ArrayList<>();
+//
+//        for (AssignedPeersEntity assignedPeers : assignedPeersList) {
+//            for (AssignedPeerEvaluators evaluator : assignedPeers.getEvaluators()) {
+//                if (evaluatorIds.contains(evaluator.getEvaluator().getUserID()) ) {
+//                    EvaluatorAssignmentDTO dto = new EvaluatorAssignmentDTO(
+//                            assignedPeers.getId(),
+//                            assignedPeers.getDateAssigned(),
+//                            assignedPeers.getPeriod(),
+//                            assignedPeers.getEvaluatee().getUserID(),
+//                            evaluator.getEvaluator().getUserID(),
+//                            evaluator.getStatus()
+//                    );
+//                    evaluatorAssignments.add(dto);
+//                }
+//            }
+//        }
+//
+//        return evaluatorAssignments;
+//    }
+    public List<AsssignedEvaluatorStatusDTO> getEvaluatorIdsAndStatusesByAssignedPeersId(int assignedPeersId) {
+        List<AssignedPeerEvaluators> evaluators = apeRepo.findByAssignedPeersId(assignedPeersId);
+        return evaluators.stream()
+                .map(e -> new AsssignedEvaluatorStatusDTO(e.getEvaluator().getUserID(), e.getStatus()))
+                .collect(Collectors.toList());
+    }
+
 
 
 }

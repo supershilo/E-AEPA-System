@@ -1,9 +1,6 @@
 package com.capstone.eapa.Controller;
 
-import com.capstone.eapa.DTO.AssignedPeersDTO;
-import com.capstone.eapa.DTO.EvaluatorAssignmentDTO;
-import com.capstone.eapa.DTO.EvaluatorDTO;
-import com.capstone.eapa.DTO.UserDTO;
+import com.capstone.eapa.DTO.*;
 import com.capstone.eapa.Entity.AssignedPeerEvaluators;
 import com.capstone.eapa.Entity.AssignedPeersEntity;
 import com.capstone.eapa.Entity.UserEntity;
@@ -131,5 +128,14 @@ public class AssignedPeersController {
         }
     }
 
+    //get statuses for evaluators
+//    @GetMapping("/checkEvaluatorsStats")
+//    public List<EvaluatorAssignmentDTO> checkEvaluatorsStats(@RequestParam List<Integer> evaluatorIds) {
+//        return apServ.getEvaluateeAssignmentsByEvaluators(evaluatorIds);
+//    }
+    @GetMapping("/getEvaluatorIdsAndStatuses")
+    public List<AsssignedEvaluatorStatusDTO> getEvaluatorIdsAndStatuses(@RequestParam int assignedPeersId) {
+        return apServ.getEvaluatorIdsAndStatusesByAssignedPeersId(assignedPeersId);
+    }
 
 }

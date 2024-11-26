@@ -15,7 +15,8 @@ import java.util.List;
 
 @Repository
 public interface EvalStatusTrackerRepository extends JpaRepository<EvalStatusTrackerEntity, Integer> {
-    // Check if an entry exists for a specific user, academic year, and semester
+        List<EvalStatusTrackerEntity> findByUser_UserID(int userId);
+        // Check if an entry exists for a specific user, academic year, and semester
     boolean existsByUserAndSemesterAndAcademicYear(UserEntity user, SemesterEntity semester, AcademicYearEntity academicYear);
 
     // Native query to find duplicates

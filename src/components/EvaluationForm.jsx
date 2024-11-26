@@ -26,6 +26,7 @@ function EvaluationForm({
   handleRenderFlag,
   annualFirstSemId,
   annualSecondSemId,
+  setTakeEval,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
@@ -753,7 +754,8 @@ function EvaluationForm({
         localStorage.removeItem("jobResponses");
         setResponses([]);
         setOpenForm(false);
-        setEvalType("");
+        setTakeEval(true);
+        //setEvalType("");
         setEvaluationID(0);
         handleRenderFlag();
       } else {

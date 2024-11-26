@@ -37,7 +37,7 @@ const AnnualFirstSemComments = ({ headId, userId, filter, schoolYear }) => {
       const response = await axios.get(`${apiUrl}headcomments/filteredcomments`, {
         params: {
           userID: userId,       
-          period: "Annual-2nd",  
+          period: "Annual-1st",  
           schoolYear: schoolYear, 
           semester: "First Semester"     
         },
@@ -100,7 +100,7 @@ const handleSaveComment = async () => {
         userID: { userID: userId }, 
         headID: { userID: headId }, 
         comment: commentsData[editingCommentID], 
-        period: "Annual-2nd",
+        period: "Annual-1st",
         schoolYear: schoolYear, 
         semester: "First Semester",
       };
@@ -161,7 +161,7 @@ const handleSaveComment = async () => {
             response.question?.quesID
           );
           const isSelfEvaluation = response.evaluation?.evalType === "SELF";
-          const isCorrectPeriod = response.evaluation?.period === "Annual-2nd";
+          const isCorrectPeriod = response.evaluation?.period === "Annual-1st";
           const isCorrectSchoolYear = response.evaluation?.schoolYear === schoolYear;
           return isCorrectUser && isCorrectQuestion && isSelfEvaluation && isCorrectPeriod && isCorrectSchoolYear;
         });
@@ -250,7 +250,7 @@ const handleSaveComment = async () => {
           `${apiUrl}assignedPeers/getAssignedPeersId`,
           {
             params: {
-              period: "Annual-2nd",
+              period: "Annual-1st",
               evaluateeId: userId,
             },
           }
@@ -286,7 +286,7 @@ const handleSaveComment = async () => {
                   res.question?.quesID
                 );
                 const isPeerEvaluation = res.evaluation?.evalType === "PEER-A";
-                const isCorrectPeriod = res.evaluation?.period === "Annual-2nd";
+                const isCorrectPeriod = res.evaluation?.period === "Annual-1st";
                 const isCorrectSchoolYear = res.evaluation?.schoolYear === schoolYear;
 
                 return (
